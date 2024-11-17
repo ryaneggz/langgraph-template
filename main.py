@@ -1,6 +1,6 @@
 
 from src.utils.stream import stream_graph_tokens
-from src.flows.should_run_end import graph
+from src.flows.terminal_interact import graph
 
 # Chat loop
 while True:

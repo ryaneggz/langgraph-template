@@ -43,5 +43,5 @@ def error_node(state: State):
 def should_run(state: State):
     return "call_model" if 'please' in state["messages"][-1].content.lower() else END
 
-# def should_run(state: State):
-#     return "call_model" if 'please' in state["messages"][-1].content.lower() else 'error'
+def should_run(state: State):
+    return "call_model" if 'please' in state["messages"][-1].content.lower() else 'error'
