@@ -13,8 +13,8 @@ class StreamInput(BaseModel):
 
 def stream_graph_updates(graph: StateGraph, input: StreamInput):
     for event in graph.stream(input, input['configurable'], stream_mode='values'):
-        if event.get('call_model'):
-            print("Bot: " + event['call_model']['messages'][-1].content)
+        if event.get('call_chat_model'):
+            print("Bot: " + event['call_chat_model']['messages'][-1].content)
         elif event.get('error'):
             print("Error: " + event['error']['messages'][-1].content)
         elif event.get('messages'):

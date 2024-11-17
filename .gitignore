@@ -1,4 +1,4 @@
 .env*
 .venv
-./sandbox/graphs/*
+sandbox/graphs/*
 **/__pycache__/
