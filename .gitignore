@@ -2,3 +2,5 @@
 .venv
 sandbox/graphs/*
 **/__pycache__/
+sandbox/docs
+sandbox/contexts/clsk
