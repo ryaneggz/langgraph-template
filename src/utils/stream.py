@@ -34,3 +34,17 @@ def stream_graph_tokens(
     ):
         if msg.content and not isinstance(msg, HumanMessage):
             print(msg.content, end="", flush=True)
+            
+            
+def stream_graph_values(
+    graph: StateGraph, 
+    input: str, 
+    config,
+    stream_mode: str = "values"
+):
+    for chunk in graph.stream(
+        input, 
+        {"configurable": config},
+        stream_mode=stream_mode
+    ):
+        chunk["messages"][-1].pretty_print()

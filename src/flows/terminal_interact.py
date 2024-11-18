@@ -1,19 +1,56 @@
-from langgraph.graph import StateGraph, END, START
+import os
+from typing import Annotated, TypedDict
 
+from langgraph.graph import StateGraph, add_messages, START, END
+from langgraph.checkpoint.memory import MemorySaver
+from langchain_core.messages import AnyMessage
+
+from src.utils.llm import LLMWrapper, ModelName
+from src.utils.tools import tool_node
 from src.utils.visualize import visualize_graph
-from src.utils.state import State
-from src.utils.nodes import call_chat_model
 
-builder = StateGraph(State)
+class State(TypedDict):
+    messages: Annotated[list[AnyMessage], add_messages]
+    tools: list
+    thread_id: int
 
-# Nodes
-builder.add_node("call_chat_model", call_chat_model)
 
-# Add conditional edge
-# builder.add_conditional_edges(START, call_chat_model)
-builder.add_edge(START, 'call_chat_model')
-# Connect nodes to the end
-builder.add_edge("call_chat_model", END)
-graph = builder.compile()
-# graph.debug = True
+def should_continue(state: State):
+    messages = state["messages"]
+    last_message = messages[-1]
+    if last_message.tool_calls:
+        return "actions"
+    return END
+
+
+def call_model(state: State):
+    messages = state["messages"]
+    # Get tools from state that match available tool names
+    selected_tools = []
+    if "tools" in state:
+        from src.utils.tools import tools
+        selected_tools = [tool for tool in tools if tool.name in state["tools"]]
+    
+    llm = LLMWrapper(
+        model_name=ModelName.ANTHROPIC,
+        api_key=os.getenv("ANTHROPIC_API_KEY"), 
+        tools=selected_tools
+    )
+    response = llm.invoke(messages)
+    return {"messages": [response]}
+
+
+workflow = StateGraph(State)
+
+# Define the two nodes we will cycle between
+workflow.add_node("agent", call_model)
+workflow.add_node("actions", tool_node)
+
+workflow.add_edge(START, "agent")
+workflow.add_conditional_edges("agent", should_continue, ["actions", END])
+workflow.add_edge("actions", "agent")
+
+checkpointer = MemorySaver()
+
+graph = workflow.compile(checkpointer=checkpointer)
 visualize_graph(graph, "terminal_interact")

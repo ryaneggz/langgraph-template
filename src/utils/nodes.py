@@ -5,9 +5,9 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import MessagesState
 
 from src.utils.state import State, StateManager
-from src.utils.llm import LLMWrapper
+from src.utils.llm import LLMWrapper, ModelName
 
-llm = LLMWrapper(model_name="openai-gpt-4o", api_key=os.getenv("OPENAI_API_KEY"))
+llm = LLMWrapper(model_name=ModelName.ANTHROPIC, api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 local_store = {}
 

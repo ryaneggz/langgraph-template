@@ -1,0 +1,6 @@
+version: "3"
+services:
+  ubuntu24:
+    image: ubuntu:24.04
+    container_name: ubuntu24
+    command: tail -f /dev/null
