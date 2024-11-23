@@ -24,13 +24,16 @@ while True:
         stream_graph_values(
             graph,
             {
+                "system": read_system_message(SystemPaths.COT_MCTS.value), 
                 "messages": [
-                    ('system', read_system_message(SystemPaths.COT_MCTS.value)), 
                     ('human', user_input)
                 ], 
                 "tools": [
-                    "docker_shell_tool",
+                    # "docker_shell_tool",
                     # "shell_tool"
+                    "vector_store_query_tool",
+                    "vector_store_add_docs_tool",
+                    "vector_store_load_tool"
                 ]
             },
             {"thread_id": 42}

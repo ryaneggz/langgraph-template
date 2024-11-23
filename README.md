@@ -71,3 +71,4 @@ This project includes tools for running shell commands and Docker container oper
 
 - [Tools Documentation](./docs/tools.md)
 - [Docker Compose Configuration](./docs/docker-compose.md)
+- [Human-In-The-Loop](https://langchain-ai.github.io/langgraph/how-tos/create-react-agent-hitl/#usage)

@@ -3,13 +3,14 @@ from typing import Annotated, TypedDict
 
 from langgraph.graph import StateGraph, add_messages, START, END
 from langgraph.checkpoint.memory import MemorySaver
-from langchain_core.messages import AnyMessage
+from langchain_core.messages import AnyMessage, SystemMessage
 
 from src.utils.llm import LLMWrapper, ModelName
 from src.utils.tools import tool_node
 from src.utils.visualize import visualize_graph
 
 class State(TypedDict):
+    system: str
     messages: Annotated[list[AnyMessage], add_messages]
     tools: list
     thread_id: int
@@ -36,6 +37,8 @@ def call_model(state: State):
         api_key=os.getenv("ANTHROPIC_API_KEY"), 
         tools=selected_tools
     )
+    if not isinstance(messages[0], SystemMessage):
+        messages.insert(0, SystemMessage(content=state.get("system", "You are a helpful assistant.")))
     response = llm.invoke(messages)
     return {"messages": [response]}
 
@@ -50,6 +53,7 @@ workflow.add_edge(START, "agent")
 workflow.add_conditional_edges("agent", should_continue, ["actions", END])
 workflow.add_edge("actions", "agent")
 
+# https://pypi.org/project/langgraph-checkpoint-postgres/
 checkpointer = MemorySaver()
 
 graph = workflow.compile(checkpointer=checkpointer)
