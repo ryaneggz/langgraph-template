@@ -2,12 +2,13 @@
 
 LangGraph Bot is a Python-based chatbot application that utilizes the LangGraph and LangChain libraries to process and respond to user inputs. The bot is designed to handle conversational flows and can be configured to use different language models.
 
-## Features
+# Project Documentation
 
-- Stream processing of user inputs and bot responses.
-- Visualization of state graphs using Mermaid.
-- Configurable session management for chat history.
-- Integration with OpenAI's GPT-4o, or Claude 3.5 Sonnet model.
+This project includes tools for running shell commands and Docker container operations. For detailed information, please refer to the following documentation:
+
+- [Tools Documentation](./docs/tools.md)
+- [Docker Compose Configuration](./docs/docker-compose.md)
+- [Human-In-The-Loop](https://langchain-ai.github.io/langgraph/how-tos/create-react-agent-hitl/#usage)
 
 ## Prerequisites
 
@@ -23,7 +24,7 @@ LangGraph Bot is a Python-based chatbot application that utilizes the LangGraph 
    cd langgraph-template
    ```
 
-2. **Set up a virtual environment using `uv venv`:**
+2. **Set up a virtual environment using virutalenv:**
 
    ```bash
    python -m venv .venv
@@ -55,15 +56,21 @@ LangGraph Bot is a Python-based chatbot application that utilizes the LangGraph 
    To start the chatbot, run the following command:
 
    ```bash
-   source .env && python main.py
+   python main.py
    ```
 
-   The bot will start a chat loop where you can input messages. Type "quit", "exit", or "q" to end the session.
+**Test API response:**
 
-# Project Documentation
+   Run the following bash script to test the api
 
-This project includes tools for running shell commands and Docker container operations. For detailed information, please refer to the following documentation:
-
-- [Tools Documentation](./docs/tools.md)
-- [Docker Compose Configuration](./docs/docker-compose.md)
-- [Human-In-The-Loop](https://langchain-ai.github.io/langgraph/how-tos/create-react-agent-hitl/#usage)
+   ```bash
+   curl -X 'POST' \
+   'http://localhost:8000/llm' \
+   -H 'accept: application/json' \
+   -H 'Content-Type: application/json' \
+   -d '{
+      "query": "What is the capital of France?",
+      "thread_id": 42,
+      "tools": []
+   }'
+   ```
