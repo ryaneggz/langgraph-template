@@ -1,4 +1,5 @@
-# Graph Agent Template 🤖
+# Langgraph AI Terminal 🤖
+#### By Ryan Eggleston [@ryaneggz](https://github.com/ryaneggz)
 
 LangGraph Bot is a Python-based chatbot application that utilizes the LangGraph and LangChain libraries to process and respond to user inputs. The bot is designed to handle conversational flows and can be configured to use different language models.
 
@@ -16,37 +17,17 @@ LangGraph Bot is a Python-based chatbot application that utilizes the LangGraph 
 
 ## Installation
 
-1. **Clone the repository:**
+1. **Create a configuration directory:**
 
    ```bash
-   git clone https://github.com/ryaneggz/langgraph-template.git
-   cd langgraph-template
+   ai --env
    ```
 
-2. **Set up a virtual environment using `uv venv`:**
+2. **Edit the env file:**
 
    ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows use `.venv\Scripts\activate`
+   nano $HOME/.ai-term/.env
    ```
-
-3. **Install the dependencies:**
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Configuration
-
-1. **Environment Variables:**
-
-   Create a `.env` file in the root directory and add your API key(s):
-
-   ```bash
-   cp .example.env .env
-   ```
-
-   Ensure that your `.env` file is not tracked by git by checking the `.gitignore`:
 
 ## Usage
 
@@ -55,11 +36,22 @@ LangGraph Bot is a Python-based chatbot application that utilizes the LangGraph 
    To start the chatbot, run the following command:
 
    ```bash
-   source .env && python main.py
+   ai --help
+
+   ### RESULT
+   # usage: ai [-h] [--t TOOLS] [--ls] [--v] [--chat] [--id ID] [--env] [input ...]
+   # AI CLI Tool
+   # positional arguments:
+   # input       Input text for the AI
+   # options:
+   # -h, --help  show this help message and exit
+   # --t TOOLS   Comma-separated list of tools to use
+   # --ls        List available tools
+   # --v         Visualize the graph
+   # --chat      Start an interactive chat session
+   # --id ID     Thread ID for the conversation
+   # --env       Create .env file in ~/.ai-term/
    ```
-
-   The bot will start a chat loop where you can input messages. Type "quit", "exit", or "q" to end the session.
-
 # Project Documentation
 
 This project includes tools for running shell commands and Docker container operations. For detailed information, please refer to the following documentation:
@@ -67,3 +59,16 @@ This project includes tools for running shell commands and Docker container oper
 - [Tools Documentation](./docs/tools.md)
 - [Docker Compose Configuration](./docs/docker-compose.md)
 - [Human-In-The-Loop](https://langchain-ai.github.io/langgraph/how-tos/create-react-agent-hitl/#usage)
+
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
