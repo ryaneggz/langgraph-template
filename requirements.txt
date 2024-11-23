@@ -1,3 +1,4 @@
+python-dotenv
 langgraph
 langchain_anthropic
 langchain_openai
