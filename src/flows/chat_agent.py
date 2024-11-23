@@ -2,12 +2,10 @@ import os
 from typing import Annotated, TypedDict
 
 from langgraph.graph import StateGraph, add_messages, START, END
-from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.messages import AnyMessage, SystemMessage
 
 from src.utils.llm import LLMWrapper, ModelName
 from src.utils.tools import tool_node
-from src.utils.visualize import visualize_graph
 
 class State(TypedDict):
     system: str
@@ -43,18 +41,12 @@ def call_model(state: State):
     return {"messages": [response]}
 
 
-workflow = StateGraph(State)
+builder = StateGraph(State)
 
 # Define the two nodes we will cycle between
-workflow.add_node("agent", call_model)
-workflow.add_node("actions", tool_node)
+builder.add_node("agent", call_model)
+builder.add_node("actions", tool_node)
 
-workflow.add_edge(START, "agent")
-workflow.add_conditional_edges("agent", should_continue, ["actions", END])
-workflow.add_edge("actions", "agent")
-
-# https://pypi.org/project/langgraph-checkpoint-postgres/
-checkpointer = MemorySaver()
-
-graph = workflow.compile(checkpointer=checkpointer)
-visualize_graph(graph, "terminal_interact")
+builder.add_edge(START, "agent")
+builder.add_conditional_edges("agent", should_continue, ["actions", END])
+builder.add_edge("actions", "agent")
