@@ -1,8 +1,12 @@
 
 import traceback
+
+from langgraph.checkpoint.memory import MemorySaver
+
+from src.flows.chat_agent import builder
 from src.utils.stream import stream_graph_values
 from src.utils.system import read_system_message, SystemPaths
-from src.flows.terminal_interact import graph
+from src.utils.visualize import visualize_graph
 
 
 # Chat loop
@@ -13,14 +17,10 @@ while True:
             print("Goodbye!")
             break
 
-        # stream_graph_tokens(
-        #     graph, 
-        #     user_input,
-        #     {
-        #         "enabled": False,
-        #         "session_id": "1"
-        #     }
-        # )
+        # https://pypi.org/project/langgraph-checkpoint-postgres/
+        checkpointer = MemorySaver()
+        graph = builder.compile(checkpointer=checkpointer)
+        visualize_graph(graph, "terminal_interact")
         stream_graph_values(
             graph,
             {
