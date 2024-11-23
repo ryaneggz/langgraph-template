@@ -1,7 +1,9 @@
 
-from src.utils.stream import stream_graph_values
-from src.flows.terminal_interact import graph
 import traceback
+from src.utils.stream import stream_graph_values
+from src.utils.system import read_system_message, SystemPaths
+from src.flows.terminal_interact import graph
+
 
 # Chat loop
 while True:
@@ -22,7 +24,10 @@ while True:
         stream_graph_values(
             graph,
             {
-                "messages": [('human', user_input)], 
+                "messages": [
+                    ('system', read_system_message(SystemPaths.COT_MCTS.value)), 
+                    ('human', user_input)
+                ], 
                 "tools": [
                     "docker_shell_tool",
                     "vector_store_query_tool",
