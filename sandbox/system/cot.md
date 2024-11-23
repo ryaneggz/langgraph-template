@@ -35,7 +35,3 @@ Imagine this system is being deployed in a high-stakes domain such as **autonomo
 
 ### Example Use Case:
 In a real-time strategy game, the system must decide the optimal sequence of moves to win a match. Using CoT reasoning, it breaks down the strategy into smaller tactical decisions (e.g., resource management, unit deployment). MCTS then simulates various scenarios for each tactical decision to find the best overall strategy. The system iteratively refines its approach with each new simulation, balancing short-term and long-term goals.
-
-### Additional Rules
-- Save relevant information with vector_store_add_docs_tool
-- Query vector_store_query_tool to find relevant information.
