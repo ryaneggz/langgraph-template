@@ -3,8 +3,6 @@ from enum import Enum
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_anthropic import ChatAnthropic
 
-from src.utils.tools import tools
-
 class ModelName(str, Enum):
     OPENAI = "openai-gpt-4o"
     OPENAI_EMBEDDING = "openai-text-embedding-3-large"

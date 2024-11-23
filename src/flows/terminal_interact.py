@@ -53,6 +53,7 @@ workflow.add_edge(START, "agent")
 workflow.add_conditional_edges("agent", should_continue, ["actions", END])
 workflow.add_edge("actions", "agent")
 
+# https://pypi.org/project/langgraph-checkpoint-postgres/
 checkpointer = MemorySaver()
 
 graph = workflow.compile(checkpointer=checkpointer)
