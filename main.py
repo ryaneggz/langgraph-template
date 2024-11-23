@@ -1,13 +1,15 @@
-
-import traceback
+## https://www.softgrade.org/sse-with-fastapi-react-langgraph/
+from typing import Optional, List, Any, Annotated
 
 from dotenv import load_dotenv
+from fastapi import FastAPI, Body
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
 from langgraph.checkpoint.memory import MemorySaver
 
 from src.flows.chat_agent import builder
-from src.utils.stream import stream_graph_values
-from src.utils.system import read_system_message, SystemPaths
 from src.utils.visualize import visualize_graph
+from src.utils.stream import event_stream
 load_dotenv()
 
 # Initialize graph and visualize once at start
@@ -15,32 +17,37 @@ checkpointer = MemorySaver()
 graph = builder.compile(checkpointer=checkpointer)
 visualize_graph(graph, "chat_agent")
 
-# Chat loop
-while True:
-    try:
-        user_input = input("\n>> User: ")
-        if user_input.lower() in ["quit", "exit", "q"]:
-            print("Goodbye!")
-            break
+app = FastAPI(
+    title="Graph Agent Template 🤖",
+    description="A template for building chatbots with LangGraph",
+    contact={
+        "name": "Ryan Eggleston",
+        "email": "ryaneggleston@promptengineers.ai"
+    },
+    debug=True
+)
 
-        stream_graph_values(
-            graph,
-            {
-                "system": read_system_message(SystemPaths.COT_MCTS.value), 
-                "messages": [
-                    ('human', user_input)
-                ], 
-                "tools": [
-                    # "docker_shell_tool",
-                    # "shell_tool"
-                    "vector_store_query_tool",
-                    "vector_store_add_docs_tool",
-                    "vector_store_load_tool"
-                ]
-            },
-            {"thread_id": 42}
-        )
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        traceback.print_exc()
-        break
+class Parameters(BaseModel):
+    query: str
+    tools: Optional[List[Any]] = Field(default_factory=list)
+    thread_id: int = Field(default=42)
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "query": "What is the capital of France?",
+                "tools": [],
+                "thread_id": 42
+            }
+        }
+
+@app.post("/llm")
+def stream(body: Annotated[Parameters, Body()]):
+    return StreamingResponse(
+        event_stream(graph, body.query, body.tools, body.thread_id), 
+        media_type="text/event-stream"
+    )
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
