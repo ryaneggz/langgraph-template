@@ -29,10 +29,11 @@ while True:
                     ('human', user_input)
                 ], 
                 "tools": [
-                    "docker_shell_tool",
+                    # "docker_shell_tool",
                     "vector_store_query_tool",
-                    "vector_store_add_docs_tool",
+                    # "vector_store_add_docs_tool",
                     # "shell_tool"
+                    "vector_store_load_tool"
                 ]
             },
             {"thread_id": 42}

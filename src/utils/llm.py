@@ -13,6 +13,7 @@ class ModelName(str, Enum):
 class LLMWrapper:
     def __init__(self, model_name: str, tools: list = None, **kwargs):
         self.model = None
+        self.model_name = model_name
         self.kwargs = kwargs
         self.tools = tools
         self.choose_model(model_name)
@@ -37,10 +38,10 @@ class LLMWrapper:
         else:
             self.model = chosen_model
             
-    def embedding_model(self, model_name: str):
+    def embedding_model(self):
         chosen_model = None
-        if 'openai' in model_name:
-            model_name = model_name.replace('openai-', '')
+        if 'openai' in self.model_name:
+            model_name = self.model_name.replace('openai-', '')
             chosen_model = OpenAIEmbeddings(model=model_name, **self.kwargs)
         else:
             raise ValueError(f"Embedding model {model_name} not supported")
