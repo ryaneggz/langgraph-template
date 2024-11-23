@@ -2,6 +2,9 @@ from langchain_core.tools import tool
 
 from langchain_community.tools import ShellTool, StructuredTool
 from langgraph.prebuilt import ToolNode
+from langchain_core.documents import Document
+
+from src.utils.vector import VectorStore
 
 @tool
 def get_weather(location: str):
@@ -48,6 +51,37 @@ def docker_shell_tool(commands: list[str]):
     
     return outputs  # Return the output of all commands
 
+@tool
+def vector_store_query_tool(query: str):
+    """Query the vector store. Search type can be 'mmr' or 'similarity'. Search kwargs is a dictionary of kwargs for the search type."""
+    vector_store = VectorStore()
+    return vector_store.retrieve(query, "mmr", {"k": 1, "fetch_k": 2, "lambda_mult": 0.5})
 
-tools = [get_weather, get_coolest_cities, shell_tool, docker_shell_tool]
+@tool
+def vector_store_add_docs_tool(docs: list[Document]):
+    """Add documents to the vector store.
+    
+    Example:
+
+        .. code-block:: python
+
+            from langchain_core.documents import Document
+
+            document = Document(
+                page_content="Hello, world!",
+                metadata={"source": "https://example.com"}
+            )
+    """
+    vector_store = VectorStore()
+    return vector_store.add_docs(docs)
+
+
+tools = [
+    get_weather, 
+    get_coolest_cities, 
+    shell_tool, 
+    docker_shell_tool, 
+    vector_store_query_tool, 
+    vector_store_add_docs_tool
+]
 tool_node = ToolNode(tools)

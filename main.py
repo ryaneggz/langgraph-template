@@ -25,6 +25,8 @@ while True:
                 "messages": [('human', user_input)], 
                 "tools": [
                     "docker_shell_tool",
+                    "vector_store_query_tool",
+                    "vector_store_add_docs_tool",
                     # "shell_tool"
                 ]
             },
