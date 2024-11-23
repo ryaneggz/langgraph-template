@@ -55,7 +55,7 @@ LangGraph Bot is a Python-based chatbot application that utilizes the LangGraph 
 
 ## Usage
 
-1. **Run the application:**
+**Run the application:**
 
    To start the chatbot, run the following command:
 
@@ -65,39 +65,10 @@ LangGraph Bot is a Python-based chatbot application that utilizes the LangGraph 
 
    The bot will start a chat loop where you can input messages. Type "quit", "exit", or "q" to end the session.
 
-2. **Debugging:**
+# Project Documentation
 
-   If you are using VSCode, you can use the provided launch configuration to debug the application:
+This project includes tools for running shell commands and Docker container operations. For detailed information, please refer to the following documentation:
 
-   ```json:.vscode/launch.json
-   startLine: 1
-   endLine: 14
-   ```
-
-## Development
-
-- **Visualizing Graphs:**
-
-  The application can visualize state graphs using the `visualize_graph` function:
-
-  ```python:src/utils/visualize.py
-  startLine: 1
-  endLine: 19
-  ```
-
-- **Stream Processing:**
-
-  The `stream_graph_tokens` function handles the streaming of user inputs and bot responses:
-
-  ```python:src/utils/stream.py
-  startLine: 25
-  endLine: 36
-  ```
-
-## Contributing
-
-Contributions are welcome! Please fork the repository and submit a pull request for any improvements or bug fixes.
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
+- [Tools Documentation](./docs/tools.md)
+- [Docker Compose Configuration](./docs/docker-compose.md)
+- [Human-In-The-Loop](https://langchain-ai.github.io/langgraph/how-tos/create-react-agent-hitl/#usage)

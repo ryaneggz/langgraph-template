@@ -13,8 +13,8 @@ class StreamInput(BaseModel):
 
 def stream_graph_updates(graph: StateGraph, input: StreamInput):
     for event in graph.stream(input, input['configurable'], stream_mode='values'):
-        if event.get('call_model'):
-            print("Bot: " + event['call_model']['messages'][-1].content)
+        if event.get('call_chat_model'):
+            print("Bot: " + event['call_chat_model']['messages'][-1].content)
         elif event.get('error'):
             print("Error: " + event['error']['messages'][-1].content)
         elif event.get('messages'):
@@ -34,3 +34,17 @@ def stream_graph_tokens(
     ):
         if msg.content and not isinstance(msg, HumanMessage):
             print(msg.content, end="", flush=True)
+            
+            
+def stream_graph_values(
+    graph: StateGraph, 
+    input: str, 
+    config,
+    stream_mode: str = "values"
+):
+    for chunk in graph.stream(
+        input, 
+        {"configurable": config},
+        stream_mode=stream_mode
+    ):
+        chunk["messages"][-1].pretty_print()

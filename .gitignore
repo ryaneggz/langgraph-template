@@ -1,3 +1,6 @@
 .env*
 .venv
-./sandbox/graphs/*
+sandbox/graphs/*
+**/__pycache__/
+sandbox/docs
+sandbox/contexts/clsk

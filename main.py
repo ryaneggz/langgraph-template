@@ -1,6 +1,9 @@
 
-from src.utils.stream import stream_graph_tokens
-from src.flows.should_run_end import graph
+import traceback
+from src.utils.stream import stream_graph_values
+from src.utils.system import read_system_message, SystemPaths
+from src.flows.terminal_interact import graph
+
 
 # Chat loop
 while True:
@@ -10,14 +13,32 @@ while True:
             print("Goodbye!")
             break
 
-        stream_graph_tokens(
-            graph, 
-            user_input,
+        # stream_graph_tokens(
+        #     graph, 
+        #     user_input,
+        #     {
+        #         "enabled": False,
+        #         "session_id": "1"
+        #     }
+        # )
+        stream_graph_values(
+            graph,
             {
-                "enabled": False,
-                "session_id": "1"
-            }
+                "system": read_system_message(SystemPaths.COT_MCTS.value), 
+                "messages": [
+                    ('human', user_input)
+                ], 
+                "tools": [
+                    # "docker_shell_tool",
+                    # "shell_tool"
+                    "vector_store_query_tool",
+                    "vector_store_add_docs_tool",
+                    "vector_store_load_tool"
+                ]
+            },
+            {"thread_id": 42}
         )
     except Exception as e:
         print(f"An error occurred: {e}")
+        traceback.print_exc()
         break
