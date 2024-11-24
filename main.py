@@ -15,7 +15,7 @@ load_dotenv()
 
 
 app = FastAPI(
-    title="Langgraph API Starter 🤖",
+    title="LangGraph API Starter 🤖",
     summary=(
         "This is a simple API for building chatbots with LangGraph. " +
         "It allows you to create new threads, query existing threads, " +
