@@ -5,3 +5,14 @@ sandbox/graphs/*
 sandbox/docs
 sandbox/contexts/clsk
 docker/postgres/data
+Dockerfile
+README.md
+docker*
+scripts
+langgraph.json
+.dockerignore
+.cursorignore
+.vscode
+.git*
+.example.env
+docs
