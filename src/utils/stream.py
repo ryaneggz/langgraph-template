@@ -1,19 +1,41 @@
+from typing import Optional, List, Any, Annotated
+
+from pydantic import BaseModel, Field
 from langgraph.graph import StateGraph
 from langchain_core.tools import BaseTool
 from langchain_core.messages import HumanMessage
 from pydantic import BaseModel
 
 
-from langchain_core.messages import HumanMessage, ToolMessage
+from langchain_core.messages import HumanMessage, ToolMessage, AnyMessage
 from src.utils.system import read_system_message, SystemPaths
 
 class Configurable(BaseModel):
-    enabled: bool
-    session_id: str
+    thread_id: str
 
 class StreamInput(BaseModel):
     messages: list
     configurable: Configurable
+    
+class LLMHTTPResponse(BaseModel):
+    # system: Optional[str] = Field(default="You are a helpful assistant.")
+    messages: list[AnyMessage] = Field(default_factory=list)
+    # tools: Optional[List[Any]] = Field(default_factory=list)
+    # thread_id: str = Field(default="42")
+    
+class Parameters(BaseModel):
+    query: str
+    tools: Optional[List[Any]] = Field(default_factory=list)
+    thread_id: str = Field(default="42")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "query": "What is the capital of France?",
+                "tools": [],
+                "thread_id": "42"
+            }
+        }
 
 
 def stream_graph_updates(graph: StateGraph, input: StreamInput):
@@ -58,20 +80,19 @@ def event_stream(
     graph: StateGraph, 
     query: str,
     tools: list[BaseTool] = [], 
-    thread_id: int = 42
+    thread_id: str = None
 ):
     initial_state = {
         "system": read_system_message(SystemPaths.COT_MCTS.value),
         "messages": [HumanMessage(content=query)],
         "tools": tools,
-        "thread_id": {"enabled": True, "session_id": thread_id}
+        "thread_id": thread_id
     }
-    for chunk in graph.stream(initial_state, {"thread_id": thread_id}):
+
+    for chunk in graph.stream(initial_state, {'configurable': {'thread_id': thread_id}}):
         for node_name, node_results in chunk.items():
             chunk_messages = node_results.get("messages", [])
             for message in chunk_messages:
-                # You can have any logic you like here
-                # The important part is the yield
                 if not message.content:
                     continue
                 if isinstance(message, ToolMessage):
@@ -80,3 +101,33 @@ def event_stream(
                     event_str = "event: ai_event"
                 data_str = f"data: {message.content}"
                 yield f"{event_str}\n{data_str}\n\n"
+                
+      
+
+## https://github.com/langchain-ai/langgraph/tree/main/libs/checkpoint-postgres
+## https://langchain-ai.github.io/langgraph/how-tos/persistence_postgres/#with-a-connection-pool 
+## https://api.python.langchain.com/en/latest/checkpoint/langchain_postgres.checkpoint.PostgresSaver.html         
+def http_response(
+    graph: StateGraph, 
+    query: str,
+    tools: list[BaseTool] = [], 
+    thread_id: str = None,
+    checkpointer: any = None
+):
+    initial_state = {
+        "system": read_system_message(SystemPaths.COT_MCTS.value),
+        "messages": [HumanMessage(content=query)],
+        "tools": tools,
+        "thread_id": thread_id
+    }
+    config = {'configurable': {'thread_id': thread_id}}
+    res = graph.invoke(initial_state, config)
+    # checkpoint = checkpointer.get(config)
+    # updated = checkpointer.put(
+    #     {"configurable": {"thread_id": thread_id, "checkpoint_ns": "chat_agent"}}, 
+    #     checkpoint,
+    #     {}, 
+    #     {}
+    # )
+    # print(updated)
+    return LLMHTTPResponse(**res)   

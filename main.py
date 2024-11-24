@@ -1,21 +1,16 @@
 ## https://www.softgrade.org/sse-with-fastapi-react-langgraph/
-from typing import Optional, List, Any, Annotated
+from typing import Annotated
+import json
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Body
-from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field
-from langgraph.checkpoint.memory import MemorySaver
+from fastapi.responses import JSONResponse
 
+from src.infra.db import get_db_checkpointer
 from src.flows.chat_agent import builder
 from src.utils.visualize import visualize_graph
-from src.utils.stream import event_stream
+from src.utils.stream import http_response, Parameters
 load_dotenv()
-
-# Initialize graph and visualize once at start
-checkpointer = MemorySaver()
-graph = builder.compile(checkpointer=checkpointer)
-visualize_graph(graph, "chat_agent")
 
 app = FastAPI(
     title="Graph Agent Template 🤖",
@@ -27,25 +22,24 @@ app = FastAPI(
     debug=True
 )
 
-class Parameters(BaseModel):
-    query: str
-    tools: Optional[List[Any]] = Field(default_factory=list)
-    thread_id: int = Field(default=42)
-    
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "query": "What is the capital of France?",
-                "tools": [],
-                "thread_id": 42
-            }
-        }
-
 @app.post("/llm")
-def stream(body: Annotated[Parameters, Body()]):
-    return StreamingResponse(
-        event_stream(graph, body.query, body.tools, body.thread_id), 
-        media_type="text/event-stream"
+def llm_query(body: Annotated[Parameters, Body()]):
+    # Create a global connection pool
+    checkpointer = get_db_checkpointer()
+    graph = builder.compile(checkpointer=checkpointer)
+    visualize_graph(graph, "chat_agent")
+    
+    state = http_response(
+        graph, 
+        body.query, 
+        body.tools, 
+        body.thread_id,
+        checkpointer
+    )
+    
+    return JSONResponse(
+        content=state.model_dump(),
+        status_code=200
     )
 
 if __name__ == "__main__":
