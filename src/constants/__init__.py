@@ -1,6 +1,6 @@
+import os
 
-
-DB_URI = "postgresql://admin:test1234@localhost:5432/lg_template_dev?sslmode=disable"
+DB_URI = os.getenv("POSTGRES_CONNECTION_STRING", "postgresql://admin:test1234@localhost:5432/postgres?sslmode=disable")
 CONNECTION_POOL_KWARGS = {
     "autocommit": True,
     "prepare_threshold": 0,

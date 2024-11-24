@@ -31,7 +31,10 @@ services:
 
   # Graphchat
   graphchat:
-    image: ryaneggz/graphchat:e08dd3d
+    # image: ryaneggz/graphchat:389e5ae
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: graphchat
     env_file:
       - .env

@@ -8,4 +8,6 @@ langchain-experimental
 fastapi
 uvicorn
 psycopg
+psycopg[binary]
+# psycopg[c]
 psycopg-pool
