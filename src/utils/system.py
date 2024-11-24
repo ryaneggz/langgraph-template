@@ -13,7 +13,7 @@ class SystemPaths(Enum):
 def read_system_message(filepath):
     try:
         with open(filepath, 'r') as file:
-            return file.read().strip()
+            return str(file.read().strip())
     except Exception as e:
         print(f"Error reading system message file: {e}")
         return "You are a helpful AI assistant."

@@ -2,28 +2,7 @@ import os
 from enum import Enum
 from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_core.documents import Document
-
-
-def get_embedding_model():
-    from src.utils.llm import LLMWrapper
-    llm = LLMWrapper(model_name="openai-text-embedding-3-large", api_key=os.getenv('OPENAI_API_KEY'))
-    return llm.embedding_model()
-
-def get_vector_store():
-    embedding_model = get_embedding_model()
-    return InMemoryVectorStore(embedding_model)
-
-class SearchType(str, Enum):
-    MMR = "mmr"
-    SIMILARITY = "similarity"
-    
-class SearchKwargs(dict):
-    k: int = 3
-    fetch_k: int = 2
-    lambda_mult: float = 0.5
-    filter: str = None
-
-DEFAULT_VECTOR_STORE_PATH = './sandbox/db/vectorstore.json'
+from src.constants import DEFAULT_VECTOR_STORE_PATH
 
 class VectorStore:
     def __init__(self, vector_store: InMemoryVectorStore = None):
@@ -82,3 +61,14 @@ class VectorStore:
     
     def find_docs_by_ids(self, ids: list[str]):
         return self.vector_store.get_by_ids(ids)
+    
+    
+## Retrieval Utils
+def get_embedding_model():
+    from src.utils.llm import LLMWrapper
+    llm = LLMWrapper(model_name="openai-text-embedding-3-large", api_key=os.getenv('OPENAI_API_KEY'))
+    return llm.embedding_model()
+
+def get_vector_store():
+    embedding_model = get_embedding_model()
+    return InMemoryVectorStore(embedding_model)

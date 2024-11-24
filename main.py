@@ -1,15 +1,13 @@
 ## https://www.softgrade.org/sse-with-fastapi-react-langgraph/
+import uuid
 from typing import Annotated
-import json
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, status
 from fastapi.responses import JSONResponse
 
-from src.infra.db import get_db_checkpointer
-from src.flows.chat_agent import builder
-from src.utils.visualize import visualize_graph
-from src.utils.stream import http_response, Parameters
+from src.entities import LLMHTTPResponse, LLMQuery
+from src.utils.agent import Agent
 load_dotenv()
 
 app = FastAPI(
@@ -22,26 +20,38 @@ app = FastAPI(
     debug=True
 )
 
+### Create New Thread
 @app.post("/llm")
-def llm_query(body: Annotated[Parameters, Body()]):
-    # Create a global connection pool
-    checkpointer = get_db_checkpointer()
-    graph = builder.compile(checkpointer=checkpointer)
-    visualize_graph(graph, "chat_agent")
+def llm_query_new_thread(body: Annotated[LLMQuery, Body()]):
+    agent = Agent(str(uuid.uuid4()))
+    agent.builder(tools=body.tools)
+    messages = agent.messages(body.query, body.system)
+    return agent.process(messages, body.stream)
+
+### Query Existing Thread
+@app.post("/llm/{thread_id}")
+def llm_query_existing_thread(thread_id: str, body: Annotated[LLMQuery, Body()]):
+    agent = Agent(thread_id)
+    agent.builder(tools=body.tools)
+    messages = agent.messages(body.query, body.system)
+    return agent.process(messages, body.stream)
     
-    state = http_response(
-        graph, 
-        body.query, 
-        body.tools, 
-        body.thread_id,
-        checkpointer
+### Query Agent History
+@app.get("/llm/thread/{thread_id}")
+def llm_history(thread_id: str):
+    agent = Agent(thread_id)
+    checkpoint = agent.checkpoint()
+    response = LLMHTTPResponse(
+        thread_id=thread_id, 
+        messages=checkpoint.get('channel_values').get('messages')
     )
-    
     return JSONResponse(
-        content=state.model_dump(),
-        status_code=200
+        content=response.model_dump(),
+        status_code=status.HTTP_200_OK
     )
 
+
+### Run Server
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
