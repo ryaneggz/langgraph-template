@@ -20,7 +20,7 @@ connection_kwargs = {
     "prepare_threshold": 0,
 }
 app = FastAPI(
-    title="Graph Agent Template 🤖",
+    title="Langgraph Chat Agent API 🤖",
     description="A template for building chatbots with LangGraph",
     contact={
         "name": "Ryan Eggleston",
