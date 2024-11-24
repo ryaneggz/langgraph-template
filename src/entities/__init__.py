@@ -45,6 +45,9 @@ class LLMHTTPResponse(BaseModel):
     thread_id: str = Field(...)
     messages: list[AnyMessage] = Field(default_factory=list)
     
+class Answer(BaseModel):
+    thread_id: str = Field(...)
+    answer: AnyMessage = Field(...)
     
 ##### Vector Store
 class SearchType(str, Enum):

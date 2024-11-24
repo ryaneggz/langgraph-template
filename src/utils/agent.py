@@ -11,7 +11,7 @@ from psycopg_pool import ConnectionPool
 
 from src.utils.tools import collect_tools
 from src.utils.llm import LLMWrapper, ModelName
-from src.entities import LLMHTTPResponse
+from src.entities import Answer
 from src.utils.system import SystemPaths, read_system_message
 
 class Agent:
@@ -60,9 +60,9 @@ class Agent:
     ) -> Response:
         if not stream:
             invoke = self.graph.invoke({"messages": messages}, {'configurable': {'thread_id': self.thread_id}})
-            content = LLMHTTPResponse(
+            content = Answer(
                 thread_id=self.thread_id,
-                messages=invoke.get('messages')
+                answer=invoke.get('messages')[-1]
             ).model_dump()
 
             return JSONResponse(
