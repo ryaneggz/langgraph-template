@@ -1,7 +1,9 @@
-.env*
+**/.env*
 .venv
+**/data/
 sandbox/graphs/*
 **/__pycache__/
 sandbox/docs
 sandbox/contexts/clsk
 docker/postgres/data
+deployment/docker/postgres/data
