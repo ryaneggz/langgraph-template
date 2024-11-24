@@ -1,8 +1,11 @@
 python-dotenv
 langgraph
+langgraph-checkpoint-postgres
 langchain_anthropic
 langchain_openai
 langchain-community
 langchain-experimental
 fastapi
 uvicorn
+psycopg
+psycopg-pool

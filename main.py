@@ -1,24 +1,26 @@
 ## https://www.softgrade.org/sse-with-fastapi-react-langgraph/
-from typing import Optional, List, Any, Annotated
+import uuid
+from typing import Annotated
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, Body
-from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field
-from langgraph.checkpoint.memory import MemorySaver
+from fastapi import FastAPI, Body, status
+from fastapi.responses import JSONResponse
+from langchain_core.messages import HumanMessage
+from psycopg_pool import ConnectionPool
 
-from src.flows.chat_agent import builder
-from src.utils.visualize import visualize_graph
-from src.utils.stream import event_stream
+from src.constants import DB_URI
+from src.entities import LLMHTTPResponse, NewThread, ExistingThread
+from src.utils.agent import Agent
 load_dotenv()
 
-# Initialize graph and visualize once at start
-checkpointer = MemorySaver()
-graph = builder.compile(checkpointer=checkpointer)
-visualize_graph(graph, "chat_agent")
-
+# with ConnectionPool(DB_URI, min_size=1, max_size=20) as pool:
+#     pass
+connection_kwargs = {
+    "autocommit": True,
+    "prepare_threshold": 0,
+}
 app = FastAPI(
-    title="Graph Agent Template 🤖",
+    title="Langgraph Chat Agent API 🤖",
     description="A template for building chatbots with LangGraph",
     contact={
         "name": "Ryan Eggleston",
@@ -27,27 +29,53 @@ app = FastAPI(
     debug=True
 )
 
-class Parameters(BaseModel):
-    query: str
-    tools: Optional[List[Any]] = Field(default_factory=list)
-    thread_id: int = Field(default=42)
-    
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "query": "What is the capital of France?",
-                "tools": [],
-                "thread_id": 42
-            }
-        }
-
+### Create New Thread
 @app.post("/llm")
-def stream(body: Annotated[Parameters, Body()]):
-    return StreamingResponse(
-        event_stream(graph, body.query, body.tools, body.thread_id), 
-        media_type="text/event-stream"
-    )
+def new_thread(body: Annotated[NewThread, Body()]):
+    with ConnectionPool(
+        conninfo=DB_URI,
+        max_size=20,
+        kwargs=connection_kwargs,
+    ) as pool:
+        agent = Agent(str(uuid.uuid4()), pool)
+        agent.builder(tools=body.tools)
+        messages = agent.messages(body.query, body.system)
+        return agent.process(messages, body.stream)
 
+## Query Existing Thread
+@app.post("/llm/{thread_id}")
+def existing_thread(thread_id: str, body: Annotated[ExistingThread, Body()]):
+    with ConnectionPool(
+        conninfo=DB_URI,
+        max_size=20,
+        kwargs=connection_kwargs,
+    ) as pool:  
+        agent = Agent(thread_id, pool)
+        agent.builder(tools=body.tools)
+        messages = [HumanMessage(content=body.query)]
+        return agent.process(messages, body.stream)
+    
+### Query Agent History
+@app.get("/llm/thread/{thread_id}")
+def thread_history(thread_id: str):
+    with ConnectionPool(
+        conninfo=DB_URI,
+        max_size=20,
+        kwargs=connection_kwargs,
+    ) as pool:
+        agent = Agent(thread_id, pool)
+        checkpoint = agent.checkpoint()
+        response = LLMHTTPResponse(
+            thread_id=thread_id, 
+            messages=checkpoint.get('channel_values').get('messages')
+        )
+        return JSONResponse(
+            content=response.model_dump(),
+            status_code=status.HTTP_200_OK
+        )
+
+
+### Run Server
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -4,7 +4,8 @@ from langchain_community.tools import ShellTool
 from langgraph.prebuilt import ToolNode
 from langchain_core.documents import Document
 
-from src.utils.vector import DEFAULT_VECTOR_STORE_PATH, VectorStore
+from src.utils.retrieval import VectorStore
+from src.constants import DEFAULT_VECTOR_STORE_PATH
 
 @tool
 def get_weather(location: str):
@@ -92,3 +93,11 @@ tools = [
     vector_store_load_tool
 ]
 tool_node = ToolNode(tools)
+
+###################################### UTILS ######################################
+def collect_tools(selected_tools: list[str]):
+    from src.utils.tools import tools
+    filtered_tools = [tool for tool in tools if tool.name in selected_tools]
+    if len(filtered_tools) == 0:
+        raise ValueError(f"No tools found by the names: {selected_tools.join(', ')}")
+    return filtered_tools
