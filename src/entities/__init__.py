@@ -12,11 +12,22 @@ class StreamInput(BaseModel):
     messages: list
     configurable: Configurable
     
-class LLMQuery(BaseModel):
-    system: Optional[str] = Field(default="You are a helpful assistant.")
-    query: str = Field(default="What is the capital of France?")
+class ExistingThread(BaseModel):
+    query: str = Field(...)
     tools: Optional[List[Any]] = Field(default_factory=list)
     stream: Optional[bool] = Field(default=False)
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "query": "What about Germany?",
+                "tools": [],
+                "stream": False
+            }
+        }
+    
+class NewThread(ExistingThread):
+    system: Optional[str] = Field(default="You are a helpful assistant.")
     visualize: Optional[bool] = Field(default=False)
     
     class Config:
