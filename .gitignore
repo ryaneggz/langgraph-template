@@ -4,4 +4,4 @@ sandbox/graphs/*
 **/__pycache__/
 sandbox/docs
 sandbox/contexts/clsk
-docer/postgres/data/
+docker/postgres/data

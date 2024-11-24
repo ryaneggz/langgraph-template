@@ -9,15 +9,13 @@ from langgraph.checkpoint.postgres import PostgresSaver
 from langgraph.prebuilt import create_react_agent
 from psycopg_pool import ConnectionPool
 
-from src.constants import DB_URI
 from src.utils.tools import collect_tools
 from src.utils.llm import LLMWrapper, ModelName
 from src.entities import LLMHTTPResponse
 from src.utils.system import SystemPaths, read_system_message
 
-
 class Agent:
-    def __init__(self, thread_id: str):
+    def __init__(self, thread_id: str, pool: ConnectionPool):
         self.connection_kwargs = {
             "autocommit": True,
             "prepare_threshold": 0,
@@ -25,35 +23,35 @@ class Agent:
         self.thread_id = thread_id
         self.config = {"configurable": {"thread_id": self.thread_id}}
         self.graph = None
-        self.pool = ConnectionPool(DB_URI, min_size=1, max_size=20)
+        self.pool = pool
+        
+    def _checkpointer(self):
+        checkpointer = PostgresSaver(self.pool)
+        checkpointer.setup()
+        return checkpointer
+    
+    def checkpoint(self):
+        checkpointer = self._checkpointer()
+        checkpoint = checkpointer.get(self.config)
+        return checkpoint
         
     def builder(
         self,
-        tools: list[str] = [], 
+        tools: list[str] = [],
+        debug: bool = False
     ) -> StateGraph:
-        with ConnectionPool(
-            conninfo=DB_URI,
-            max_size=20,
-            kwargs=self.connection_kwargs,
-        ) as pool:
-            llm = LLMWrapper(
-                model_name=ModelName.ANTHROPIC,
-                api_key=os.getenv("ANTHROPIC_API_KEY"), 
-                tools=tools
-            )
-            checkpointer = PostgresSaver(pool)
-            # NOTE: you need to call .setup() the first time you're using your checkpointer
-            checkpointer.setup()
-            tools = [] if len(tools) == 0 else collect_tools(tools)
-            graph = create_react_agent(llm, tools=tools, checkpointer=checkpointer)
-            self.graph = graph
-            return graph
-
-    def checkpoint(self):
-        checkpointer = PostgresSaver(self.pool)
-        checkpointer.setup()
-        checkpoint = checkpointer.get(self.config)
-        return checkpoint
+        llm = LLMWrapper(
+            model_name=ModelName.ANTHROPIC,
+            api_key=os.getenv("ANTHROPIC_API_KEY"), 
+            tools=tools
+        )
+        checkpointer = self._checkpointer()
+        tools = [] if len(tools) == 0 else collect_tools(tools)
+        graph = create_react_agent(llm, tools=tools, checkpointer=checkpointer)
+        if debug:
+            graph.debug = True
+        self.graph = graph
+        return graph
         
     def process(
         self,
@@ -66,7 +64,7 @@ class Agent:
                 thread_id=self.thread_id,
                 messages=invoke.get('messages')
             ).model_dump()
-            self.pool.close()
+
             return JSONResponse(
                 content=content,
                 status_code=status.HTTP_200_OK
