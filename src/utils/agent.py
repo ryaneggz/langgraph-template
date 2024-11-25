@@ -13,7 +13,7 @@ from src.utils.tools import collect_tools
 from src.utils.llm import LLMWrapper, ModelName
 from src.entities import Answer
 from src.utils.system import SystemPaths, read_system_message
-from src.utils.stream import event_stream
+from src.utils.stream import stream_tokens, stream_chunks
 
 class Agent:
     def __init__(self, thread_id: str, pool: ConnectionPool):
@@ -72,10 +72,11 @@ class Agent:
             )
             
         # Create generator that keeps pool reference
-        async def stream_generator():
+        def stream_generator():
             try:
-                async for chunk in event_stream(self.graph, messages, self.thread_id):
-                    yield chunk
+                for chunk in stream_chunks(self.graph, messages, self.thread_id):
+                    if chunk:
+                        yield chunk
             finally:
                 # Ensure pool is closed after streaming is complete
                 if not self.pool.closed:
