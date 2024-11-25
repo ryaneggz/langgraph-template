@@ -1,7 +1,7 @@
 import os
 
 from fastapi import status
-from fastapi.responses import Response, JSONResponse
+from fastapi.responses import Response, JSONResponse, StreamingResponse
 from psycopg_pool import ConnectionPool
 from langgraph.graph import StateGraph
 from langchain_core.messages import AnyMessage, SystemMessage, HumanMessage
@@ -13,6 +13,7 @@ from src.utils.tools import collect_tools
 from src.utils.llm import LLMWrapper, ModelName
 from src.entities import Answer
 from src.utils.system import SystemPaths, read_system_message
+from src.utils.stream import event_stream
 
 class Agent:
     def __init__(self, thread_id: str, pool: ConnectionPool):
@@ -43,7 +44,7 @@ class Agent:
         llm = LLMWrapper(
             model_name=ModelName.ANTHROPIC,
             api_key=os.getenv("ANTHROPIC_API_KEY"), 
-            tools=tools
+            tools=[]
         )
         checkpointer = self._checkpointer()
         tools = [] if len(tools) == 0 else collect_tools(tools)
@@ -70,9 +71,19 @@ class Agent:
                 status_code=status.HTTP_200_OK
             )
             
-        return JSONResponse(
-            content={"error": "Streaming is not implemented yet."},
-            status_code=status.HTTP_501_NOT_IMPLEMENTED
+        # Create generator that keeps pool reference
+        async def stream_generator():
+            try:
+                async for chunk in event_stream(self.graph, messages, self.thread_id):
+                    yield chunk
+            finally:
+                # Ensure pool is closed after streaming is complete
+                if not self.pool.closed:
+                    self.pool.close()
+
+        return StreamingResponse(
+            stream_generator(),
+            media_type="text/event-stream"
         )
         
     @staticmethod

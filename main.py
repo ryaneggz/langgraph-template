@@ -44,15 +44,28 @@ app = FastAPI(
     }
 )
 def new_thread(body: Annotated[NewThread, Body()]):
-    with ConnectionPool(
+    if not body.stream:
+        # Non-streaming response can use context manager
+        with ConnectionPool(
+            conninfo=DB_URI,
+            max_size=20,
+            kwargs=CONNECTION_POOL_KWARGS,
+        ) as pool:
+            agent = Agent(str(uuid.uuid4()), pool)
+            agent.builder(tools=body.tools)
+            messages = agent.messages(body.query, body.system)
+            return agent.process(messages, body.stream)
+    
+    # For streaming, create pool without context manager
+    pool = ConnectionPool(
         conninfo=DB_URI,
         max_size=20,
         kwargs=CONNECTION_POOL_KWARGS,
-    ) as pool:
-        agent = Agent(str(uuid.uuid4()), pool)
-        agent.builder(tools=body.tools)
-        messages = agent.messages(body.query, body.system)
-        return agent.process(messages, body.stream)
+    )
+    agent = Agent(str(uuid.uuid4()), pool)
+    agent.builder(tools=body.tools)
+    messages = agent.messages(body.query, body.system)
+    return agent.process(messages, body.stream)
 
 ## Query Existing Thread
 @app.post(
@@ -73,15 +86,28 @@ def existing_thread(
     thread_id: str, 
     body: Annotated[ExistingThread, Body()]
 ):
-    with ConnectionPool(
+    if not body.stream:
+        # Non-streaming response can use context manager
+        with ConnectionPool(
+            conninfo=DB_URI,
+            max_size=20,
+            kwargs=CONNECTION_POOL_KWARGS,
+        ) as pool:  
+            agent = Agent(thread_id, pool)
+            agent.builder(tools=body.tools)
+            messages = [HumanMessage(content=body.query)]
+            return agent.process(messages, body.stream)
+    
+    # For streaming, create pool without context manager
+    pool = ConnectionPool(
         conninfo=DB_URI,
         max_size=20,
         kwargs=CONNECTION_POOL_KWARGS,
-    ) as pool:  
-        agent = Agent(thread_id, pool)
-        agent.builder(tools=body.tools)
-        messages = [HumanMessage(content=body.query)]
-        return agent.process(messages, body.stream)
+    )
+    agent = Agent(thread_id, pool)
+    agent.builder(tools=body.tools)
+    messages = [HumanMessage(content=body.query)]
+    return agent.process(messages, body.stream)
     
 ### Query Thread History
 @app.get(
