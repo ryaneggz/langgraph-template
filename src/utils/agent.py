@@ -9,7 +9,7 @@ from langgraph.checkpoint.postgres import PostgresSaver
 from langgraph.prebuilt import create_react_agent
 from psycopg_pool import ConnectionPool
 
-from src.utils.tools import collect_tools
+from src.tools import collect_tools
 from src.utils.llm import LLMWrapper, ModelName
 from src.entities import Answer
 from src.utils.system import SystemPaths, read_system_message
@@ -43,7 +43,7 @@ class Agent:
         llm = LLMWrapper(
             model_name=ModelName.ANTHROPIC,
             api_key=os.getenv("ANTHROPIC_API_KEY"), 
-            tools=tools
+            tools=[]
         )
         checkpointer = self._checkpointer()
         tools = [] if len(tools) == 0 else collect_tools(tools)

@@ -5,7 +5,7 @@ The `shell_tool` is a function that allows running shell commands. It accepts a 
 - `commands`: A list of strings, each representing a shell command to be executed.
 ### Usage
 ```python
-from src.utils.tools import shell_tool
+from src.tools import shell_tool
 
 result = shell_tool(["ls -l", "pwd"])
 print(result)
@@ -17,7 +17,7 @@ The `docker_shell_tool` is a function that allows running shell commands inside 
 - `commands`: A list of strings, each representing a shell command to be executed in the Docker container.
 ### Usage
 ```python
-from src.utils.tools import docker_shell_tool
+from src.tools import docker_shell_tool
 
 result = docker_shell_tool(["ls -l", "pwd"])
 print(result)

@@ -16,23 +16,27 @@ load_dotenv()
 
 
 app = FastAPI(
-    title="LangGraph API Starter 🤖",
-    summary=(
+    title="LangGraph API Starter 🤖", 
+    description=(
         "This is a simple API for building chatbots with LangGraph. " +
         "It allows you to create new threads, query existing threads, " +
-        "and get the history of a thread."
+        "and get the history of a thread.\n Check out the repo on " +
+        f"<a href='https://github.com/ryaneggz/langgraph-template'>Github</a>"
     ),
     contact={
         "name": "Ryan Eggleston",
         "email": "ryaneggleston@promptengineers.ai"
     },
-    debug=True
+    debug=True,
+    docs_url="/"
 )
+
+TAG = "Agent"
 
 ### Create New Thread
 @app.post(
     "/llm", 
-    tags=["LLM"], 
+    tags=[TAG], 
     responses={
         status.HTTP_200_OK: {
             "description": "Latest message from new thread.",
@@ -58,7 +62,7 @@ def new_thread(body: Annotated[NewThread, Body()]):
 ## Query Existing Thread
 @app.post(
     "/llm/{thread_id}", 
-    tags=["LLM"],
+    tags=[TAG],
     responses={
         status.HTTP_200_OK: {
             "description": "Latest message from existing thread.",
@@ -87,7 +91,7 @@ def existing_thread(
 ### Query Thread History
 @app.get(
     "/thread/{thread_id}", 
-    tags=["Thread"],
+    tags=[TAG],
     responses={
         status.HTTP_200_OK: {
             "description": "All messages from existing thread.",
@@ -116,6 +120,29 @@ def thread_history(thread_id: str):
             status_code=status.HTTP_200_OK
         )
 
+### List Tools
+from src.tools import tools
+tool_names = [tool.name for tool in tools]
+tools_response = {"tools": tool_names}
+@app.get(
+    "/tools", 
+    tags=[TAG],
+    responses={
+        status.HTTP_200_OK: {
+            "description": "All tools.",
+            "content": {
+                "application/json": {
+                    "example": tools_response
+                }
+            }
+        }
+    }
+)
+def list_tools():
+    return JSONResponse(
+        content=tools_response,
+        status_code=status.HTTP_200_OK
+    )
 
 ### Run Server
 if __name__ == "__main__":
