@@ -11,6 +11,8 @@ services:
       POSTGRES_MULTIPLE_DATABASES: "lg_template_dev,lg_template_test"
     ports:
       - "5432:5432"
+    networks:
+      - app-network
     volumes:
       - ./docker/postgres/data:/var/lib/postgresql/data
       - ./docker/postgres/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
@@ -24,6 +26,8 @@ services:
       PGADMIN_DEFAULT_PASSWORD: test1234
     ports:
       - "4040:80"
+    networks:
+      - app-network
     volumes:
       - ./docker/pgadmin/servers.json:/pgadmin4/servers.json
     depends_on:
@@ -31,19 +35,36 @@ services:
 
   # Graphchat
   graphchat:
-    image: ryaneggz/graphchat:b572a97
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile
+    # image: ryaneggz/graphchat:b572a97
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: graphchat
     env_file:
       - .env
     ports:
       - "8000:8000"
+    networks:
+      - app-network
     depends_on:
       - postgres
 
-  # ubuntu24:
-  #   image: ubuntu:24.04
-  #   container_name: ubuntu24
-  #   command: tail -f /dev/null
+  slack-response:
+    container_name: slack_response
+    image: ryaneggz/slack-agent:latest
+    env_file: .env.slack
+    restart: unless-stopped
+    networks:
+      - app-network
+    depends_on:
+      - graphchat
+
+# Add networks section at the bottom of the file
+networks:
+  app-network:
+    driver: bridge
+
+# ubuntu24:
+#   image: ubuntu:24.04
+#   container_name: ubuntu24
+#   command: tail -f /dev/null
