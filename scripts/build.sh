@@ -14,6 +14,7 @@ PROJECT_ID="graphchat"
 
 # Build the Docker image and tag it for Artifact Registry
 docker build --squash -t $REPOSITORY/$PROJECT_ID:$TAG .
+docker tag $REPOSITORY/$PROJECT_ID:$TAG $REPOSITORY/$PROJECT_ID:latest
 
 ########################################################################
 ## Docker Hub
@@ -25,4 +26,5 @@ read -r response
 if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]
 then
   docker push $REPOSITORY/$PROJECT_ID:$TAG
+  docker push $REPOSITORY/$PROJECT_ID:latest
 fi

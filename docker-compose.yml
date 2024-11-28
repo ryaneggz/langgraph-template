@@ -30,30 +30,23 @@ services:
       - postgres
 
   # Graphchat
-  graphchat:
-    # image: ryaneggz/graphchat:b572a97
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: graphchat
-    env_file:
-      - .env
-    ports:
-      - "8000:8000"
-    depends_on:
-      - postgres
+  # graphchat:
+  #   # image: ryaneggz/graphchat:latest
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: graphchat
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "8000:8000"
+  #   depends_on:
+  #     - postgres
 
-  slack-response:
+  slack_response:
     container_name: slack_response
     image: ryaneggz/slack-agent:latest
     env_file: .env.slack
     restart: unless-stopped
-    # networks:
-    #   - slacknet
-    depends_on:
-      - graphchat
-
-# ubuntu24:
-#   image: ubuntu:24.04
-#   container_name: ubuntu24
-#   command: tail -f /dev/null
+    # depends_on:
+    #   - graphchat
