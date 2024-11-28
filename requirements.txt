@@ -11,3 +11,4 @@ psycopg
 psycopg[binary]
 # psycopg[c]
 psycopg-pool
+loguru

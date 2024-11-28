@@ -7,3 +7,4 @@ sandbox/docs
 sandbox/contexts/clsk
 docker/postgres/data
 deployment/docker/postgres/data
+logs/

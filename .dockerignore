@@ -17,3 +17,4 @@ langgraph.json
 .example.env
 docs
 deployment
+logs/

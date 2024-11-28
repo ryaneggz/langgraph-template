@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Body, status
 from fastapi.responses import JSONResponse
 from langchain_core.messages import HumanMessage
+from loguru import logger
 from psycopg_pool import ConnectionPool
 
 from src.constants import DB_URI, CONNECTION_POOL_KWARGS
@@ -54,7 +55,9 @@ def new_thread(body: Annotated[NewThread, Body()]):
         max_size=20,
         kwargs=CONNECTION_POOL_KWARGS,
     ) as pool:
-        agent = Agent(str(uuid.uuid4()), pool)
+        thread_id = str(uuid.uuid4())
+        logger.info(f"Creating new thread with ID: {thread_id} and Tools: {body.tools} and Query: {body.query}")
+        agent = Agent(thread_id, pool)
         agent.builder(tools=body.tools)
         messages = agent.messages(body.query, body.system)
         return agent.process(messages, body.stream)
@@ -84,6 +87,7 @@ def existing_thread(
         kwargs=CONNECTION_POOL_KWARGS,
     ) as pool:  
         agent = Agent(thread_id, pool)
+        logger.info(f"Querying existing thread with ID: {thread_id} and Tools: {body.tools} and Query: {body.query}")
         agent.builder(tools=body.tools)
         messages = [HumanMessage(content=body.query)]
         return agent.process(messages, body.stream)
