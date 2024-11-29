@@ -43,7 +43,7 @@ TAG = "Agent"
             "description": "Latest message from new thread.",
             "content": {
                 "application/json": {
-                    "example": Answer.Config.json_schema_extra['examples']['new_thread']
+                    "example": Answer.model_json_schema()['examples']['new_thread']
                 }
             }
         }
@@ -71,7 +71,7 @@ def new_thread(body: Annotated[NewThread, Body()]):
             "description": "Latest message from existing thread.",
             "content": {
                 "application/json": {
-                    "example": Answer.Config.json_schema_extra['examples']['existing_thread']
+                    "example": Answer.model_json_schema()['examples']['existing_thread']
                 }
             }
         }
@@ -101,7 +101,7 @@ def existing_thread(
             "description": "All messages from existing thread.",
             "content": {
                 "application/json": {
-                    "example": LLMHTTPResponse.Config.json_schema_extra['examples']['thread_history']
+                    "example": LLMHTTPResponse.model_json_schema()['examples']['thread_history']
                 }
             }
         }
