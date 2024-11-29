@@ -1,0 +1,40 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
+    tags:
+      - '*rc*'
+
+jobs:
+  ###############################################################
+  ## Deploy to VM
+  ###############################################################
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.ref, 'rc') }}
+    environment: Dev
+    steps:
+    - name: Deploy to VM
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_USER: ${{ secrets.SSH_USER }}
+      run: |
+        # Setup SSH
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+        
+        # Add host to known hosts
+        ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+        
+        # SSH into server and get system info
+        ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST '
+          uname -a &&
+          df -h &&
+          free -h &&
+          uptime
+        '
