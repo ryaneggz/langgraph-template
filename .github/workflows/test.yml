@@ -30,9 +30,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: Test
     env:
-      APP_ENV: ${{ vars.APP_ENV }}
-      APP_LOG_LEVEL: ${{ vars.APP_LOG_LEVEL }}
-      POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+      APP_ENV: test
+      APP_LOG_LEVEL: debug
+      POSTGRES_CONNECTION_STRING: ${{ secrets.POSTGRES_CONNECTION_STRING }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
     services:
