@@ -47,10 +47,13 @@ jobs:
           git fetch --all --tags
           git checkout ${TAG} -f  # Force checkout the tag
           
-          # Kill any existing agent_api tmux sessions
-          for session in \$(tmux ls -F '#{session_name}' 2>/dev/null | grep '^agent_api'); do
-            tmux kill-session -t \$session || true
-          done
+          # Check for existing agent_api tmux sessions
+          if tmux ls -F '#{session_name}' 2>/dev/null | grep -q '^agent_api'; then
+            # Kill any existing agent_api tmux sessions
+            for session in \$(tmux ls -F '#{session_name}' 2>/dev/null | grep '^agent_api'); do
+              tmux kill-session -t \$session || true
+            done
+          fi
           
           # Create new tmux session with version in name
           SESSION_NAME="agent_api_${TAG}"
