@@ -25,38 +25,42 @@ class ExistingThread(BaseModel):
     tools: Optional[List[Any]] = Field(default_factory=list)
     stream: Optional[bool] = Field(default=False)
     
-    class Config:
-        json_schema_extra = {"example": EXISTING_THREAD_QUERY_EXAMPLE}
+    model_config = {
+        "json_schema_extra": {"example": EXISTING_THREAD_QUERY_EXAMPLE}
+    }
     
 class NewThread(ExistingThread):
     system: Optional[str] = Field(default="You are a helpful assistant.")
     visualize: Optional[bool] = Field(default=False)
     
-    class Config:
-        json_schema_extra = {"example": NEW_THREAD_QUERY_EXAMPLE}
+    model_config = {
+        "json_schema_extra": {"example": NEW_THREAD_QUERY_EXAMPLE}
+    }
         
 class LLMHTTPResponse(BaseModel):
     thread_id: str = Field(...)
     messages: list[AnyMessage] = Field(default_factory=list)
     
-    class Config:
-        json_schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "examples": {
                 "thread_history": THREAD_HISTORY_EXAMPLE
             }
         }
+    }
     
 class Answer(BaseModel):
     thread_id: str = Field(...)
     answer: AnyMessage = Field(...)
     
-    class Config:
-        json_schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "examples": {
                 'new_thread': NEW_THREAD_ANSWER_EXAMPLE,
                 'existing_thread': EXISTING_THREAD_ANSWER_EXAMPLE,
             }
         }
+    }
         
 
     
