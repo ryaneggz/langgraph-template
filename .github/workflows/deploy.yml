@@ -48,7 +48,7 @@ jobs:
           git checkout ${TAG} -f  # Force checkout the tag
           
           # Kill any existing agent_api tmux sessions
-          for session in \$(tmux ls -F '#{session_name}' 2>/dev/null | grep '^agent_api_'); do
+          for session in \$(tmux ls -F '#{session_name}' 2>/dev/null | grep '^agent_api'); do
             tmux kill-session -t \$session || true
           done
           
