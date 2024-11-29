@@ -21,6 +21,7 @@ jobs:
         SSH_USER: ${{ secrets.SSH_USER }}
       run: |
         # Setup SSH
+        mkdir -p ~/.ssh
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan github.com >> ~/.ssh/known_hosts
