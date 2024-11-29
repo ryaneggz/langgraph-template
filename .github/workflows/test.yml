@@ -35,20 +35,20 @@ jobs:
       POSTGRES_CONNECTION_STRING: ${{ secrets.POSTGRES_CONNECTION_STRING }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-    services:
-      postgres:
-        image: pgvector/pgvector:pg16
-        env:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: test1234
-          POSTGRES_DB: lg_template_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    # services:
+    #   postgres:
+    #     image: pgvector/pgvector:pg16
+    #     env:
+    #       POSTGRES_USER: admin
+    #       POSTGRES_PASSWORD: test1234
+    #       POSTGRES_DB: lg_template_test
+    #     ports:
+    #       - 5432:5432
+    #     options: >-
+    #       --health-cmd pg_isready
+    #       --health-interval 10s
+    #       --health-timeout 5s
+    #       --health-retries 5
       # redis:
       #   image: redis:alpine
       #   ports:
