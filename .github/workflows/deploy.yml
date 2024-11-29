@@ -47,17 +47,19 @@ jobs:
           git fetch --all --tags
           git checkout ${TAG} -f  # Force checkout the tag
           
-          # Check for existing agent_api tmux sessions
-          if tmux ls -F '#{session_name}' 2>/dev/null | grep -q '^agent_api'; then
-            # Kill any existing agent_api tmux sessions
-            for session in \$(tmux ls -F '#{session_name}' 2>/dev/null | grep '^agent_api'); do
-              tmux kill-session -t \$session || true
+          # Check for existing agent_api tmux sessions and kill them if they exist
+          if tmux has-session -t 'agent_api*' 2>/dev/null; then
+            echo 'Killing existing agent_api sessions...'
+            tmux list-sessions -F '#{session_name}' | grep '^agent_api' | while read session; do
+              tmux kill-session -t \"\$session\" || true
             done
+          else
+            echo 'No existing agent_api sessions found'
           fi
           
           # Create new tmux session with version in name
-          SESSION_NAME="agent_api_${TAG}"
-          tmux new-session -d -s "${SESSION_NAME}" '
+          SESSION_NAME=\"agent_api_${TAG}\"
+          tmux new-session -d -s \"\${SESSION_NAME}\" '
             source .venv/bin/activate
             uv pip install -r requirements.txt
             python main.py
