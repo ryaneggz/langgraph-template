@@ -53,8 +53,8 @@ jobs:
           done
           
           # Create new tmux session with version in name
-          SESSION_NAME=\"agent_api_\${TAG}\"
-          tmux new-session -d -s \$SESSION_NAME '
+          SESSION_NAME="agent_api_${TAG}"
+          tmux new-session -d -s "${SESSION_NAME}" '
             source .venv/bin/activate
             uv pip install -r requirements.txt
             python main.py
