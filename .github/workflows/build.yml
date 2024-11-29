@@ -33,6 +33,9 @@ jobs:
       run: |
         COMMIT_SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
         DOCKER_IMAGE=ryaneggz/graphchat:${COMMIT_SHORT_SHA}
+        DOCKER_LATEST=ryaneggz/graphchat:latest
         
-        echo "Building image: $DOCKER_IMAGE"
-        docker build --squash --push -t $DOCKER_IMAGE .
+        echo "Building images: $DOCKER_IMAGE and $DOCKER_LATEST"
+        docker build --squash -t $DOCKER_IMAGE -t $DOCKER_LATEST .
+        docker push $DOCKER_IMAGE
+        docker push $DOCKER_LATEST
