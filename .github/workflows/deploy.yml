@@ -31,8 +31,9 @@ jobs:
         
         # SSH into server and get system info
         ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST '
-          uname -a &&
-          df -h &&
-          free -h &&
-          uptime
+          echo "User: $(whoami)"
+          echo "Hostname: $(hostname)"
+          echo "OS: $(uname -a)"
+          echo "Uptime: $(uptime -p)"
+          docker ps
         '
