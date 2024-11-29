@@ -6,3 +6,5 @@ CONNECTION_POOL_KWARGS = {
     "prepare_threshold": 0,
 }
 DEFAULT_VECTOR_STORE_PATH = './sandbox/db/vectorstore.json'
+APP_USERNAME = os.getenv("APP_USERNAME", "admin")
+APP_PASSWORD = os.getenv("APP_PASSWORD", "test1234")
