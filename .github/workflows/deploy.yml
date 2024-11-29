@@ -34,6 +34,8 @@ jobs:
         
         # SSH into server and deploy
         ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "
+          set -e  # Exit immediately if a command fails
+          
           echo 'User: $(whoami)'
           echo 'Hostname: $(hostname)'
           echo 'OS: $(uname -a)'
@@ -43,8 +45,7 @@ jobs:
           
           cd ~/agent_api
           git fetch --all --tags
-          git checkout ${TAG}
-          git pull
+          git checkout ${TAG} -f  # Force checkout the tag
           
           # Kill any existing agent_api tmux sessions
           for session in \$(tmux ls -F '#{session_name}' 2>/dev/null | grep '^agent_api_'); do
