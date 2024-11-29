@@ -41,7 +41,7 @@ jobs:
           echo 'OS: $(uname -a)'
           echo 'Uptime: $(uptime -p)'
           docker ps
-          tmux ls
+          tmux ls || true  # Won't fail if no sessions exist
           
           cd ~/agent_api
           git fetch --all --tags
