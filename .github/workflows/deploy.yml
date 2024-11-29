@@ -29,12 +29,35 @@ jobs:
         # Add host to known hosts
         ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
         
-        # SSH into server and get system info
-        ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST '
-          echo "User: $(whoami)"
-          echo "Hostname: $(hostname)"
-          echo "OS: $(uname -a)"
-          echo "Uptime: $(uptime -p)"
+        # Extract tag from ref
+        TAG=${GITHUB_REF#refs/tags/}
+        
+        # SSH into server and deploy
+        ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "
+          echo 'User: $(whoami)'
+          echo 'Hostname: $(hostname)'
+          echo 'OS: $(uname -a)'
+          echo 'Uptime: $(uptime -p)'
           docker ps
           tmux ls
-        '
+          
+          cd ~/agent_api
+          git fetch --all --tags
+          git checkout ${TAG}
+          git pull
+          
+          # Kill any existing agent_api tmux sessions
+          for session in \$(tmux ls -F '#{session_name}' 2>/dev/null | grep '^agent_api_'); do
+            tmux kill-session -t \$session || true
+          done
+          
+          # Create new tmux session with version in name
+          SESSION_NAME=\"agent_api_\${TAG}\"
+          tmux new-session -d -s \$SESSION_NAME '
+            source .venv/bin/activate
+            uv pip install -r requirements.txt
+            python main.py
+          '
+          
+          echo \"Deployment completed successfully with session: \${SESSION_NAME}\"
+        "
