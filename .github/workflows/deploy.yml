@@ -36,4 +36,5 @@ jobs:
           echo "OS: $(uname -a)"
           echo "Uptime: $(uptime -p)"
           docker ps
+          tmux ls
         '
