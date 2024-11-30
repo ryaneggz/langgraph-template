@@ -42,32 +42,38 @@ resource "digitalocean_droplet" "web" {
   region     = "nyc3"
   size       = "s-1vcpu-1gb"
   user_data = <<-EOF
-              #!/bin/bash
+                #!/bin/bash
 
-              # Install docker
-              sudo apt-get update
-              sudo apt-get install -y \
-                apt-transport-https \
-                ca-certificates \
-                curl \
-                software-properties-common
-              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-              echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-              sudo apt-get update
-              sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-              sudo systemctl enable docker
-              sudo systemctl start docker
+                # Update and install necessary packages
+                sudo apt-get update
+                sudo apt-get install -y \
+                    apt-transport-https \
+                    ca-certificates \
+                    curl \
+                    software-properties-common
 
-              # Create server_admin user with sudo access
-              useradd -m -s /bin/bash server_admin
-              echo "server_admin:${random_password.password.result}" | chpasswd
-              usermod -aG sudo,docker server_admin
-              
-              # Create aiuser
-              useradd -m -s /bin/bash aiuser
-              echo "aiuser:${random_password.aiuser_password.result}" | chpasswd
-              usermod -aG docker aiuser
-              EOF
+                # Install Docker
+                curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+                echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+                sudo apt-get update
+                sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+                sudo systemctl enable docker
+                sudo systemctl start docker
+
+                # Create server_admin user
+                sudo useradd -m -s /bin/bash server_admin
+                echo "server_admin:${random_password.password.result}" | sudo chpasswd --crypt-method=SHA512
+                sudo usermod -aG sudo,docker server_admin
+
+                # Create aiuser
+                sudo useradd -m -s /bin/bash aiuser
+                echo "aiuser:${random_password.aiuser_password.result}" | sudo chpasswd --crypt-method=SHA512
+                sudo usermod -aG sudo,docker aiuser
+
+                # Ensure home directories have correct ownership
+                sudo chown -R server_admin:server_admin /home/server_admin
+                sudo chown -R aiuser:aiuser /home/aiuser
+                EOF
 }
 
 resource "digitalocean_project_resources" "project_resources" {
