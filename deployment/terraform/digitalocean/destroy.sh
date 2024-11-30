@@ -5,8 +5,14 @@ read -p "Would you like to preview the changes or destroy the resources? (previe
 if [[ $confirm == "preview" ]]; then
     terraform plan -destroy
 fi
+
 if [[ $confirm == "destroy" ]]; then
     terraform destroy
+fi
+
+# Ask if they'd like to delete the token and project
+read -p "Would you like to delete the token and project? (y/n): " confirm
+if [[ $confirm == "y" ]]; then
     rm .terraform.do.token
     rm .terraform.do.project
 fi
