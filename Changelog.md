@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v0.0.1
 
+### Fixed
+  - bugfix/28-cannot-auth-tools-list (2024-11-30)
+
 ### Changed 
   - feature/25-add-basic-auth (2024-11-29)
   - feature/19-deploy-to-dev (2024-11-28)
