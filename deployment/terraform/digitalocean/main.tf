@@ -13,10 +13,6 @@ terraform {
 
 variable "do_token" {}
 variable "project_name" {}
-variable "host_name" {
-  description = "The name of the host (Droplet)."
-  type        = string
-}
 
 provider "digitalocean" {
   token = var.do_token
@@ -31,49 +27,35 @@ resource "random_password" "password" {
   special          = false
 }
 
-resource "random_password" "aiuser_password" {
-  length           = 32
-  special          = false
-}
-
 resource "digitalocean_droplet" "web" {
-  image      = "ubuntu-24-04-x64"
-  name       = var.host_name
-  region     = "nyc3"
-  size       = "s-1vcpu-1gb"
+  image  = "ubuntu-20-04-x64"
+  name   = "slack-agent-B"
+  region = "nyc3"
+  size   = "s-1vcpu-1gb"
   user_data = <<-EOF
-                #!/bin/bash
+            #!/bin/bash
 
-                # Update and install necessary packages
-                sudo apt-get update
-                sudo apt-get install -y \
-                    apt-transport-https \
-                    ca-certificates \
-                    curl \
-                    software-properties-common
+            # Create serveradmin user with sudo access
+            NEW_USER="serveradmin"
+            PASSWORD="${random_password.password.result}"
 
-                # Install Docker
-                curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-                echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-                sudo apt-get update
-                sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-                sudo systemctl enable docker
-                sudo systemctl start docker
+            useradd -m -s /bin/bash $NEW_USER
+            echo "$NEW_USER:$PASSWORD" | chpasswd
+            usermod -aG sudo $NEW_USER
 
-                # Create server_admin user
-                sudo useradd -m -s /bin/bash server_admin
-                echo "server_admin:${random_password.password.result}" | sudo chpasswd --crypt-method=SHA512
-                sudo usermod -aG sudo,docker server_admin
+            # Install Docker
+            apt-get update
+            apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+            add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+            apt-get update
+            apt-get install -y docker-ce
+            usermod -aG docker $NEW_USER
 
-                # Create aiuser
-                sudo useradd -m -s /bin/bash aiuser
-                echo "aiuser:${random_password.aiuser_password.result}" | sudo chpasswd --crypt-method=SHA512
-                sudo usermod -aG sudo,docker aiuser
-
-                # Ensure home directories have correct ownership
-                sudo chown -R server_admin:server_admin /home/server_admin
-                sudo chown -R aiuser:aiuser /home/aiuser
-                EOF
+            # Install Docker Compose
+            curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            chmod +x /usr/local/bin/docker-compose
+            EOF
 }
 
 resource "digitalocean_project_resources" "project_resources" {
@@ -87,16 +69,7 @@ output "droplet_ip" {
   value = digitalocean_droplet.web.ipv4_address
 }
 
-output "server_admin_username" {
-  value = "server_admin"
-}
-
-output "server_admin_password" {
-  value      = random_password.password.result
-  sensitive  = true
-}
-
-output "aiuser_password" {
-  value      = random_password.aiuser_password.result
-  sensitive  = true
+output "serveradmin_password" {
+  value = random_password.password.result
+  sensitive = true
 }

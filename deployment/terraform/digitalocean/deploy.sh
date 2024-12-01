@@ -35,17 +35,17 @@ echo "##########################################################################
 # Confirm output
 read -p "Would you like to output the passwords? (y/n): " confirm
 if [[ $confirm == "y" ]]; then
-    echo -e "\nserver_admin password:"
-    terraform output -raw server_admin_password
+    echo -e "\nserveradmin password:"
+    terraform output -raw serveradmin_password
     echo -e ""
-    echo -e "\naiuser password:"
-    terraform output -raw aiuser_password
-    echo -e ""
+    # echo -e "\naiuser password:"
+    # terraform output -raw aiuser_password
+    # echo -e ""
 fi
 
 echo -e ""
 echo -e "################################################################################"
 echo "Login to the server"
 echo "################################################################################"
-echo -e "ssh server_admin@$(terraform output -raw droplet_ip)"
+echo -e "ssh serveradmin@$(terraform output -raw droplet_ip)"
 echo -e "ssh aiuser@$(terraform output -raw droplet_ip)"
