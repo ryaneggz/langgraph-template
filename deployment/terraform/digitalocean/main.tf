@@ -79,6 +79,15 @@ resource "digitalocean_droplet" "web" {
             && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
             && sudo apt update \
             && sudo apt install gh -y
+
+            # Clone the repository
+            cd /home/$AI_USER
+            git clone https://github.com/ryaneggz/langgraph-template agent_api
+            cd agent_api
+            
+            # Set up Database
+            export POSTGRES_CONNECTION_STRING="postgresql://admin:test1234@localhost:5432/lg_template_dev?sslmode=disable"
+            docker compose up -d
             EOF
 }
 
