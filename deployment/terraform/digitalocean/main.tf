@@ -22,7 +22,12 @@ data "digitalocean_project" "project" {
   name = var.project_name
 }
 
-resource "random_password" "password" {
+resource "random_password" "serveradmin_password" {
+  length           = 32
+  special          = false
+}
+
+resource "random_password" "aiuser_password" {
   length           = 32
   special          = false
 }
@@ -36,12 +41,18 @@ resource "digitalocean_droplet" "web" {
             #!/bin/bash
 
             # Create serveradmin user with sudo access
-            NEW_USER="serveradmin"
-            PASSWORD="${random_password.password.result}"
+            ADMIN_USER="serveradmin"
+            ADMIN_PASSWORD="${random_password.serveradmin_password.result}"
+            useradd -m -s /bin/bash $ADMIN_USER
+            echo "$ADMIN_USER:$ADMIN_PASSWORD" | chpasswd
+            usermod -aG sudo $ADMIN_USER
 
-            useradd -m -s /bin/bash $NEW_USER
-            echo "$NEW_USER:$PASSWORD" | chpasswd
-            usermod -aG sudo $NEW_USER
+            # Create aiuser user
+            AI_USER="aiuser"
+            AI_PASSWORD="${random_password.aiuser_password.result}"
+            useradd -m -s /bin/bash $AI_USER
+            echo "$AI_USER:$AI_PASSWORD" | chpasswd
+            usermod -aG sudo $AI_USER
 
             # Install Docker
             apt-get update
@@ -50,8 +61,9 @@ resource "digitalocean_droplet" "web" {
             add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
             apt-get update
             apt-get install -y docker-ce
-            usermod -aG docker $NEW_USER
-
+            usermod -aG docker $ADMIN_USER
+            usermod -aG docker $AI_USER
+    
             # Install Docker Compose
             curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
             chmod +x /usr/local/bin/docker-compose
@@ -70,6 +82,11 @@ output "droplet_ip" {
 }
 
 output "serveradmin_password" {
-  value = random_password.password.result
+  value = random_password.serveradmin_password.result
+  sensitive = true
+}
+
+output "aiuser_password" {
+  value = random_password.aiuser_password.result
   sensitive = true
 }

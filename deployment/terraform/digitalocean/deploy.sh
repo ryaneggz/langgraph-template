@@ -38,9 +38,9 @@ if [[ $confirm == "y" ]]; then
     echo -e "\nserveradmin password:"
     terraform output -raw serveradmin_password
     echo -e ""
-    # echo -e "\naiuser password:"
-    # terraform output -raw aiuser_password
-    # echo -e ""
+    echo -e "\naiuser password:"
+    terraform output -raw aiuser_password
+    echo -e ""
 fi
 
 echo -e ""
