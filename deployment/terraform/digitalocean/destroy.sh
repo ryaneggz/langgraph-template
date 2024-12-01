@@ -13,6 +13,5 @@ fi
 # Ask if they'd like to delete the token and project
 read -p "Would you like to delete the token and project? (y/n): " confirm
 if [[ $confirm == "y" ]]; then
-    rm .terraform.do.token
-    rm .terraform.do.project
+    rm .terraform.config.json
 fi

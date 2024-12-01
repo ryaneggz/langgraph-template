@@ -1,19 +1,54 @@
 #! /bin/bash
 
-# Check if token file exists, otherwise prompt for token
-if [ -f .terraform.do.token ]; then
-    do_token=$(cat .terraform.do.token)
+# Check if config file exists, otherwise create it
+if [ -f .terraform.config.json ]; then
+    # Read values from config file
+    do_token=$(jq -r '.do_token' .terraform.config.json)
+    project_name=$(jq -r '.project_name' .terraform.config.json)
+    region=$(jq -r '.region' .terraform.config.json)
+    size=$(jq -r '.size' .terraform.config.json)
 else
+    # Prompt for token
     read -p "Enter your DigitalOcean API token: " do_token
-    echo "$do_token" > .terraform.do.token
-fi
-
-# Check if project name file exists, otherwise prompt for project name
-if [ -f .terraform.do.project ]; then
-    project_name=$(cat .terraform.do.project)
-else
+    
+    # Prompt for project name
     read -p "Enter the name of the project: " project_name
-    echo "$project_name" > .terraform.do.project
+    
+    # Prompt for region
+    echo "Available regions:"
+    echo "1) NYC1 - New York City, United States"
+    echo "2) NYC3 - New York City, United States" 
+    echo "3) SFO3 - San Francisco, United States"
+    read -p "Select region (1-3): " region_choice
+    case $region_choice in
+        1) region="nyc1";;
+        2) region="nyc3";;
+        3) region="sfo3";;
+        *) echo "Invalid choice, defaulting to nyc3"; region="nyc3";;
+    esac
+    
+    # Prompt for size
+    echo "Available sizes:"
+    echo "1) s-1vcpu-1gb - 1GB RAM, 1 vCPU"
+    echo "2) s-1vcpu-2gb - 2GB RAM, 1 vCPU"
+    echo "3) s-2vcpu-2gb - 2GB RAM, 2 vCPU"
+    read -p "Select size (1-3): " size_choice
+    case $size_choice in
+        1) size="s-1vcpu-1gb";;
+        2) size="s-1vcpu-2gb";;
+        3) size="s-2vcpu-2gb";;
+        *) echo "Invalid choice, defaulting to s-1vcpu-1gb"; size="s-1vcpu-1gb";;
+    esac
+    
+    # Create config file
+    cat > .terraform.config.json << EOF
+{
+    "do_token": "$do_token",
+    "project_name": "$project_name",
+    "region": "$region",
+    "size": "$size"
+}
+EOF
 fi
 
 # Ask if user would like to upgrade terraform
@@ -25,7 +60,7 @@ fi
 # Confirm deployment
 read -p "Are you sure you want to deploy? (y/n): " confirm
 if [[ $confirm == "y" ]]; then
-    terraform apply -var="do_token=$do_token" -var="project_name=$project_name"
+    terraform apply -var="do_token=$do_token" -var="project_name=$project_name" -var="region=$region" -var="size=$size"
 fi
 
 echo -e ""

@@ -13,6 +13,9 @@ terraform {
 
 variable "do_token" {}
 variable "project_name" {}
+variable "host_name" {}
+variable "region" {}
+variable "size" {}
 
 provider "digitalocean" {
   token = var.do_token
@@ -34,10 +37,10 @@ resource "random_password" "aiuser_password" {
 
 // https://www.perplexity.ai/search/terraform-ubuntu-template-digi-Vuo6tX2iRreg_yx.ESWjvg
 resource "digitalocean_droplet" "web" {
-  image  = "ubuntu-20-04-x64"
-  name   = "slack-agent-B"
-  region = "nyc3"
-  size   = "s-1vcpu-1gb"
+  image  = "ubuntu-24-04-x64"
+  name   = var.host_name
+  region = var.region
+  size   = var.size
   user_data = <<-EOF
             #!/bin/bash
 
