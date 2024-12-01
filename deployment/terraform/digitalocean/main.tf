@@ -32,6 +32,7 @@ resource "random_password" "aiuser_password" {
   special          = false
 }
 
+// https://www.perplexity.ai/search/terraform-ubuntu-template-digi-Vuo6tX2iRreg_yx.ESWjvg
 resource "digitalocean_droplet" "web" {
   image  = "ubuntu-20-04-x64"
   name   = "slack-agent-B"
@@ -52,7 +53,7 @@ resource "digitalocean_droplet" "web" {
             AI_PASSWORD="${random_password.aiuser_password.result}"
             useradd -m -s /bin/bash $AI_USER
             echo "$AI_USER:$AI_PASSWORD" | chpasswd
-            usermod -aG sudo $AI_USER
+            # usermod -aG sudo $AI_USER
 
             # Install Docker
             apt-get update
