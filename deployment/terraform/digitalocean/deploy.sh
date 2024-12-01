@@ -7,6 +7,11 @@ if [ -f .terraform.config.json ]; then
     project_name=$(jq -r '.project_name' .terraform.config.json)
     region=$(jq -r '.region' .terraform.config.json)
     size=$(jq -r '.size' .terraform.config.json)
+    anthropic_api_key=$(jq -r '.anthropic_api_key' .terraform.config.json)
+    openai_api_key=$(jq -r '.openai_api_key' .terraform.config.json)
+    slack_bot_token=$(jq -r '.slack_bot_token' .terraform.config.json)
+    slack_app_token=$(jq -r '.slack_app_token' .terraform.config.json)
+    app_tag=$(jq -r '.app_tag' .terraform.config.json)
 fi
 
 # Prompt for token if null or empty
@@ -49,13 +54,40 @@ if [ "$size" = "null" ] || [ -z "$size" ]; then
     esac
 fi
 
+# Prompt for API tokens if null or empty
+if [ "$anthropic_api_key" = "null" ] || [ -z "$anthropic_api_key" ]; then
+    read -p "Enter your Anthropic API key: " anthropic_api_key
+fi
+
+if [ "$openai_api_key" = "null" ] || [ -z "$openai_api_key" ]; then
+    read -p "Enter your OpenAI API key: " openai_api_key
+fi
+
+if [ "$slack_bot_token" = "null" ] || [ -z "$slack_bot_token" ]; then
+    read -p "Enter your Slack Bot Token: " slack_bot_token
+fi
+
+if [ "$slack_app_token" = "null" ] || [ -z "$slack_app_token" ]; then
+    read -p "Enter your Slack App Token: " slack_app_token
+fi
+
+# Prompt for app tag if null or empty
+if [ "$app_tag" = "null" ] || [ -z "$app_tag" ]; then
+    read -p "Enter the app tag (e.g., v1.0.0): " app_tag
+fi
+
 # Create/update config file
 cat > .terraform.config.json << EOF
 {
     "do_token": "$do_token",
     "project_name": "$project_name",
     "region": "$region",
-    "size": "$size"
+    "size": "$size",
+    "anthropic_api_key": "$anthropic_api_key",
+    "openai_api_key": "$openai_api_key",
+    "slack_bot_token": "$slack_bot_token",
+    "slack_app_token": "$slack_app_token",
+    "app_tag": "$app_tag"
 }
 EOF
 
@@ -68,7 +100,16 @@ fi
 # Confirm deployment
 read -p "Are you sure you want to deploy? (y/n): " confirm
 if [[ $confirm == "y" ]]; then
-    terraform apply -var="do_token=$do_token" -var="project_name=$project_name" -var="region=$region" -var="size=$size"
+    terraform apply \
+        -var="do_token=$do_token" \
+        -var="project_name=$project_name" \
+        -var="region=$region" \
+        -var="size=$size" \
+        -var="anthropic_api_key=$anthropic_api_key" \
+        -var="openai_api_key=$openai_api_key" \
+        -var="slack_bot_token=$slack_bot_token" \
+        -var="slack_app_token=$slack_app_token" \
+        -var="app_tag=$app_tag"
 fi
 
 echo -e ""

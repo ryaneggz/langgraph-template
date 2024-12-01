@@ -16,6 +16,11 @@ variable "project_name" {}
 variable "host_name" {}
 variable "region" {}
 variable "size" {}
+variable "anthropic_api_key" {}
+variable "openai_api_key" {}
+variable "slack_bot_token" {}
+variable "slack_app_token" {}
+variable "app_tag" {}
 
 provider "digitalocean" {
   token = var.do_token
@@ -44,16 +49,24 @@ resource "digitalocean_droplet" "web" {
   user_data = <<-EOF
             #!/bin/bash
 
-            # Create serveradmin user with sudo access
+            # Set environment variables
             ADMIN_USER="serveradmin"
             ADMIN_PASSWORD="${random_password.serveradmin_password.result}"
+            AI_USER="aiuser"
+            AI_PASSWORD="${random_password.aiuser_password.result}"
+            APP_TAG="${var.app_tag}"
+            ANTHROPIC_API_KEY="${var.anthropic_api_key}"
+            OPENAI_API_KEY="${var.openai_api_key}"
+            SLACK_BOT_TOKEN="${var.slack_bot_token}"
+            SLACK_APP_TOKEN="${var.slack_app_token}"
+            SLACK_AGENT_IMAGE_NAME="ryaneggz/slack-agent:latest"
+
+            # Create serveradmin user with sudo access
             useradd -m -s /bin/bash $ADMIN_USER
             echo "$ADMIN_USER:$ADMIN_PASSWORD" | chpasswd
             usermod -aG sudo $ADMIN_USER
 
             # Create aiuser user
-            AI_USER="aiuser"
-            AI_PASSWORD="${random_password.aiuser_password.result}"
             useradd -m -s /bin/bash $AI_USER
             echo "$AI_USER:$AI_PASSWORD" | chpasswd
             # usermod -aG sudo $AI_USER
@@ -85,9 +98,37 @@ resource "digitalocean_droplet" "web" {
             git clone https://github.com/ryaneggz/langgraph-template agent_api
             cd agent_api
             
+            # Create .env file
+            cat > /home/$AI_USER/agent_api/.env << EOL
+            OPENAI_API_KEY=$OPENAI_API_KEY
+            ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
+            POSTGRES_CONNECTION_STRING="postgresql://admin:test1234@localhost:5432/lg_template_dev?sslmode=disable"
+            EOL
+
+            # Create .env.slack file
+            cat > /home/$AI_USER/agent_api/.env.slack << EOL
+            SLACK_BOT_TOKEN=$SLACK_BOT_TOKEN
+            SLACK_APP_TOKEN=$SLACK_APP_TOKEN
+            BASE_API_URL=http://localhost:8000
+            EOL
+
             # Set up Database
-            export POSTGRES_CONNECTION_STRING="postgresql://admin:test1234@localhost:5432/lg_template_dev?sslmode=disable"
             docker compose up -d
+
+            # Start the agent API
+            git fetch --all --tags
+            git checkout $APP_TAG -f 
+            
+            echo 'Checking for existing agent_api sessions...'
+            tmux ls 2>/dev/null | grep '^agent_api' | cut -d: -f1 | xargs -I{} tmux kill-session -t {} || echo 'No existing agent_api sessions found'
+
+            # Create new tmux session with version in name
+            SESSION_NAME="agent_api_$APP_TAG"
+            tmux new-session -d -s "$SESSION_NAME" '
+                source .venv/bin/activate
+                uv pip install -r requirements.txt
+                python main.py
+            '
             EOF
 }
 
