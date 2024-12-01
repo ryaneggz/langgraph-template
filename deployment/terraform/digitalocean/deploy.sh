@@ -12,6 +12,8 @@ if [ -f .terraform.config.json ]; then
     slack_bot_token=$(jq -r '.slack_bot_token' .terraform.config.json)
     slack_app_token=$(jq -r '.slack_app_token' .terraform.config.json)
     app_tag=$(jq -r '.app_tag' .terraform.config.json)
+    app_username=$(jq -r '.app_username' .terraform.config.json)
+    app_password=$(jq -r '.app_password' .terraform.config.json)
 fi
 
 # Prompt for token if null or empty
@@ -76,6 +78,16 @@ if [ "$app_tag" = "null" ] || [ -z "$app_tag" ]; then
     read -p "Enter the app tag (e.g., v1.0.0): " app_tag
 fi
 
+# Prompt for app username if null or empty
+if [ "$app_username" = "null" ] || [ -z "$app_username" ]; then
+    read -p "Enter the app username: " app_username
+fi
+
+# Prompt for app password if null or empty
+if [ "$app_password" = "null" ] || [ -z "$app_password" ]; then
+    read -p "Enter the app password: " app_password
+fi
+
 # Create/update config file
 cat > .terraform.config.json << EOF
 {
@@ -87,7 +99,9 @@ cat > .terraform.config.json << EOF
     "openai_api_key": "$openai_api_key",
     "slack_bot_token": "$slack_bot_token",
     "slack_app_token": "$slack_app_token",
-    "app_tag": "$app_tag"
+    "app_tag": "$app_tag",
+    "app_username": "$app_username",
+    "app_password": "$app_password"
 }
 EOF
 
@@ -109,7 +123,9 @@ if [[ $confirm == "y" ]]; then
         -var="openai_api_key=$openai_api_key" \
         -var="slack_bot_token=$slack_bot_token" \
         -var="slack_app_token=$slack_app_token" \
-        -var="app_tag=$app_tag"
+        -var="app_tag=$app_tag" \
+        -var="app_username=$app_username" \
+        -var="app_password=$app_password"
 fi
 
 echo -e ""
@@ -117,14 +133,17 @@ echo -e "#######################################################################
 echo "Outputting passwords"
 echo "################################################################################"
 # Confirm output
-read -p "Would you like to output the passwords? (y/n): " confirm
-if [[ $confirm == "y" ]]; then
+read -p "Would you like to output the passwords? (y/n) " confirm
+if [ "$confirm" = "y" ]; then
     echo -e "\nserveradmin password:"
-    terraform output -raw serveradmin_password
-    echo -e ""
+    terraform output -raw serveradmin_password > .terraform.serveradmin_password
+    cat .terraform.serveradmin_password
+    echo -e "\nPassword saved to .terraform.serveradmin_password"
+    
     echo -e "\naiuser password:"
-    terraform output -raw aiuser_password
-    echo -e ""
+    terraform output -raw aiuser_password > .terraform.aiuser_password
+    cat .terraform.aiuser_password
+    echo -e "\nPassword saved to .terraform.aiuser_password"
 fi
 
 echo -e ""
