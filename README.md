@@ -8,6 +8,7 @@ This project includes tools for running shell commands and Docker container oper
 
 - [Tools Documentation](./docs/tools.md)
 - [Docker Compose Configuration](./docs/docker-compose.md)
+- [Deploy to DigitalOcean](./docs/deploy-digitalocean.md)
 - [Human-In-The-Loop](https://langchain-ai.github.io/langgraph/how-tos/create-react-agent-hitl/#usage)
 
 ## Prerequisites
@@ -15,7 +16,7 @@ This project includes tools for running shell commands and Docker container oper
 - Python 3.10 or higher
 - Access to OpenAI API (for GPT-4o model) or Anthropic API (for Claude 3.5 Sonnet)
 
-## Installation
+## Installation (Locally)
 
 1. **Clone the repository:**
 
@@ -59,18 +60,4 @@ This project includes tools for running shell commands and Docker container oper
    python main.py
    ```
 
-**Test API response:**
-
-   Run the following bash script to test the api
-
-   ```bash
-   curl -X 'POST' \
-   'http://localhost:8000/llm' \
-   -H 'accept: application/json' \
-   -H 'Content-Type: application/json' \
-   -d '{
-      "query": "What is the capital of France?",
-      "thread_id": 42,
-      "tools": []
-   }'
-   ```
+## Deployment
