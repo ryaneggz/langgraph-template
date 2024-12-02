@@ -139,8 +139,16 @@ resource "digitalocean_droplet" "web" {
             # Ownership of home directory
             chown -R $AI_USER:$AI_USER /home/$AI_USER
 
-            # Install uv
-            sudo -u $AI_USER pipx install uv || echo "Error installing uv" >> $SETUP_LOG
+            ## Install uv
+            # sudo -u $AI_USER pipx install uv || echo "Error installing uv" >> $SETUP_LOG
+            # sudo -u $AI_USER tmux new-session -d -s "agent_api" -c "/home/$AI_USER/agent_api" "uv venv && source .venv/bin/activate && uv pip install -r requirements.txt && python3 main.py"
+
+            sudo -u $AI_USER tmux new-session -d -s "agent_api" '
+                python3 -m venv .venv
+                source .venv/bin/activate
+                pip install -r requirements.txt
+                python main.py
+            '
 
             # Create done directory and html file
             sudo -u $AI_USER mkdir -p /home/$AI_USER/done || echo "Error creating done directory" >> $SETUP_LOG
@@ -188,7 +196,7 @@ resource "digitalocean_droplet" "web" {
             EOL
 
             # Start Python HTTP server in tmux
-            sudo -u $AI_USER tmux new-session -d -s "done_server" "cd /home/$AI_USER/done && python3 -m http.server 8080" && tmux new-session -d -s "agent_api" -c "/home/aiuser/agent_api" "uv venv && source .venv/bin/activate && uv pip install -r requirements.txt && python3 main.py"
+            sudo -u $AI_USER tmux new-session -d -s "done_server" "cd /home/$AI_USER/done && python3 -m http.server 8080"
 
             echo "Setup completed at $(date)" >> $SETUP_LOG
             EOF
