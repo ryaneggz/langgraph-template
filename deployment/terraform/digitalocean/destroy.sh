@@ -14,4 +14,6 @@ fi
 read -p "Would you like to delete the token and project? (y/n): " confirm
 if [[ $confirm == "y" ]]; then
     rm .terraform.config.json
+    rm .terraform.serveradmin_password
+    rm .terraform.aiuser_password
 fi
