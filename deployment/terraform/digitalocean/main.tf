@@ -60,18 +60,20 @@ resource "digitalocean_droplet" "web" {
             APP_USERNAME="${var.app_username}"
             APP_PASSWORD="${var.app_password}"
             ANTHROPIC_API_KEY="${var.anthropic_api_key}"
+            HOST_IP=$(hostname -I | awk '{print $1}')
             OPENAI_API_KEY="${var.openai_api_key}"
             SLACK_BOT_TOKEN="${var.slack_bot_token}"
             SLACK_APP_TOKEN="${var.slack_app_token}"
             SLACK_AGENT_IMAGE_NAME="ryaneggz/slack-agent:latest"
 
             # Create log file
-            SETUP_LOG="/home/aiuser/setup.log"
+            SETUP_LOG="/home/$AI_USER/done/setup.log"
             touch $SETUP_LOG
             exec 1> >(tee -a "$SETUP_LOG")
             exec 2> >(tee -a "$SETUP_LOG" >&2)
 
             echo "Starting setup at $(date)" >> $SETUP_LOG
+            echo "AI_USER: $AI_USER" >> $SETUP_LOG
 
             # Create serveradmin user with sudo access
             useradd -m -s /bin/bash $ADMIN_USER || echo "Error creating admin user" >> $SETUP_LOG
@@ -85,7 +87,7 @@ resource "digitalocean_droplet" "web" {
 
             # Install Docker
             apt-get update || echo "Error updating apt" >> $SETUP_LOG
-            apt-get install -y apt-transport-https ca-certificates curl software-properties-common python3-pip python3-venv tmux || echo "Error installing prerequisites" >> $SETUP_LOG
+            apt-get install -y apt-transport-https ca-certificates curl software-properties-common python3-pip python3-venv pipx tmux || echo "Error installing prerequisites" >> $SETUP_LOG
             curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - || echo "Error adding Docker GPG key" >> $SETUP_LOG
             add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" || echo "Error adding Docker repository" >> $SETUP_LOG
             apt-get update || echo "Error updating apt after Docker repo add" >> $SETUP_LOG
@@ -128,27 +130,21 @@ resource "digitalocean_droplet" "web" {
             docker compose up -d || echo "Error starting Docker containers" >> $SETUP_LOG
 
             # Start the agent API
-            # git fetch --all --tags
-            # git checkout $APP_TAG -f 
+            sudo -u $AI_USER git fetch --all --tags
+            sudo -u $AI_USER git checkout $APP_TAG -f 
             
-            echo 'Checking for existing agent_api sessions...'
-            sudo -u $AI_USER tmux ls 2>/dev/null | grep '^agent_api' | cut -d: -f1 | xargs -I{} tmux kill-session -t {} || echo 'No existing agent_api sessions found'
+            echo 'Checking for existing agent_api sessions...' >> $SETUP_LOG
+            sudo -u $AI_USER tmux ls 2>/dev/null | grep '^agent_api' | cut -d: -f1 | xargs -I{} tmux kill-session -t {} || echo 'No existing agent_api sessions found' >> $SETUP_LOG
 
             # Ownership of home directory
             chown -R $AI_USER:$AI_USER /home/$AI_USER
 
-            # Create new tmux session
-            SESSION_NAME="agent_api"
-            sudo -u $AI_USER tmux new-session -d -s "$SESSION_NAME" '
-                python3 -m venv .venv || echo "Error creating virtual environment" >> /home/$AI_USER/setup.log
-                source .venv/bin/activate || echo "Error activating virtual environment" >> /home/$AI_USER/setup.log
-                pip install -r requirements.txt || echo "Error installing requirements" >> /home/$AI_USER/setup.log
-                python main.py || echo "Error starting Python application" >> /home/$AI_USER/setup.log
-            '
+            # Install uv
+            sudo -u $AI_USER pipx install uv || echo "Error installing uv" >> $SETUP_LOG
 
             # Create done directory and html file
             sudo -u $AI_USER mkdir -p /home/$AI_USER/done || echo "Error creating done directory" >> $SETUP_LOG
-            cat > /home/$AI_USER/done/index.html << EOL || echo "Error creating index.html" >> $SETUP_LOG
+            sudo -u $AI_USER cat > /home/$AI_USER/done/index.html << EOL || echo "Error creating index.html" >> $SETUP_LOG
             <!DOCTYPE html>
             <html>
             <head>
@@ -174,15 +170,15 @@ resource "digitalocean_droplet" "web" {
                 <div class="info-box">
                     <h2>Services Status</h2>
                     <ul>
-                        <li>Agent API: Running on port 8000</li>
-                        <li>Database: Running on port 5432</li>
-                        <li>Status Page: Running on port 8080</li>
+                        <li>Agent API: Running on port <a href="http://$HOST_IP:8000">http://$HOST_IP:8000</a></li>
+                        <li>Database: Running on port <a href="http://$HOST_IP:4040">http://$HOST_IP:4040</a></li>
+                        <li>Status Page: Running on port <a href="http://$HOST_IP:8080">http://$HOST_IP:8080</a></li>
                     </ul>
                 </div>
                 <div class="info-box">
                     <h2>Next Steps</h2>
                     <ul>
-                        <li>Check the setup logs at: /home/aiuser/setup.log</li>
+                        <li>Check the setup logs at: <a href="http://$HOST_IP:8080/setup.log">http://$HOST_IP:8080/setup.log</a></li>
                         <li>Monitor the API using: tmux attach -t agent_api</li>
                         <li>View Docker containers: docker ps</li>
                     </ul>
@@ -192,7 +188,7 @@ resource "digitalocean_droplet" "web" {
             EOL
 
             # Start Python HTTP server in tmux
-            sudo -u $AI_USER tmux new-session -d -s "done_server" "cd /home/$AI_USER/done && python3 -m http.server 8080"
+            sudo -u $AI_USER tmux new-session -d -s "done_server" "cd /home/$AI_USER/done && python3 -m http.server 8080" && tmux new-session -d -s "agent_api" -c "/home/aiuser/agent_api" "uv venv && source .venv/bin/activate && uv pip install -r requirements.txt && python3 main.py"
 
             echo "Setup completed at $(date)" >> $SETUP_LOG
             EOF
