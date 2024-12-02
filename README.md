@@ -73,4 +73,4 @@ This project includes tools for running shell commands and Docker container oper
       "thread_id": 42,
       "tools": []
    }'
-   ```
+   ```# TODO: Replace pip with uv
