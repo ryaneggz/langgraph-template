@@ -34,6 +34,7 @@ services:
     container_name: slack_agent
     image: ryaneggz/slack-agent:latest
     env_file: .env.slack
+    network_mode: host
     restart: always
 
   ## Graphchat
