@@ -81,6 +81,4 @@ class Agent:
         if not isinstance(messages[0], SystemMessage):
             if system:
                 messages.insert(0, SystemMessage(content=system))
-            else:
-                messages.insert(0, SystemMessage(content=read_system_message(SystemPaths.COT_MCTS.value)))
         return messages

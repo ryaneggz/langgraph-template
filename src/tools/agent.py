@@ -1,8 +1,10 @@
 import json
+import uuid
 from langchain_core.tools import tool, ToolException
 
 from psycopg_pool import ConnectionPool
 from src.constants import DB_URI, CONNECTION_POOL_KWARGS
+from src.utils.logger import logger
 
 @tool
 def available_tools():
@@ -11,14 +13,14 @@ def available_tools():
     return [tool.name for tool in tools]
 
 @tool
-def agent_builder(thread_id: str, query: str, system: str, tools: list[str]):
+def agent_builder(query: str, system: str, tools: list[str], thread_id: str = None):
     """Build and run an AI agent with the specified configuration.
     
     Args:
-        thread_id (str): Unique identifier for the conversation thread
         query (str): The user's question or request to be processed
         system (str): System message to set context and instructions for the agent
         tools (list[str]): List of tool names the agent should have access to
+        thread_id (str): Unique identifier for the conversation thread, if not provided, a new thread will be created
         
     Returns:
         Response: JSON response containing the agent's answer and thread_id
@@ -40,11 +42,21 @@ def agent_builder(thread_id: str, query: str, system: str, tools: list[str]):
             kwargs=CONNECTION_POOL_KWARGS,
         ) as pool:
             from src.utils.agent import Agent
-            agent = Agent(thread_id, pool)
+            logger.debug(f"Agent Builder Request:\n"
+                    f"Thread ID: {thread_id}\n"
+                    f"System: {system}\n"
+                    f"Tools: {', '.join(tools)}\n"
+                    f"Query: {query}\n")
+            
+            agent = Agent(thread_id or str(uuid.uuid4()), pool)
             agent.builder(tools=tools)
             messages = agent.messages(query, system)
             response = agent.process(messages, False)
             data = json.loads(response.body.decode('utf-8'))
-            return data.get('answer').get('content')
+            return {
+                "thread_id": thread_id,
+                "answer": data.get('answer').get('content')
+            }
     except Exception as e:
+        logger.error(f"Error in agent_builder: {str(e)}")
         raise ToolException(f"Error running agent: {str(e)}")

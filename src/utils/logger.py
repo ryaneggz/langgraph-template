@@ -1,4 +1,5 @@
 from loguru import logger
+import os
 import sys
 from datetime import datetime
 
@@ -50,7 +51,7 @@ logger.remove()  # Remove the default handler
 logger.add(
     sys.stdout,
     format=LOG_FORMAT,
-    level="INFO",  # Change to DEBUG for verbose output
+    level=os.getenv("LOG_LEVEL", "INFO").upper(),  # Change to DEBUG for verbose output
     colorize=True,
     backtrace=True,  # Show error backtraces for easier debugging
     diagnose=True,   # Show variable values in tracebacks
