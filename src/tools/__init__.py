@@ -1,16 +1,18 @@
 
 from langgraph.prebuilt import ToolNode
+from langchain_core.tools import tool
 from src.tools.shell import shell_local, shell_docker
 from src.tools.retrieval import retrieval_query, retrieval_add, retrieval_load
-from src.tools.agent import agent_builder
+from src.tools.agent import agent_builder, available_tools
 
 tools = [       
+    available_tools,
     shell_local,
     shell_docker,
     retrieval_query,
     retrieval_add,
     retrieval_load,
-    agent_builder
+    agent_builder,
 ]
 tool_node = ToolNode(tools)
 

@@ -2,6 +2,10 @@ from langchain_core.tools import tool
 from src.utils.agent import Agent
 from psycopg_pool import ConnectionPool
 from src.constants import DB_URI, CONNECTION_POOL_KWARGS
+from src.tools import tools
+@tool
+def available_tools():
+    return [tool.name for tool in tools]
 
 @tool
 def agent_builder(thread_id: str, query: str, system: str, tools: list[str]):
