@@ -1,10 +1,12 @@
 from langchain_core.tools import tool
-from src.utils.agent import Agent
+
 from psycopg_pool import ConnectionPool
 from src.constants import DB_URI, CONNECTION_POOL_KWARGS
-from src.tools import tools
+
 @tool
 def available_tools():
+    """List all available tools."""
+    from src.tools import tools
     return [tool.name for tool in tools]
 
 @tool
@@ -35,6 +37,7 @@ def agent_builder(thread_id: str, query: str, system: str, tools: list[str]):
         max_size=20,
         kwargs=CONNECTION_POOL_KWARGS,
     ) as pool:
+        from src.utils.agent import Agent
         agent = Agent(thread_id, pool)
         agent.builder(tools=tools)
         messages = agent.messages(query, system)
