@@ -50,7 +50,7 @@ def agent_builder(query: str, system: str, tools: list[str], thread_id: str = No
             
             agent = Agent(thread_id or str(uuid.uuid4()), pool)
             agent.builder(tools=tools)
-            messages = agent.messages(query, system)
+            messages = agent.messages(query, system if not thread_id else None)
             response = agent.process(messages, False)
             data = json.loads(response.body.decode('utf-8'))
             return {
