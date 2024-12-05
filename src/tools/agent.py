@@ -1,4 +1,5 @@
-from langchain_core.tools import tool
+import json
+from langchain_core.tools import tool, ToolException
 
 from psycopg_pool import ConnectionPool
 from src.constants import DB_URI, CONNECTION_POOL_KWARGS
@@ -32,14 +33,18 @@ def agent_builder(thread_id: str, query: str, system: str, tools: list[str]):
                 tools=["weather_query"]
             )
     """
-    with ConnectionPool(
-        conninfo=DB_URI,
-        max_size=20,
-        kwargs=CONNECTION_POOL_KWARGS,
-    ) as pool:
-        from src.utils.agent import Agent
-        agent = Agent(thread_id, pool)
-        agent.builder(tools=tools)
-        messages = agent.messages(query, system)
-        response = agent.process(messages, False)
-        return response
+    try:
+        with ConnectionPool(
+            conninfo=DB_URI,
+            max_size=20,
+            kwargs=CONNECTION_POOL_KWARGS,
+        ) as pool:
+            from src.utils.agent import Agent
+            agent = Agent(thread_id, pool)
+            agent.builder(tools=tools)
+            messages = agent.messages(query, system)
+            response = agent.process(messages, False)
+            data = json.loads(response.body.decode('utf-8'))
+            return data.get('answer').get('content')
+    except Exception as e:
+        raise ToolException(f"Error running agent: {str(e)}")
