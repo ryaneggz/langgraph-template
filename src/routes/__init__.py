@@ -121,7 +121,7 @@ def thread_history(
 ### List Tools
 ################################################################################
 from src.tools import tools
-tool_names = [tool.name for tool in tools]
+tool_names = [{'id':tool.name, 'description':tool.description, 'args':tool.args} for tool in tools]
 tools_response = {"tools": tool_names}
 @router.get(
     "/tools", 
