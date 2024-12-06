@@ -41,10 +41,10 @@ def new_thread(
         kwargs=CONNECTION_POOL_KWARGS,
     ) as pool:
         thread_id = str(uuid.uuid4())
-        logger.info(f"Creating new thread with ID: {thread_id} and Tools: {body.tools} and Query: {body.query}")
+        logger.info(f"Creating new thread with ID: {thread_id} {f'and Tools: {', '.join(body.tools)}' if body.tools else ''} and Query: {body.query}")
         agent = Agent(thread_id, pool)
         agent.builder(tools=body.tools)
-        messages = agent.messages(body.query, body.system)
+        messages = agent.messages(body.query, body.system, body.images)
         return agent.process(messages, body.stream)
     
 ################################################################################

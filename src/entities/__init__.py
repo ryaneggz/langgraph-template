@@ -24,6 +24,7 @@ class ExistingThread(BaseModel):
     query: str = Field(...)
     tools: Optional[List[Any]] = Field(default_factory=list)
     stream: Optional[bool] = Field(default=False)
+    images: Optional[List[str]] = Field(default_factory=list)
     
     model_config = {
         "json_schema_extra": {"example": EXISTING_THREAD_QUERY_EXAMPLE}
