@@ -79,7 +79,7 @@ def existing_thread(
         tools_str = f"and Tools: {', '.join(body.tools)}" if body.tools else ""
         logger.info(f"Querying existing thread with ID: {thread_id} {tools_str} and Query: {body.query}")
         agent.builder(tools=body.tools)
-        messages = [HumanMessage(content=body.query)]
+        messages = agent.messages(query=body.query, images=body.images)
         return agent.process(messages, body.stream)
     
 ################################################################################
