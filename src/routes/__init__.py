@@ -41,7 +41,8 @@ def new_thread(
         kwargs=CONNECTION_POOL_KWARGS,
     ) as pool:
         thread_id = str(uuid.uuid4())
-        logger.info(f"Creating new thread with ID: {thread_id} {f'and Tools: {', '.join(body.tools)}' if body.tools else ''} and Query: {body.query}")
+        tools_str = f"and Tools: {', '.join(body.tools)}" if body.tools else ""
+        logger.info(f"Creating new thread with ID: {thread_id} {tools_str} and Query: {body.query}")
         agent = Agent(thread_id, pool)
         agent.builder(tools=body.tools)
         messages = agent.messages(body.query, body.system, body.images)
@@ -75,7 +76,8 @@ def existing_thread(
         kwargs=CONNECTION_POOL_KWARGS,
     ) as pool:  
         agent = Agent(thread_id, pool)
-        logger.info(f"Querying existing thread with ID: {thread_id} and Tools: {body.tools} and Query: {body.query}")
+        tools_str = f"and Tools: {', '.join(body.tools)}" if body.tools else ""
+        logger.info(f"Querying existing thread with ID: {thread_id} {tools_str} and Query: {body.query}")
         agent.builder(tools=body.tools)
         messages = [HumanMessage(content=body.query)]
         return agent.process(messages, body.stream)
