@@ -42,15 +42,16 @@ def agent_builder(query: str, system: str, tools: list[str], thread_id: str = No
             kwargs=CONNECTION_POOL_KWARGS,
         ) as pool:
             from src.utils.agent import Agent
-            logger.debug(f"Agent Builder Request:\n"
-                    f"Thread ID: {thread_id}\n"
+            unique_id = str(uuid.uuid4())
+            logger.info(f"Agent Builder Request:\n"
+                    f"Thread ID: {thread_id or unique_id}\n"
                     f"System: {system}\n"
                     f"Tools: {', '.join(tools)}\n"
                     f"Query: {query}\n")
             
-            agent = Agent(thread_id or str(uuid.uuid4()), pool)
+            agent = Agent(thread_id or unique_id, pool)
             agent.builder(tools=tools)
-            messages = agent.messages(query, system if not thread_id else None)
+            messages = agent.messages(query, system if not (thread_id or unique_id) else None)
             response = agent.process(messages, False)
             data = json.loads(response.body.decode('utf-8'))
             return {
