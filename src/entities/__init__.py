@@ -63,7 +63,21 @@ class Answer(BaseModel):
             }
         }
     }
-        
+
+class DocIds(BaseModel):
+    documents: list[str] = Field(...)
+    
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "documents": [
+                    "317369e3-d061-4a7c-afea-948edea9856b",
+                    "84d83f48-b01b-4bf3-b027-765c61772344",
+                    "e052d740-b0d4-483c-871a-7a0005d92fdd"
+                ]
+            }
+        }
+    }
         
 class Document(BaseModel):
     page_content: str
