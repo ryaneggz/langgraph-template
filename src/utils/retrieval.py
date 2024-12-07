@@ -19,17 +19,27 @@ class VectorStore:
             return self.vector_store
         
     def add_docs(self, docs: list[Document]):
-        self.vector_store.add_documents(docs)
-        self.vector_store.dump(DEFAULT_VECTOR_STORE_PATH)
-        return True
+        try:
+            updated = self.vector_store.add_documents([Document(**doc) for doc in docs])
+            self.vector_store.dump(DEFAULT_VECTOR_STORE_PATH)
+            return updated
+        except Exception as e:
+            print(f"Error adding documents to vector store: {e}")
+            return False
         
     async def aadd_docs(self, docs: list[Document]):
         await self.vector_store.aadd_documents(docs)
         return True
         
     def delete_docs(self, ids: list[str]):
-        self.vector_store.delete(ids)
-        return True
+        try:
+            self.load_vector_store()
+            self.vector_store.delete(ids)
+            self.vector_store.dump(DEFAULT_VECTOR_STORE_PATH)
+            return True
+        except Exception as e:
+            print(f"Error deleting documents from vector store: {e}")
+            return False
     
     async def adelete_docs(self, ids: list[str]):
         await self.vector_store.adelete(ids)

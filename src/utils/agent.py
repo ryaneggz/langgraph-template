@@ -41,7 +41,7 @@ class Agent:
     def builder(
         self,
         tools: list[str] = [],
-        debug: bool = False
+        debug: bool = True
     ) -> StateGraph:
         llm = LLMWrapper(
             model_name=ModelName.ANTHROPIC,

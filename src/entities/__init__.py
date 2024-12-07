@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from langchain_core.messages import AnyMessage
 
 from src.constants.examples import (
+    ADD_DOCUMENTS_EXAMPLE,
     THREAD_HISTORY_EXAMPLE,
     NEW_THREAD_ANSWER_EXAMPLE,
     EXISTING_THREAD_ANSWER_EXAMPLE,
@@ -63,6 +64,17 @@ class Answer(BaseModel):
         }
     }
         
+        
+class Document(BaseModel):
+    page_content: str
+    metadata: dict = {}
+        
+class AddDocuments(BaseModel):
+    documents: list[Any] = Field(...)
+    
+    model_config = {
+        "json_schema_extra": {"example": ADD_DOCUMENTS_EXAMPLE}
+    }
 
     
 ##### Vector Store

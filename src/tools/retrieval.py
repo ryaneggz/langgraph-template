@@ -1,5 +1,4 @@
 from langchain_core.tools import tool
-from langgraph.prebuilt import ToolNode
 from langchain_core.documents import Document
 
 from src.utils.retrieval import VectorStore
