@@ -30,6 +30,21 @@ class VectorStore:
     async def aadd_docs(self, docs: list[Document]):
         await self.vector_store.aadd_documents(docs)
         return True
+    
+    def edit_doc(self, id: str, doc: Document):
+        try:
+            self.load_vector_store()
+            found = self.vector_store.store.get(id)
+            if found:
+                # Update the document fields
+                found['metadata'] = doc.metadata
+                self.vector_store.store[id] = found
+                self.vector_store.dump(DEFAULT_VECTOR_STORE_PATH)
+                del found['vector']
+                return found
+        except Exception as e:
+            print(f"Error editing document in vector store: {e}")
+            return False
         
     def delete_docs(self, ids: list[str]):
         try:
@@ -69,7 +84,15 @@ class VectorStore:
         results = retriever.invoke(query)
         return results
     
+    def list_docs(self):
+        self.load_vector_store()
+        docs = list(self.vector_store.store.values())
+        for doc in docs:
+            doc.pop('vector', None)
+        return docs
+    
     def find_docs_by_ids(self, ids: list[str]):
+        self.load_vector_store()
         return self.vector_store.get_by_ids(ids)
     
     

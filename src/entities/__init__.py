@@ -6,6 +6,7 @@ from langchain_core.messages import AnyMessage
 
 from src.constants.examples import (
     ADD_DOCUMENTS_EXAMPLE,
+    LIST_DOCUMENTS_EXAMPLE,
     THREAD_HISTORY_EXAMPLE,
     NEW_THREAD_ANSWER_EXAMPLE,
     EXISTING_THREAD_ANSWER_EXAMPLE,
@@ -82,6 +83,10 @@ class DocIds(BaseModel):
 class Document(BaseModel):
     page_content: str
     metadata: dict = {}
+    
+    model_config = {
+        "json_schema_extra": {"example": ADD_DOCUMENTS_EXAMPLE['documents'][0]}
+    }
         
 class AddDocuments(BaseModel):
     documents: list[Any] = Field(...)

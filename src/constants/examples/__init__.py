@@ -188,3 +188,25 @@ ADD_DOCUMENTS_EXAMPLE = {
         }
     ]
 }
+
+LIST_DOCUMENTS_EXAMPLE = {
+    "documents": [
+        {
+            "id": "317369e3-d061-4a7c-afea-948edea9856b",
+            "text": "The boy who cried wolf is a story about a boy who cried wolf to trick the villagers into thinking there was a wolf when there wasn't.",
+            "metadata": {
+                "source": "https://en.wikipedia.org/wiki/The_Boy_Who_Cried_Wolf",
+                "title": "The Boy Who Cried Wolf"
+            },
+            "type": "Document"
+        },
+        {
+            "id": "84d83f48-b01b-4bf3-b027-765c61772344",
+            "text": "The three little pigs went to the market. One pig went to the store and bought a pound of sugar. Another pig went to the store and bought a pound of flour. The third pig went to the store and bought a pound of lard.",
+            "metadata": {
+                "source": "https://en.wikipedia.org/wiki/The_Three_Little_Pigs",
+                "title": "The Three Little Pigs"
+            }
+        }
+    ]
+}

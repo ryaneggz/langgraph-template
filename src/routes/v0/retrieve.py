@@ -5,7 +5,8 @@ from fastapi import Body, HTTPException, status, Depends, APIRouter
 from fastapi.responses import JSONResponse
 from loguru import logger
 
-from src.entities import AddDocuments, DocIds
+from src.constants.examples import LIST_DOCUMENTS_EXAMPLE
+from src.entities import AddDocuments, DocIds, Document
 from src.utils.auth import verify_credentials
 from src.utils.retrieval import VectorStore
 
@@ -41,8 +42,91 @@ def add_documents(
             status_code=status.HTTP_400_BAD_REQUEST, 
             content={"error": "Failed to add documents to the vector store"}
         )
+        
+        
     
-    
+################################################################################
+### List Documents
+################################################################################
+@router.get(
+    "/documents", 
+    responses={
+        status.HTTP_200_OK: {
+            "description": "List all documents in the vector store.",
+            "content": {
+                "application/json": {
+                    "example": LIST_DOCUMENTS_EXAMPLE
+                }
+            }
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            "description": "Failed to delete documents from the vector store."
+        }
+    }
+)
+def list_documents(
+    username: str = Depends(verify_credentials)
+):
+    vectorstore = VectorStore()
+    return JSONResponse(status_code=status.HTTP_200_OK, content={"documents": vectorstore.list_docs()}) 
+
+
+################################################################################
+### Add Documents
+################################################################################
+@router.put(
+    "/documents/{id}", 
+    responses={
+        status.HTTP_200_OK: {
+            "description": "Update a document in the vector store.",
+            "content": {
+                "application/json": {
+                    "example": LIST_DOCUMENTS_EXAMPLE['documents'][0]
+                }
+            }
+        }
+    }
+)
+def update_document(
+    id: str,
+    body: Annotated[Document, Body()],
+    username: str = Depends(verify_credentials)
+):
+    logger.info(f"Updating document in the vector store: {body}")
+    updated = VectorStore().edit_doc(id, body)
+    if updated:
+        return JSONResponse(status_code=status.HTTP_200_OK, content={"documents": updated})
+    else:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            content={"error": "Failed to add documents to the vector store"}
+        )
+
+################################################################################
+### Find Documents
+################################################################################
+@router.get(
+    "/documents/{id}", 
+    responses={
+        status.HTTP_200_OK: {
+            "description": "Find document by id.",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "document": LIST_DOCUMENTS_EXAMPLE['documents'][0]
+                    }
+                }
+            }
+        }
+    }
+)
+def find_document(
+    id: str,
+    username: str = Depends(verify_credentials)
+):
+    vectorstore = VectorStore()
+    doc = vectorstore.find_docs_by_ids([id])[0]
+    return JSONResponse(status_code=status.HTTP_200_OK, content={"document": doc.model_dump()}) 
     
 ################################################################################
 ### Delete Documents
