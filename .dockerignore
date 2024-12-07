@@ -3,7 +3,8 @@
 sandbox/graphs/*
 **/__pycache__/
 sandbox/docs
-sandbox/contexts/clsk
+sandbox/contexts
+sandbox/db/*
 docker/postgres/data
 Dockerfile
 README.md

@@ -9,3 +9,4 @@ docker/postgres/data
 deployment/docker/postgres/data
 deployment/terraform/digitalocean/*terraform*
 logs/
+# sandbox/db
