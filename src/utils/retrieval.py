@@ -20,6 +20,7 @@ class VectorStore:
         
     def add_docs(self, docs: list[Document]):
         try:
+            self.load_vector_store()
             updated = self.vector_store.add_documents([Document(**doc) for doc in docs])
             self.vector_store.dump(DEFAULT_VECTOR_STORE_PATH)
             return updated

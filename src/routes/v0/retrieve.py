@@ -146,8 +146,8 @@ def delete_documents(
     body: Annotated[DocIds, Body()],
     username: str = Depends(verify_credentials)
 ):
-    logger.info(f"Deleting documents from the vector store: {body}")
-    deleted = VectorStore().delete_docs(body)
+    logger.info(f"Deleting documents from the vector store: {body.documents}")
+    deleted = VectorStore().delete_docs(body.documents)
     if deleted:
         return HTTPException(status_code=status.HTTP_204_NO_CONTENT)
     else:
