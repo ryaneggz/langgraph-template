@@ -4,7 +4,7 @@ import os
 from fastapi import FastAPI
 from dotenv import load_dotenv
 
-from src.routes.v0 import tool, llm, thread, retrieve
+from src.routes.v0 import tool, llm, thread, retrieve, source
 load_dotenv()
 
 # Define the FastAPI app
@@ -30,6 +30,7 @@ app.include_router(llm)
 app.include_router(thread)
 app.include_router(tool)
 app.include_router(retrieve)
+app.include_router(source)
 
 ### Run Server
 if __name__ == "__main__":
