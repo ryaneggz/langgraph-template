@@ -8,7 +8,11 @@ langchain-community==0.3.8
 langchain-experimental==0.3.3
 fastapi
 uvicorn
+python-multipart
 psycopg
 psycopg[binary]
 psycopg-pool
+pypdf
+rapidocr-onnxruntime
 loguru
+nest_asyncio
