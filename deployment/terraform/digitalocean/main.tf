@@ -87,7 +87,7 @@ resource "digitalocean_droplet" "web" {
 
             # Install Docker
             apt-get update || echo "Error updating apt" >> $SETUP_LOG
-            apt-get install -y apt-transport-https ca-certificates curl software-properties-common python3-pip python3-venv pipx tmux || echo "Error installing prerequisites" >> $SETUP_LOG
+            apt-get install -y apt-transport-https ca-certificates curl software-properties-common python3-pip python3-venv pipx tmux libpq-dev || echo "Error installing prerequisites" >> $SETUP_LOG
             curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - || echo "Error adding Docker GPG key" >> $SETUP_LOG
             add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" || echo "Error adding Docker repository" >> $SETUP_LOG
             apt-get update || echo "Error updating apt after Docker repo add" >> $SETUP_LOG
