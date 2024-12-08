@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - bugfix/28-cannot-auth-tools-list (2024-11-30)
 
 ### Changed 
+  - feature/48-sql-agent (2024-12-07)
   - feature/46-create-docs-from-data-sources (2024-12-07)
   - feature/44-indexing-vectors (2024-12-06)
   - feature/23-multimodal-query (2024-12-05)
