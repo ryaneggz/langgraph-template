@@ -9,9 +9,8 @@ langchain-experimental==0.3.3
 fastapi
 uvicorn
 python-multipart
-psycopg
-psycopg[binary]
-psycopg-pool
+psycopg2
+psycopg2-binary
 pypdf
 rapidocr-onnxruntime
 loguru

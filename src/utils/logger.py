@@ -1,7 +1,8 @@
-import os
 from loguru import logger
 import sys
 from datetime import datetime
+
+from src.constants import APP_LOG_LEVEL
 
 # Define a log format that is readable and user-friendly
 LOG_FORMAT = (
@@ -16,7 +17,7 @@ logger.remove()  # Remove the default handler
 logger.add(
     sys.stdout,
     format=LOG_FORMAT,
-    level=os.getenv("LOG_LEVEL", "INFO").upper(),  # Change to DEBUG for verbose output
+    level=APP_LOG_LEVEL.upper(),  # Change to DEBUG for verbose output
     colorize=True,
     backtrace=True,  # Show error backtraces for easier debugging
     diagnose=True,   # Show variable values in tracebacks
