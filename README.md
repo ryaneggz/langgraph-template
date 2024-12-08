@@ -10,6 +10,8 @@ This project includes tools for running shell commands and Docker container oper
 - [Docker Compose Configuration](./docs/docker-compose.md)
 - [Deploy to DigitalOcean](./docs/deploy-digitalocean.md)
 - [Human-In-The-Loop](https://langchain-ai.github.io/langgraph/how-tos/create-react-agent-hitl/#usage)
+- [Configuring gcalcli](https://github.com/insanum/gcalcli/blob/HEAD/docs/api-auth.md)
+- [Issues Logging into gcalcli](https://github.com/insanum/gcalcli/issues/808)
 
 ## Prerequisites
 
