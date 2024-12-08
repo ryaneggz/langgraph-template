@@ -17,7 +17,7 @@ logger.remove()  # Remove the default handler
 logger.add(
     sys.stdout,
     format=LOG_FORMAT,
-    level=APP_LOG_LEVEL.upper(),  # Change to DEBUG for verbose output
+    level=APP_LOG_LEVEL,  # Change to DEBUG for verbose output
     colorize=True,
     backtrace=True,  # Show error backtraces for easier debugging
     diagnose=True,   # Show variable values in tracebacks

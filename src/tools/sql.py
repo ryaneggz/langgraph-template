@@ -1,6 +1,6 @@
 import os
 
-from langchain_core.tools import tool
+from langchain_core.tools import tool, ToolException
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from langchain_community.agent_toolkits.sql.base import create_sql_agent
 from langchain_community.utilities import SQLDatabase
@@ -11,20 +11,21 @@ from src.utils.logger import logger
 from src.utils.llm import LLMWrapper, ModelName
 
 @tool
-def sql_query_read(query: str):
-    """Run a SQL query against a database.
+def sql_query_read(question: str):
+    """Execute a read-only query against a PostgreSQL database based on a natural language question.
 
     Args:
-        query (str): SQL query string to execute
+        question (str): A natural language question about the data (e.g., "How many users signed up last week?")
+                       The question will be converted to a SELECT query automatically.
 
     Returns:
         dict: Response containing:
-            - input: Original query string
-            - output: Query execution results
-            - intermediate_steps: Any intermediate processing steps
+            - input: Original question
+            - output: Query results
+            - intermediate_steps: Steps showing question-to-SQL conversion and execution
     """
     try:
-        logger.info(f"Running READ SQL query: {query}")
+        logger.info(f"Running READ SQL query: {question}")
         db = SQLDatabase.from_uri(DB_URI_SANDBOX, engine_args={"pool_size": 20})
         llm = LLMWrapper(
             model_name=ModelName.ANTHROPIC,
@@ -38,27 +39,29 @@ def sql_query_read(query: str):
             verbose=True if APP_LOG_LEVEL == "DEBUG" else False
         )
     
-        response = agent.invoke(query)
+        response = agent.invoke(question)
         return response
-    except Exception as e:
-        logger.error(f"Error running SQL query: {str(e)}")
+    except ToolException as e:
+        logger.error(f"Error running SQL query (READ): {str(e)}")
         raise e
 
 @tool
-def sql_query_write(query: str):
-    """Run a SQL query against a database.
+def sql_query_write(question: str):
+    """Execute a data modification query against a PostgreSQL database based on a natural language request.
 
     Args:
-        query (str): SQL query string to execute
+        question (str): A natural language request to modify data (e.g., "Delete all inactive users" or 
+                       "Update John's email to john@example.com")
+                       The request will be converted to an INSERT, UPDATE, or DELETE query automatically.
 
     Returns:
         dict: Response containing:
-            - input: Original query string
-            - output: Query execution results
-            - intermediate_steps: Any intermediate processing steps
+            - input: Original question
+            - output: Query results
+            - intermediate_steps: Steps showing question-to-SQL conversion and execution
     """
     try:
-        logger.info(f"Running WRITE SQL query: {query}")
+        logger.info(f"Running WRITE SQL query: {question}")
         db = SQLDatabase.from_uri(DB_URI_SANDBOX, engine_args={"pool_size": 20})
         llm = LLMWrapper(
             model_name=ModelName.ANTHROPIC,
@@ -67,8 +70,8 @@ def sql_query_write(query: str):
         )
         db_chain = SQLDatabaseChain.from_llm(llm.model, db)
     
-        response = db_chain.invoke(query)
+        response = db_chain.invoke(question)
         return response
-    except Exception as e:
-        logger.error(f"Error running SQL query: {str(e)}")
+    except ToolException as e:
+        logger.error(f"Error running SQL query (WRITE): {str(e)}")
         raise e

@@ -12,6 +12,7 @@ from langgraph.checkpoint.postgres import PostgresSaver
 from langgraph.prebuilt import create_react_agent
 from psycopg_pool import ConnectionPool
 
+from src.constants import APP_LOG_LEVEL
 from src.tools import collect_tools
 from src.utils.llm import LLMWrapper, ModelName
 from src.entities import Answer
@@ -41,7 +42,7 @@ class Agent:
     def builder(
         self,
         tools: list[str] = [],
-        debug: bool = True
+        debug: bool = True if APP_LOG_LEVEL == "DEBUG" else False
     ) -> StateGraph:
         llm = LLMWrapper(
             model_name=ModelName.ANTHROPIC,
