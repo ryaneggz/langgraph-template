@@ -15,3 +15,7 @@ pypdf
 rapidocr-onnxruntime
 loguru
 nest_asyncio
+mkdocs
+mkdocs-material
+mkdocstrings[python]
+aiofiles

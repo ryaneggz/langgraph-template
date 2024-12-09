@@ -1,7 +1,7 @@
 ## https://www.softgrade.org/sse-with-fastapi-react-langgraph/
 import os
-
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles 
 from dotenv import load_dotenv
 
 from src.routes.v0 import tool, llm, thread, retrieve, source
@@ -22,8 +22,11 @@ app = FastAPI(
         "email": "ryaneggleston@promptengineers.ai"
     },
     debug=True,
-    docs_url="/"
+    docs_url="/api"
 )
+
+# Mount the MkDocs static site
+app.mount("/", StaticFiles(directory="site", html=True), name="site")
 
 # Include the router
 app.include_router(llm)

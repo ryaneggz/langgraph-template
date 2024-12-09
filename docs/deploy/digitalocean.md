@@ -4,9 +4,7 @@ This guide walks you through deploying the application to DigitalOcean using Ter
 
 ## Prerequisites
 
-1. Install Terraform
-    - https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
-
+1. [Install Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
 2. Get your DigitalOcean API token
    - Go to [DigitalOcean Cloud Control Panel](https://cloud.digitalocean.com)
    - Navigate to API → Generate New Token
