@@ -56,6 +56,7 @@ jobs:
           SESSION_NAME=\"agent_api_${TAG}\"
           tmux new-session -d -s \"\${SESSION_NAME}\" '
             source .venv/bin/activate
+            mkdocs build
             uv pip install -r requirements.txt
             export APP_VERSION=${TAG}
             export APP_USERNAME=aiuser

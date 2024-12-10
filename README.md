@@ -1,14 +1,13 @@
-# Graph Agent Template 🤖
+# Thread Agent - Prompt Engineers AI 🤖
 
-LangGraph Bot is a Python-based chatbot application that utilizes the LangGraph and LangChain libraries to process and respond to user inputs. The bot is designed to handle conversational flows and can be configured to use different language models.
+Thread Agent is a Python-based chatbot application that utilizes the LangGraph and LangChain libraries to process and respond to user inputs. The bot is designed to handle conversational flows and can be configured to use different language models.
 
 # Project Documentation
 
 This project includes tools for running shell commands and Docker container operations. For detailed information, please refer to the following documentation:
 
-- [Tools Documentation](./docs/tools.md)
-- [Docker Compose Configuration](./docs/docker-compose.md)
-- [Deploy to DigitalOcean](./docs/deploy-digitalocean.md)
+- [Tools Documentation](./docs/tools/tools.md)
+- [Deploy to DigitalOcean](./docs/deploy/digitalocean.md)
 - [Human-In-The-Loop](https://langchain-ai.github.io/langgraph/how-tos/create-react-agent-hitl/#usage)
 - [Configuring gcalcli](https://github.com/insanum/gcalcli/blob/HEAD/docs/api-auth.md)
 - [Issues Logging into gcalcli](https://github.com/insanum/gcalcli/issues/808)

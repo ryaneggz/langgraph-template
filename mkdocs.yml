@@ -1,9 +1,16 @@
-site_name: DedWeb SlackAgent
+site_name: Thread Agent
 nav:
   - Home: index.md
-  - Deploy: deploy/digitalocean.md
-  - Tools: tools/tools.md
-  - Services: services/docker-compose.md
+  - Deploy:
+    - DigitalOcean: deploy/digitalocean.md
+    # - Docker: deploy/docker.md
+    # - Kubernetes: deploy/kubernetes.md
+    # - AWS: deploy/aws.md
+    - AWS RDS: deploy/aws-rds.md
+  - Tools:
+    - Shell Local: tools/shell_local.md
+    - Shell Docker: tools/shell_docker.md
+  - API: api
 theme:
   name: material
   features:

@@ -9,7 +9,7 @@ load_dotenv()
 
 # Define the FastAPI app
 app = FastAPI(
-    title="LangGraph API Starter 🤖",
+    title="Thread Agent by Prompt Engineers AI 🤖",
     version=os.getenv("APP_VERSION", "0.1.0"),
     description=(
         "This is a simple API for building chatbots with LangGraph. " +
