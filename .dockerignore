@@ -16,7 +16,6 @@ langgraph.json
 .vscode
 .git*
 .example.env
-docs
 deployment
 logs/
 tests
