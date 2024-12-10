@@ -84,6 +84,7 @@ jobs:
         uv pip install -v --system --no-cache-dir \
         -r requirements.txt \
         -r requirements-dev.txt
+        mkdocs build
 
     - name: Save Python dependencies cache
       if: steps.cache-python.outputs.cache-hit != 'true'
