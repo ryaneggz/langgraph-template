@@ -74,6 +74,7 @@ def stream_chunks(
         if msg.content and not isinstance(msg, HumanMessage):
             # Convert message content to SSE format
             data = {
+                "thread_id": thread_id,
                 "event": "ai_chunk" if isinstance(msg, AIMessageChunk) else "tool_chunk",
                 "content": msg.content
             }

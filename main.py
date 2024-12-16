@@ -1,12 +1,12 @@
 ## https://www.softgrade.org/sse-with-fastapi-react-langgraph/
 import uuid
 from typing import Annotated
-
-from dotenv import load_dotenv
-from fastapi import FastAPI, Body, status
+from fastapi import FastAPI, Body, status, Request
 from fastapi.responses import JSONResponse
 from langchain_core.messages import HumanMessage
 from psycopg_pool import ConnectionPool
+
+from dotenv import load_dotenv
 
 from src.constants import DB_URI, CONNECTION_POOL_KWARGS
 from src.entities import Answer, LLMHTTPResponse, NewThread, ExistingThread
@@ -38,34 +38,45 @@ app = FastAPI(
             "content": {
                 "application/json": {
                     "example": Answer.Config.json_schema_extra['examples']['new_thread']
+                },
+                "text/event-stream": {
+                    "description": "Server-sent events stream",
+                    "schema": {
+                        "type": "string",
+                        "format": "binary",
+                        "example": 'data: {"thread_id": "e208fbc9-92cd-4f50-9286-6eab533693c4", "event": "ai_chunk", "content": [{"text": "Hello", "type": "text", "index": 0}]}\n\n'
+                    }
                 }
             }
         }
     }
 )
-def new_thread(body: Annotated[NewThread, Body()]):
-    if not body.stream:
-        # Non-streaming response can use context manager
-        with ConnectionPool(
+async def new_thread(
+    request: Request,
+    body: Annotated[NewThread, Body()]
+):
+    # Check if client accepts SSE
+    if "text/event-stream" in request.headers.get("accept", ""):
+        pool = ConnectionPool(
             conninfo=DB_URI,
             max_size=20,
             kwargs=CONNECTION_POOL_KWARGS,
-        ) as pool:
-            agent = Agent(str(uuid.uuid4()), pool)
-            agent.builder(tools=body.tools)
-            messages = agent.messages(body.query, body.system)
-            return agent.process(messages, body.stream)
-    
-    # For streaming, create pool without context manager
-    pool = ConnectionPool(
+        )
+        agent = Agent(str(uuid.uuid4()), pool)
+        agent.builder(tools=body.tools)
+        messages = agent.messages(body.query, body.system)
+        return agent.process(messages, "text/event-stream")
+
+    # Default JSON response
+    with ConnectionPool(
         conninfo=DB_URI,
         max_size=20,
         kwargs=CONNECTION_POOL_KWARGS,
-    )
-    agent = Agent(str(uuid.uuid4()), pool)
-    agent.builder(tools=body.tools)
-    messages = agent.messages(body.query, body.system)
-    return agent.process(messages, body.stream)
+    ) as pool:
+        agent = Agent(str(uuid.uuid4()), pool)
+        agent.builder(tools=body.tools)
+        messages = agent.messages(body.query, body.system)
+        return agent.process(messages, "application/json")
 
 ## Query Existing Thread
 @app.post(
@@ -77,37 +88,44 @@ def new_thread(body: Annotated[NewThread, Body()]):
             "content": {
                 "application/json": {
                     "example": Answer.Config.json_schema_extra['examples']['existing_thread']
+                },
+                "text/event-stream": {
+                    "description": "Server-sent events stream",
+                    "schema": {
+                        "type": "string",
+                        "format": "binary",
+                        "example": 'data: {"thread_id": "e208fbc9-92cd-4f50-9286-6eab533693c4", "event": "ai_chunk", "content": [{"text": "Hello", "type": "text", "index": 0}]}\n\n'
+                    }
                 }
             }
         }
     }
 )
-def existing_thread(
-    thread_id: str, 
+async def existing_thread(
+    request: Request,
+    thread_id: str,
     body: Annotated[ExistingThread, Body()]
 ):
-    if not body.stream:
-        # Non-streaming response can use context manager
-        with ConnectionPool(
+    if "text/event-stream" in request.headers.get("accept", ""):
+        pool = ConnectionPool(
             conninfo=DB_URI,
             max_size=20,
             kwargs=CONNECTION_POOL_KWARGS,
-        ) as pool:  
-            agent = Agent(thread_id, pool)
-            agent.builder(tools=body.tools)
-            messages = [HumanMessage(content=body.query)]
-            return agent.process(messages, body.stream)
-    
-    # For streaming, create pool without context manager
-    pool = ConnectionPool(
+        )
+        agent = Agent(thread_id, pool)
+        agent.builder(tools=body.tools)
+        messages = [HumanMessage(content=body.query)]
+        return agent.process(messages, "text/event-stream")
+
+    with ConnectionPool(
         conninfo=DB_URI,
         max_size=20,
         kwargs=CONNECTION_POOL_KWARGS,
-    )
-    agent = Agent(thread_id, pool)
-    agent.builder(tools=body.tools)
-    messages = [HumanMessage(content=body.query)]
-    return agent.process(messages, body.stream)
+    ) as pool:
+        agent = Agent(thread_id, pool)
+        agent.builder(tools=body.tools)
+        messages = [HumanMessage(content=body.query)]
+        return agent.process(messages, "application/json")
     
 ### Query Thread History
 @app.get(

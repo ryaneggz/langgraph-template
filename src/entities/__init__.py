@@ -23,7 +23,6 @@ class StreamInput(BaseModel):
 class ExistingThread(BaseModel):
     query: str = Field(...)
     tools: Optional[List[Any]] = Field(default_factory=list)
-    stream: Optional[bool] = Field(default=False)
     
     class Config:
         json_schema_extra = {"example": EXISTING_THREAD_QUERY_EXAMPLE}
