@@ -2,7 +2,6 @@ NEW_THREAD_QUERY_EXAMPLE = {
     "system": "You are a helpful assistant.",
     "query": "What is the capital of France?",
     "tools": [],
-    "stream": False,
     "images": [],
     "visualize": False
 }
@@ -40,7 +39,6 @@ NEW_THREAD_ANSWER_EXAMPLE = {
 EXISTING_THREAD_QUERY_EXAMPLE = {
     "query": "What about Germany?",
     "tools": [],
-    "stream": False,
     "images": []
 }
 

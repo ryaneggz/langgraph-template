@@ -4,7 +4,7 @@ import requests
 from typing import Optional
 
 from fastapi import status
-from fastapi.responses import Response, JSONResponse
+from fastapi.responses import Response, JSONResponse, StreamingResponse
 from psycopg_pool import ConnectionPool
 from langgraph.graph import StateGraph
 from langchain_core.messages import AnyMessage, SystemMessage, HumanMessage
@@ -17,6 +17,7 @@ from src.tools import collect_tools
 from src.utils.llm import LLMWrapper, ModelName
 from src.entities import Answer
 from src.utils.logger import logger
+from src.utils.stream import stream_chunks
 
 class Agent:
     def __init__(self, thread_id: str, pool: ConnectionPool):
@@ -60,9 +61,9 @@ class Agent:
     def process(
         self,
         messages: list[AnyMessage], 
-        stream: bool = False,
+        content_type: str = "application/json",
     ) -> Response:
-        if not stream:
+        if content_type == "application/json":
             invoke = self.graph.invoke({"messages": messages}, {'configurable': {'thread_id': self.thread_id}})
             content = Answer(
                 thread_id=self.thread_id,
@@ -74,9 +75,21 @@ class Agent:
                 status_code=status.HTTP_200_OK
             )
             
-        return JSONResponse(
-            content={"error": "Streaming is not implemented yet."},
-            status_code=status.HTTP_501_NOT_IMPLEMENTED
+        # Assume text/event-stream for streaming
+        def stream_generator():
+            try:
+                for chunk in stream_chunks(self.graph, messages, self.thread_id):
+                    if chunk:
+                        print(chunk)
+                        yield chunk
+            finally:
+                # Ensure pool is closed after streaming is complete
+                if not self.pool.closed:
+                    self.pool.close()
+
+        return StreamingResponse(
+            stream_generator(),
+            media_type="text/event-stream"
         )
         
     @staticmethod

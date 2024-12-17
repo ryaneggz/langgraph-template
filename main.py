@@ -25,15 +25,15 @@ app = FastAPI(
     docs_url="/api"
 )
 
-# Mount the MkDocs static site
-app.mount("/", StaticFiles(directory="site", html=True), name="site")
-
 # Include the router
 app.include_router(llm)
 app.include_router(thread)
 app.include_router(tool)
 app.include_router(retrieve)
 app.include_router(source)
+
+# Mount the MkDocs static site
+app.mount("/", StaticFiles(directory="site", html=True), name="site")
 
 ### Run Server
 if __name__ == "__main__":
