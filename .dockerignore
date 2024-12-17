@@ -3,7 +3,8 @@
 sandbox/graphs/*
 **/__pycache__/
 sandbox/docs
-sandbox/contexts/clsk
+sandbox/contexts
+sandbox/db/*
 docker/postgres/data
 Dockerfile
 README.md
@@ -15,5 +16,6 @@ langgraph.json
 .vscode
 .git*
 .example.env
-docs
 deployment
+logs/
+tests

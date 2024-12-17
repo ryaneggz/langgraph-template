@@ -7,3 +7,7 @@ sandbox/docs
 sandbox/contexts/clsk
 docker/postgres/data
 deployment/docker/postgres/data
+deployment/terraform/digitalocean/*terraform*
+logs/
+sandbox/db/*
+site

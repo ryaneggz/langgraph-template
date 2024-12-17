@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 # Install Python dependencies
 RUN pip install --upgrade pip \
     && pip install uv \
-    && uv pip install -v --system --no-cache-dir -r requirements.txt 
+    && uv pip install -v --system --no-cache-dir -r requirements.txt
 
 # Stage 2: Final stage
 FROM python:3.10-slim
@@ -38,6 +38,9 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copy application code
 COPY . .
+
+# Build the FastAPI application
+RUN mkdocs build && rm -rf docs/
 
 # Start the FastAPI application
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
