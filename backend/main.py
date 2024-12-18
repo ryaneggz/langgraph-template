@@ -1,9 +1,12 @@
 ## https://www.softgrade.org/sse-with-fastapi-react-langgraph/
 import os
+from pathlib import Path
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles 
 from dotenv import load_dotenv
 
+from src.constants import APP_PORTAL_ENABLED
 from src.routes.v0 import tool, llm, thread, retrieve, source
 load_dotenv()
 
@@ -33,7 +36,19 @@ app.include_router(retrieve)
 app.include_router(source)
 
 # Mount the MkDocs static site
-app.mount("/", StaticFiles(directory="site", html=True), name="site")
+public_dir = Path("src/public")
+# Mount the public directory if it exists (for React app)
+if public_dir.exists():
+    app.mount("/", StaticFiles(directory="src/public", html=True), name="public")
+    app.mount("/docs", StaticFiles(directory="src/site", html=True), name="site")
+else:
+    app.mount("/", StaticFiles(directory="src/site", html=True), name="site")
+
+# API Landing Page
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+async def read_root():
+    if APP_PORTAL_ENABLED and public_dir.exists():
+        return FileResponse(public_dir)
 
 ### Run Server
 if __name__ == "__main__":
