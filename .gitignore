@@ -11,3 +11,4 @@
 **/logs/
 **/sandbox/db/*
 **/site
+backend/src/public
