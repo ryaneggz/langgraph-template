@@ -1,4 +1,4 @@
 #!/bin/bash
 
-mkdocs build
+mkdocs build --site-dir src/public/docs
 echo "Docs built"
