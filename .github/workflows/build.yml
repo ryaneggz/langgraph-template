@@ -20,6 +20,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Download frontend build artifacts
+      uses: dawidd6/action-download-artifact@v3
+      with:
+        workflow: test.yml
+        name: frontend-dist
+        path: ./backend/src/public/
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
@@ -30,6 +37,7 @@ jobs:
         password: ${{ env.DOCKER_PASSWORD }}
 
     - name: Build and push Docker image
+      working-directory: ./backend
       run: |
         COMMIT_SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
         DOCKER_IMAGE=ryaneggz/graphchat:${COMMIT_SHORT_SHA}
