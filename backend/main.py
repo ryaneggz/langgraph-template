@@ -37,18 +37,27 @@ app.include_router(source)
 
 # Mount the MkDocs static site
 public_dir = Path("src/public")
+docs_dir = Path("src/site")
+
 # Mount the public directory if it exists (for React app)
-if public_dir.exists():
+if APP_PORTAL_ENABLED and public_dir.exists():
     app.mount("/", StaticFiles(directory="src/public", html=True), name="public")
-    app.mount("/docs", StaticFiles(directory="src/site", html=True), name="site")
 else:
+    # Mount docs as root if no portal
     app.mount("/", StaticFiles(directory="src/site", html=True), name="site")
 
 # API Landing Page
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
-async def read_root():
+async def home():
     if APP_PORTAL_ENABLED and public_dir.exists():
-        return FileResponse(public_dir)
+        return FileResponse(public_dir / "index.html")
+    else:
+        return FileResponse(docs_dir / "index.html")
+
+# API Landing Page
+@app.get("/docs", response_class=HTMLResponse, include_in_schema=False)
+async def documentation():
+    return FileResponse(docs_dir)
 
 ### Run Server
 if __name__ == "__main__":
