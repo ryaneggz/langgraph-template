@@ -35,7 +35,7 @@ app.include_router(retrieve)
 app.include_router(source)
 
 public_dir = Path("src/public")
-docs_dir = Path("src/site")
+docs_dir = Path("site")
 
 # If portal is enabled and public directory exists, serve the React app at "/"
 if APP_PORTAL_ENABLED and public_dir.exists():
