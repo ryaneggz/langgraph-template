@@ -65,6 +65,7 @@ jobs:
     environment: Test
     env:
       APP_ENV: test
+      APP_PORTAL_ENABLED: 1
       APP_LOG_LEVEL: debug
       POSTGRES_CONNECTION_STRING: ${{ secrets.POSTGRES_CONNECTION_STRING }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
