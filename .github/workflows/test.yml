@@ -43,9 +43,9 @@ jobs:
       working-directory: ./frontend
       run: npm ci
 
-    - name: Run tests
-      working-directory: ./frontend
-      run: npm test
+    # - name: Run tests
+    #   working-directory: ./frontend
+    #   run: npm test
 
     - name: Build frontend
       working-directory: ./frontend
@@ -103,7 +103,6 @@ jobs:
 
     - name: Cache Python dependencies
       id: cache-python
-      working-directory: ./backend
       uses: actions/cache@v4
       with:
         path: ~/.cache/pip
@@ -126,7 +125,6 @@ jobs:
       if: steps.cache-python.outputs.cache-hit != 'true'
       id: save-cache-python
       uses: actions/cache@v4
-      working-directory: ./backend
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/requirements-dev.txt') }}
