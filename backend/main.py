@@ -3,6 +3,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles 
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 from src.constants import APP_PORTAL_ENABLED
@@ -25,6 +26,15 @@ app = FastAPI(
     },
     debug=True,
     docs_url="/api"
+)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Include routers
