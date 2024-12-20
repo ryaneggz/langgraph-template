@@ -1,5 +1,10 @@
 import apiClient from '../utils/apiClient';
 import { SSE } from "sse.js";
+import debug from 'debug';
+
+debug.enable('services:*');
+const logger = debug('services:threadService');
+
 
 interface ThreadPayload {
   threadId?: string;
@@ -11,6 +16,7 @@ interface ThreadPayload {
 }
 
 export const queryThread = async (payload: ThreadPayload) => {
+  logger("Querying thread");
   const source = new SSE(`http://localhost:8000/llm${payload.threadId ? `/${payload.threadId}` : ''}`, // TODO: Make this dynamic
     {
       headers: {
@@ -23,14 +29,19 @@ export const queryThread = async (payload: ThreadPayload) => {
     }
   );
   source.addEventListener("error", (e: any) => {
-    console.error("Error received from server:", e);
+    logger("Error received from server:", e);
     const errData = JSON.parse(e?.data);
     alert(errData?.detail);
     source.close();
     throw new Error(errData?.detail);
   });
   source.addEventListener("message", (e: any) => {
-    console.log(e.data);
+    const data = JSON.parse(e.data);
+    logger("Message received from server:", data.content[0].text);
+    if (data.type === "end") {
+      source.close();
+      logger("Thread ended");
+    }
   });
   source.stream();
 };
