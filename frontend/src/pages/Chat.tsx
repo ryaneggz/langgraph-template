@@ -1,13 +1,8 @@
 import ChatLayout from '../layouts/ChatLayout';
-import { Link } from 'react-router-dom';
 
 export default function Chat() {
     return (
         <ChatLayout>
-            <Link to="/dashboard" style={{ textDecoration: 'none', color: 'inherit' }}>
-                ← Back to Dashboard
-            </Link>
-
             <div className="chat-history">
                 <div className="message ai-message">
                     Hello! How can I help you today?
