@@ -56,7 +56,7 @@ jobs:
           SESSION_NAME=\"agent_api_${TAG}\"
           tmux new-session -d -s \"\${SESSION_NAME}\" '
             cd ../backend
-            uv venv
+            # uv venv
             source .venv/bin/activate
             uv pip install -r requirements.txt
             export APP_VERSION=${TAG}

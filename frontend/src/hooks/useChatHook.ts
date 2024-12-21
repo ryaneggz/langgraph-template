@@ -2,7 +2,7 @@ import debug from 'debug';
 import { SSE } from "sse.js";
 import { useRef, useState } from "react";
 import { ThreadPayload } from '../entities';
-
+import { VITE_API_URL } from '../config';
 debug.enable('hooks:*');
 const logger = debug('hooks:useChatHook');
 
@@ -37,7 +37,7 @@ export default function useChatHook() {
         setResponse("");
         responseRef.current = "";
         const auth = localStorage.getItem('auth');
-        const source = new SSE(`http://localhost:8000/llm${payload.threadId ? `/${payload.threadId}` : ''}`, // TODO: Make this dynamic
+        const source = new SSE(`${VITE_API_URL}/llm${payload.threadId ? `/${payload.threadId}` : ''}`, // TODO: Make this dynamic
             {
                 headers: {
                     'Content-Type': 'application/json', 

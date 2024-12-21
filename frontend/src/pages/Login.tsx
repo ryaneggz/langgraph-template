@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NoAuthLayout from '../layouts/NoAuthLayout';
+import { VITE_API_URL } from '../config';
 
 export default function Login() {
     const [username, setUsername] = useState('');
@@ -15,7 +16,7 @@ export default function Login() {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:8000/tools', {
+            const response = await fetch(`${VITE_API_URL}/tools`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Basic ${btoa(`${username}:${password}`)}`,

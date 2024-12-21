@@ -1,8 +1,9 @@
 import axios, { AxiosResponse } from 'axios';
+import { VITE_API_URL } from '../config';
 
 // Create an Axios instance
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8000', // Replace with your API base URL
+  baseURL: VITE_API_URL, // Replace with your API base URL
   timeout: 10000, // Set request timeout
   headers: {
     'Content-Type': 'application/json',
