@@ -4,16 +4,19 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles 
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
 
-from src.constants import APP_PORTAL_ENABLED
 from src.routes.v0 import tool, llm, thread, retrieve, source
-
-load_dotenv()
+from src.constants import (
+    HOST,
+    PORT,
+    LOG_LEVEL,
+    APP_VERSION,
+    APP_PORTAL_ENABLED
+)
 
 app = FastAPI(
     title="Thread Agent by Prompt Engineers AI 🤖",
-    version=os.getenv("APP_VERSION", "0.1.0"),
+    version=APP_VERSION,
     description=(
         "This is a simple API for building chatbots with LangGraph. " 
         "It allows you to create new threads, query existing threads, "
@@ -65,9 +68,18 @@ async def home():
 ### Run Server
 if __name__ == "__main__":
     import uvicorn
+    
+    print(f"Environment Settings:")
+    print(f"LOG_LEVEL: {LOG_LEVEL}")
+    print(f"APP_PORTAL_ENABLED: {APP_PORTAL_ENABLED}")
+    
+    
+    print(f"Configuration Settings:")
+    print(f"Public Dir Exists: {public_dir.exists()}")
+    
     uvicorn.run(
-        app, 
-        host=str(os.getenv("HOST", "0.0.0.0")), 
-        port=int(os.getenv("PORT", 8000)),
-        log_level=os.getenv("LOG_LEVEL", "info")
+        app,
+        host=HOST,
+        port=PORT, 
+        log_level=LOG_LEVEL
     )
