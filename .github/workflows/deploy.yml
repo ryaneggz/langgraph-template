@@ -60,7 +60,7 @@ jobs:
             npm run deploy
             source .venv/bin/activate
             uv pip install -r requirements.txt
-            cd ../backend && bash scripts/build.sh
+            cd ../backend && bash scripts/docs.sh
             rm -rf docs
             export APP_VERSION=${TAG}
             export APP_USERNAME=aiuser
