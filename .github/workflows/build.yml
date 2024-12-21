@@ -27,6 +27,13 @@ jobs:
         name: frontend-dist
         path: ./backend/src/public/
 
+    - name: Download docs artifacts  
+      uses: dawidd6/action-download-artifact@v3
+      with:
+        workflow: test.yml
+        name: mkdocs-site
+        path: ./backend/src/public/docs/
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 

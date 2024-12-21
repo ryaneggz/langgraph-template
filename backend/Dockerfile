@@ -39,8 +39,5 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy application code
 COPY . .
 
-# Build the FastAPI application
-RUN mkdocs build && rm -rf docs/
-
 # Start the FastAPI application
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
