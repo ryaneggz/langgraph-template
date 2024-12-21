@@ -95,6 +95,14 @@ export default function Login() {
                         </button>
                     </form>
                 </div>
+                <div className="text-center flex justify-center gap-2 my-3">
+                            <a href="/docs" target="_blank">
+                                <img src="https://img.shields.io/badge/View%20Documentation-Docs-blue" alt="Documentation" />
+                            </a>
+                            <a href="https://github.com/ryaneggz/langgraph-template" target="_blank">
+                                <img src="https://img.shields.io/badge/Join%20our%20community-Github-black" alt="Github" />
+                            </a>
+                        </div>
             </main>
         </NoAuthLayout>
     );
