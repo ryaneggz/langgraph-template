@@ -55,13 +55,9 @@ jobs:
           # Create new tmux session with version in name
           SESSION_NAME=\"agent_api_${TAG}\"
           tmux new-session -d -s \"\${SESSION_NAME}\" '
-            cp -r docs backend/docs
-            cd frontend
-            npm run deploy
+            cd ../backend
             source .venv/bin/activate
             uv pip install -r requirements.txt
-            cd ../backend && bash scripts/docs.sh
-            rm -rf docs
             export APP_VERSION=${TAG}
             export APP_USERNAME=aiuser
             export APP_PORTAL_ENABLED=1

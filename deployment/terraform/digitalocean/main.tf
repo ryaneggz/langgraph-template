@@ -107,6 +107,11 @@ resource "digitalocean_droplet" "web" {
             sudo apt update || echo "Error updating apt after GitHub CLI repo add" >> $SETUP_LOG
             sudo apt install gh -y || echo "Error installing GitHub CLI" >> $SETUP_LOG
 
+            # Install Node
+            wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash >> $SETUP_LOG
+            source ~/.bashrc >> $SETUP_LOG
+            nvm install 22 >> $SETUP_LOG
+
             # Clone the repository
             cd /home/$AI_USER || echo "Error changing to AI user home directory" >> $SETUP_LOG
             sudo -u $AI_USER git clone https://github.com/ryaneggz/langgraph-template agent_api || echo "Error cloning repository" >> $SETUP_LOG
