@@ -123,7 +123,17 @@ jobs:
 
     - name: Build docs
       run: |
-        mkdocs build --site-dir backend/src/public/docs
+        # Copy docs folder to backend directory
+        cp -r docs backend/docs
+        
+        # Change to backend directory
+        cd backend
+        
+        # Build docs
+        mkdocs build --site-dir src/public/docs
+        
+        # Cleanup docs folder from backend
+        rm -rf docs
         
     - name: Upload docs artifacts
       uses: actions/upload-artifact@v4
