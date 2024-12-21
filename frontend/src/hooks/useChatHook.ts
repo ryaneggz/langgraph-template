@@ -62,7 +62,6 @@ export default function useChatHook() {
             setMessages(messagesWithAssistant);
         });
 
-        let threadId: string | undefined;
         source.addEventListener("message", (e: any) => {
             const data = JSON.parse(e.data);
             const message = data.content[0].text;
@@ -75,9 +74,6 @@ export default function useChatHook() {
             ];
             setMessages(finalMessages);
             setPayload({ ...payload, query: '', threadId: data.thread_id });
-            if (data.thread_id) {
-                threadId = data.thread_id;
-            }
             if (data.type === "end") {
                 source.close();
                 logger("Thread ended");
