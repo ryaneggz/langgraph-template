@@ -1,4 +1,4 @@
-.env*
-.example.env
-.venv
-logs/
+**/.env*
+**/.example.env
+**/.venv
+**/logs/

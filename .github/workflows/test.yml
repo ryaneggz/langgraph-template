@@ -24,6 +24,40 @@ on:
       - 'deployment/**'
 jobs:
   ###############################################################
+  ## Test Frontend
+  ###############################################################
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: 'npm'
+        cache-dependency-path: './frontend/package-lock.json'
+
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: npm ci
+
+    - name: Run tests
+      working-directory: ./frontend
+      run: npm test
+
+    - name: Build frontend
+      working-directory: ./frontend
+      run: npm run build
+
+    - name: Upload frontend build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-dist
+        path: ./frontend/dist/
+        retention-days: 1
+  ###############################################################
   ## Test Backend use Cache
   ###############################################################
   test-backend:
@@ -31,6 +65,7 @@ jobs:
     environment: Test
     env:
       APP_ENV: test
+      APP_PORTAL_ENABLED: 1
       APP_LOG_LEVEL: debug
       POSTGRES_CONNECTION_STRING: ${{ secrets.POSTGRES_CONNECTION_STRING }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -77,6 +112,7 @@ jobs:
           ${{ runner.os }}-pip-
 
     - name: Install dependencies
+      working-directory: ./backend
       run: |
         env | sort
         pip install --upgrade pip
@@ -95,6 +131,7 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/requirements-dev.txt') }}
 
     - name: Run tests
+      working-directory: ./backend
       env:
         PYTHONPATH: ./src:.
       run: |
