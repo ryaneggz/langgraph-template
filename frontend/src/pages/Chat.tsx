@@ -8,7 +8,7 @@ export default function Chat() {
         <ChatLayout>
             <div className="flex flex-col h-screen max-w-5xl mx-auto pb-3 min-w-[600px]"  style={{ maxHeight: 'calc(100vh - 65px)' }}>
                 <div className="flex-1 overflow-y-auto space-y-4 p-3">
-                    {messages?.map((message: any, index: number) => (
+                    {messages?.map((message: {role: string, content: string}, index: number) => (
                         <div key={index} className={`max-w-[80%] ${message.role === 'user' ? 'bg-gray-100 text-gray-800' : 'bg-blue-600 text-white'} p-3 rounded-lg rounded-${message.role === 'user' ? 'bl' : 'br'}-sm self-${message.role === 'user' ? 'start' : 'end'}`}>
                             {message.content}
                         </div>
@@ -22,6 +22,12 @@ export default function Chat() {
                         rows={1}
                         value={payload.query}
                         onChange={(e) => setPayload({ ...payload, query: e.target.value })}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                handleQuery();
+                            }
+                        }}
                     ></textarea>
                     <button 
                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" 

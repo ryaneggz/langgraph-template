@@ -11,12 +11,12 @@ const initChatState = {
     responseRef: "",
     messages: [],
     payload: {
-        threadId: '' as string,
+        threadId: '',
         images: [] as string[],
-        query: '' as string,
-        system: 'You are a helpful assistant.' as string,
+        query: '',
+        system: 'You are a helpful assistant.',
         tools: [] as any[],
-        visualize: false as boolean
+        visualize: false
     }
 }
 
@@ -33,7 +33,6 @@ export default function useChatHook() {
     const queryThread = (payload: ThreadPayload) => {
         logger("Querying thread:", payload);
         const updatedMessages = [...messages, { role: 'user', content: payload.query }];
-        setPayload({ ...payload, query: initChatState.payload.query, threadId: initChatState.payload.threadId });
         setMessages(updatedMessages);
         setResponse("");
         responseRef.current = "";
@@ -74,7 +73,7 @@ export default function useChatHook() {
                 { role: "assistant", content: responseRef.current }
             ];
             setMessages(finalMessages);
-            setPayload({ ...payload, threadId: data.thread_id });
+            setPayload({ ...payload, query: '', threadId: data.thread_id });
             if (data.thread_id) {
                 threadId = data.thread_id;
             }
