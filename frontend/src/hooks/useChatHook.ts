@@ -36,12 +36,13 @@ export default function useChatHook() {
         setMessages(updatedMessages);
         setResponse("");
         responseRef.current = "";
+        const auth = localStorage.getItem('auth');
         const source = new SSE(`http://localhost:8000/llm${payload.threadId ? `/${payload.threadId}` : ''}`, // TODO: Make this dynamic
             {
                 headers: {
                     'Content-Type': 'application/json', 
                     'Accept': 'text/event-stream', // TODO: Make this dynamic
-                    'Authorization': `Basic ${btoa("admin:test1234")}` // TODO: Make this dynamic
+                    'Authorization': `Basic ${auth}` // TODO: Make this dynamic
                 },
                 payload: JSON.stringify(payload),
                 method: 'POST'

@@ -6,15 +6,34 @@ export default function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (username === 'admin' && password === 'test1234') {
-            localStorage.setItem('token', 'dummy-token');
-            navigate('/dashboard');
-        } else {
-            setError('Invalid credentials');
+        setIsLoading(true);
+        setError('');
+
+        try {
+            const response = await fetch('http://localhost:8000/tools', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Basic ${btoa(`${username}:${password}`)}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                // Store credentials in localStorage
+                localStorage.setItem('auth', btoa(`${username}:${password}`));
+                navigate('/dashboard');
+            } else {
+                setError('Invalid credentials');
+            }
+        } catch (err) {
+            setError('Failed to connect to server');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -68,9 +87,10 @@ export default function Login() {
 
                         <button
                             type="submit"
-                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                            disabled={isLoading}
+                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Sign in
+                            {isLoading ? 'Signing in...' : 'Sign in'}
                         </button>
                     </form>
                 </div>
