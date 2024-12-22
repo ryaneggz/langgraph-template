@@ -22,7 +22,6 @@ on:
       - '.dockerignore'
       - 'README.md'
       - 'deployment/**'
-  workflow_dispatch:
 jobs:
   ###############################################################
   ## Test Frontend
@@ -63,7 +62,6 @@ jobs:
   ## Test Backend use Cache
   ###############################################################
   test-backend:
-    if: contains(github.event.head_commit.modified, 'backend/') || contains(github.event.head_commit.added, 'backend/') || contains(github.event.head_commit.removed, 'backend/') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment: Test
     env:
