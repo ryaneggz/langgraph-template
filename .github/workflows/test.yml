@@ -27,6 +27,7 @@ jobs:
   ## Test Frontend
   ###############################################################
   test-frontend:
+    if: contains(github.event.head_commit.modified, 'frontend/') || contains(github.event.head_commit.added, 'frontend/') || contains(github.event.head_commit.removed, 'frontend/')
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -61,6 +62,7 @@ jobs:
   ## Test Backend use Cache
   ###############################################################
   test-backend:
+    if: contains(github.event.head_commit.modified, 'backend/') || contains(github.event.head_commit.added, 'backend/') || contains(github.event.head_commit.removed, 'backend/')
     runs-on: ubuntu-latest
     environment: Test
     env:
