@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: '../backend/src/public',
+    emptyOutDir: true,
   },
   resolve: {
     alias: {
