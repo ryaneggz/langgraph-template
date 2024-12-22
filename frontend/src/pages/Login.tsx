@@ -96,7 +96,7 @@ export default function Login() {
                     </form>
                 </div>
                 <div className="text-center flex justify-center gap-2 my-3">
-                    <a href="/docs" target="_blank">
+                    <a href="/docs/" target="_blank">
                         <img src="https://img.shields.io/badge/View%20Documentation-Docs-blue" alt="Documentation" />
                     </a>
                     <a href="https://github.com/ryaneggz/langgraph-template" target="_blank">
