@@ -1,7 +1,5 @@
-import os
-from pathlib import Path
-from fastapi import FastAPI
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -10,8 +8,7 @@ from src.constants import (
     HOST,
     PORT,
     LOG_LEVEL,
-    APP_VERSION,
-    APP_PORTAL_ENABLED
+    APP_VERSION
 )
 
 app = FastAPI(
@@ -41,41 +38,28 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(llm)
-app.include_router(thread)
-app.include_router(tool)
-app.include_router(retrieve)
-app.include_router(source)
+PREFIX = "/api"
+app.include_router(llm, prefix=PREFIX)
+app.include_router(thread, prefix=PREFIX)
+app.include_router(tool, prefix=PREFIX)
+app.include_router(retrieve, prefix=PREFIX)
+app.include_router(source, prefix=PREFIX)
 
-public_dir = Path("src/public")
-docs_dir = Path("src/public/docs")
+app.mount("/docs", StaticFiles(directory="src/public/docs", html=True), name="docs")
+app.mount("/assets", StaticFiles(directory="src/public/assets"), name="assets")
 
-# If portal is enabled and public directory exists, serve the React app at "/"
-if APP_PORTAL_ENABLED and public_dir.exists():
-    app.mount("/", StaticFiles(directory=public_dir, html=True), name="public")
-else:
-    # If no portal, serve mkdocs at root
-    app.mount("/", StaticFiles(directory=docs_dir, html=True), name="site")
-
-# Home endpoint
-@app.get("/", response_class=HTMLResponse, include_in_schema=False)
-async def home():
-    if APP_PORTAL_ENABLED and public_dir.exists():
-        return FileResponse(public_dir / "index.html")
-    else:
-        return FileResponse(docs_dir / "index.html")
+@app.get("/{full_path:path}")
+async def serve_index(request: Request, full_path: str):
+    print(f"Received request for {request.url}")
+    return FileResponse(f"src/public/index.html")
 
 ### Run Server
 if __name__ == "__main__":
     import uvicorn
     
     print(f"Environment Settings:")
+    print(f"APP_VERSION: {APP_VERSION}")
     print(f"LOG_LEVEL: {LOG_LEVEL}")
-    print(f"APP_PORTAL_ENABLED: {APP_PORTAL_ENABLED}")
-    
-    
-    print(f"Configuration Settings:")
-    print(f"Public Dir Exists: {public_dir.exists()}")
     
     uvicorn.run(
         app,
