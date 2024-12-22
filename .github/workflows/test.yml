@@ -27,7 +27,6 @@ jobs:
   ## Test Frontend
   ###############################################################
   test-frontend:
-    if: contains(github.event.head_commit.modified, 'frontend/') || contains(github.event.head_commit.added, 'frontend/') || contains(github.event.head_commit.removed, 'frontend/')
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
