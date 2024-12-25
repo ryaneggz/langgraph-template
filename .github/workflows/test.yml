@@ -51,12 +51,12 @@ jobs:
       working-directory: ./frontend
       run: npm run build
 
-    - name: Upload frontend build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: frontend-dist
-        path: ./frontend/dist/
-        retention-days: 1
+    # - name: Upload frontend build artifacts
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: frontend-dist
+    #     path: ./frontend/dist/
+    #     retention-days: 1
   ###############################################################
   ## Test Backend use Cache
   ###############################################################
@@ -129,17 +129,17 @@ jobs:
         cd backend
         
         # Build docs
-        mkdocs build --site-dir src/public/docs
+        # mkdocs build --site-dir src/public/docs
         
         # Cleanup docs folder from backend
-        rm -rf docs
+        rm -rf docs || true
         
-    - name: Upload docs artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: mkdocs-site
-        path: backend/src/public/docs/
-        retention-days: 1
+    # - name: Upload docs artifacts
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: mkdocs-site
+    #     path: backend/src/public/docs/
+    #     retention-days: 1
 
     - name: Save Python dependencies cache
       if: steps.cache-python.outputs.cache-hit != 'true'
