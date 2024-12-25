@@ -1,5 +1,6 @@
 import { ColorModeButton } from '@/components/buttons/ColorModeButton';
 import { Link, useNavigate } from 'react-router-dom';
+import { MobileNav } from '@/components/navigation/MobileNav';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -14,8 +15,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <header className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-foreground">Thread Agents</h1>
-            <nav className="flex items-center space-x-4">
+            <h1 className="text-2xl font-bold text-foreground">Prompt Engineers AI</h1>
+            
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-4">
               <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
                 Dashboard
               </Link>
@@ -33,6 +36,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               </button>
               <ColorModeButton />
             </nav>
+
+            {/* Mobile Navigation */}
+            <MobileNav onLogout={handleLogout} />
           </div>
         </div>
       </header>
@@ -42,7 +48,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <footer className="mt-auto bg-card border-t border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <p className="text-center text-muted-foreground text-sm">
-            &copy; 2024 Thread Agents. All rights reserved.
+            &copy; 2024 Prompt Engineers AI. All rights reserved.
           </p>
         </div>
       </footer>
