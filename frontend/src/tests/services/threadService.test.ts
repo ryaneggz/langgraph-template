@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { findThread } from '../../services/threadService';
-import apiClient from '../../utils/apiClient';
+import apiClient from '../../lib/utils/apiClient';
 import { mockThread } from '../mocks';
 
 // Mock the apiClient

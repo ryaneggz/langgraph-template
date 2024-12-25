@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { listTools } from '../../services/toolService';
-import apiClient from '../../utils/apiClient';
+import apiClient from '../../lib/utils/apiClient';
 import { mockTools } from '../mocks';
 
 // Mock the apiClient

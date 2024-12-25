@@ -1,6 +1,7 @@
 import ChatLayout from '../layouts/ChatLayout';
 import { useChatContext } from '../context/ChatContext';
 import MarkdownCard from '../components/cards/MarkdownCard';
+import { Button } from '@/components/ui/button';
 
 export default function Chat() {
     const { messages, payload, handleQuery, setPayload } = useChatContext();
@@ -40,12 +41,12 @@ export default function Chat() {
                             }
                         }}
                     ></textarea>
-                    <button 
+                    <Button 
                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" 
                         onClick={handleQuery}
                     >
                         Send
-                    </button>
+                    </Button>
                 </div>
             </div>
         </ChatLayout>
