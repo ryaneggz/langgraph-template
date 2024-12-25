@@ -50,13 +50,7 @@ jobs:
     - name: Build frontend
       working-directory: ./frontend
       run: npm run build
-
-    # - name: Upload frontend build artifacts
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: frontend-dist
-    #     path: ./frontend/dist/
-    #     retention-days: 1
+      
   ###############################################################
   ## Test Backend use Cache
   ###############################################################
