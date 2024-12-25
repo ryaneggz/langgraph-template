@@ -10,24 +10,24 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <header className="bg-white shadow-sm">
+    <div className="min-h-screen flex flex-col bg-background">
+      <header className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-900">Thread Agents</h1>
+            <h1 className="text-2xl font-bold text-foreground">Thread Agents</h1>
             <nav className="flex items-center space-x-4">
-              <Link to="/dashboard" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
                 Dashboard
               </Link>
-              <Link to="/chat" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <Link to="/chat" className="text-muted-foreground hover:text-foreground transition-colors">
                 Chat
               </Link>
-              <Link to="/settings" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <Link to="/settings" className="text-muted-foreground hover:text-foreground transition-colors">
                 Settings
               </Link>
               <button
                 onClick={handleLogout}
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 Logout
               </button>
@@ -39,9 +39,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       {children}
 
-      <footer className="mt-auto bg-white border-t border-gray-200">
+      <footer className="mt-auto bg-card border-t border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <p className="text-center text-gray-500 text-sm">
+          <p className="text-center text-muted-foreground text-sm">
             &copy; 2024 Thread Agents. All rights reserved.
           </p>
         </div>

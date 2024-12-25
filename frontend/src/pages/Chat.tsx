@@ -8,18 +8,18 @@ export default function Chat() {
 
     return (
         <ChatLayout>
-            <div className="flex flex-col h-screen mx-0 pb-3"  style={{ maxHeight: 'calc(100vh - 65px)' }}>
+            <div className="flex flex-col h-screen mx-0 pb-3" style={{ maxHeight: 'calc(100vh - 65px)' }}>
                 <div className="flex-1 overflow-y-auto space-y-4 p-3">
                     {messages?.map((message: {role: string, content: string}, index: number) => {
                         if (message.role === 'user' || message.role === 'human') {
                             return (
-                                <div key={index} className="max-w-[80%] md:max-w-[50%] lg:max-w-[40%] bg-blue-600 text-white p-3 rounded-lg rounded-br-sm ml-auto">
+                                <div key={index} className="max-w-[80%] md:max-w-[50%] lg:max-w-[40%] bg-primary text-primary-foreground p-3 rounded-lg rounded-br-sm ml-auto">
                                     <MarkdownCard content={message.content} />
                                 </div>
                             )
                         } else {
                             return (
-                                <div key={index} className="max-w-[90%] bg-gray-100 text-gray-800 p-3 rounded-lg rounded-bl-sm self-start">
+                                <div key={index} className="max-w-[90%] bg-muted text-muted-foreground p-3 rounded-lg rounded-bl-sm self-start">
                                     <MarkdownCard content={message.content} />
                                 </div>
                             )
@@ -27,9 +27,9 @@ export default function Chat() {
                     })}
                 </div>
 
-                <div className="flex gap-3 border-t border-gray-200 pt-4 px-3">
+                <div className="flex gap-3 border-t border-border pt-4 px-3">
                     <textarea 
-                        className="flex-1 resize-none min-h-[44px] max-h-[200px] p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="flex-1 resize-none min-h-[44px] max-h-[200px] p-3 bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                         placeholder="Type your message here..."
                         rows={1}
                         value={payload.query}
@@ -40,9 +40,8 @@ export default function Chat() {
                                 handleQuery();
                             }
                         }}
-                    ></textarea>
+                    />
                     <Button 
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" 
                         onClick={handleQuery}
                     >
                         Send
