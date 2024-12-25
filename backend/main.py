@@ -48,7 +48,7 @@ app.include_router(source, prefix=PREFIX)
 app.mount("/docs", StaticFiles(directory="src/public/docs", html=True), name="docs")
 app.mount("/assets", StaticFiles(directory="src/public/assets"), name="assets")
 
-@app.get("/{full_path:path}")
+@app.get("/{full_path:path}", include_in_schema=False)
 async def serve_index(request: Request, full_path: str):
     print(f"Received request for {request.url}")
     return FileResponse(f"src/public/index.html")

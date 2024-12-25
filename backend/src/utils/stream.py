@@ -66,33 +66,43 @@ def stream_chunks(
     stream_mode: str = "messages"
 ):
     first = True
-    for msg, metadata in graph.stream(
-        {"messages": messages}, 
-        {'configurable': {'thread_id': thread_id}},
-        stream_mode=stream_mode
-    ):
-        if msg.content and not isinstance(msg, HumanMessage):
-            # Convert message content to SSE format
-            data = {
-                "thread_id": thread_id,
-                "event": "ai_chunk" if isinstance(msg, AIMessageChunk) else "tool_chunk",
-                "content": msg.content
-            }
-            yield f"data: {json.dumps(data)}\n\n"
-
-        if isinstance(msg, AIMessageChunk):
-            if first:
-                gathered = msg
-                first = False
-            else:
-                gathered = gathered + msg
-
-            if msg.tool_call_chunks:
-                tool_data = {
-                    "event": "tool_call",
-                    "content": str(gathered.tool_calls)
+    try:
+        for msg, metadata in graph.stream(
+            {"messages": messages}, 
+            {'configurable': {'thread_id': thread_id}},
+            stream_mode=stream_mode
+        ):
+            if msg.content and not isinstance(msg, HumanMessage):
+                # Convert message content to SSE format
+                data = {
+                    "thread_id": thread_id,
+                    "event": "ai_chunk" if isinstance(msg, AIMessageChunk) else "tool_chunk",
+                    "content": msg.content
                 }
-                yield f"data: {json.dumps(tool_data)}\n\n"
+                yield f"data: {json.dumps(data)}\n\n"
+
+            if isinstance(msg, AIMessageChunk):
+                if first:
+                    gathered = msg
+                    first = False
+                else:
+                    gathered = gathered + msg
+
+                if msg.tool_call_chunks:
+                    tool_data = {
+                        "event": "tool_call",
+                        "content": str(gathered.tool_calls)
+                    }
+                    yield f"data: {json.dumps(tool_data)}\n\n"
+    finally:
+        print("Closing stream")
+        # Send end event
+        end_data = {
+            "thread_id": thread_id,
+            "event": "end",
+            "content": []
+        }
+        yield f"data: {json.dumps(end_data)}\n\n"
 
 def stream_tokens(
     graph: StateGraph, 
