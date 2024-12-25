@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { VITE_API_URL } from '../config';
+import { VITE_API_URL } from '../../config';
 
 // Create an Axios instance
 const apiClient = axios.create({

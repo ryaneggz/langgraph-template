@@ -4,13 +4,13 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <header className="bg-white shadow-sm">
+    <div className="min-h-screen flex flex-col bg-background">
+      <header className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center">
             <button 
               onClick={() => navigate(-1)}
-              className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors mr-4"
+              className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors mr-4"
             >
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -26,7 +26,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
               </svg>
               Back
             </button>
-            <h1 className="text-2xl font-bold text-gray-900">Chat</h1>
+            <h1 className="text-2xl font-bold text-foreground">Chat</h1>
           </div>
         </div>
       </header>
