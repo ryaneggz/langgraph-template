@@ -1,3 +1,4 @@
+import { ColorModeButton } from '@/components/buttons/ColorModeButton';
 import { Link, useNavigate } from 'react-router-dom';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -30,6 +31,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               >
                 Logout
               </button>
+              <ColorModeButton />
             </nav>
           </div>
         </div>
