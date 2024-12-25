@@ -18,21 +18,9 @@ jobs:
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Download frontend build artifacts
-      uses: dawidd6/action-download-artifact@v3
+      uses: actions/checkout@v4
       with:
-        workflow: test.yml
-        name: frontend-dist
-        path: ./backend/src/public/
-
-    - name: Download docs artifacts  
-      uses: dawidd6/action-download-artifact@v3
-      with:
-        workflow: test.yml
-        name: mkdocs-site
-        path: ./backend/src/public/docs/
+          ref: ${{ github.event.workflow_run.head_sha }}
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
