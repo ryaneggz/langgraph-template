@@ -3,46 +3,45 @@ name: Build
 on:
   workflow_run:
     workflows: ["Test"]
-    types:
-      - completed
+    types: [completed]
 
 jobs:
-  ###############################################################
-  ## Build Docker Image
-  ###############################################################
   build:
     runs-on: ubuntu-latest
-    if: |
-      github.event.workflow_run.conclusion == 'success' && 
-      (github.ref == 'refs/heads/development' || 
-       github.ref == 'refs/heads/main' || 
-       github.ref == 'refs/heads/master')
+    # Use the head_branch from `workflow_run` instead of github.ref
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      (
+        github.event.workflow_run.head_branch == 'development' ||
+        github.event.workflow_run.head_branch == 'main' ||
+        github.event.workflow_run.head_branch == 'master'
+      )
     env:
       DOCKER_USERNAME: ryaneggz
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
           ref: ${{ github.event.workflow_run.head_sha }}
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ env.DOCKER_USERNAME }}
-        password: ${{ env.DOCKER_PASSWORD }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
 
-    - name: Build and push Docker image
-      working-directory: ./backend
-      run: |
-        COMMIT_SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-        DOCKER_IMAGE=ryaneggz/graphchat:${COMMIT_SHORT_SHA}
-        DOCKER_LATEST=ryaneggz/graphchat:latest
-        
-        echo "Building images: $DOCKER_IMAGE and $DOCKER_LATEST"
-        docker build --squash -t $DOCKER_IMAGE -t $DOCKER_LATEST .
-        docker push $DOCKER_IMAGE
-        docker push $DOCKER_LATEST
+      - name: Build and push Docker image
+        working-directory: ./backend
+        run: |
+          COMMIT_SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          DOCKER_IMAGE=ryaneggz/graphchat:${COMMIT_SHORT_SHA}
+          DOCKER_LATEST=ryaneggz/graphchat:latest
+          
+          echo "Building images: $DOCKER_IMAGE and $DOCKER_LATEST"
+          docker build --squash -t $DOCKER_IMAGE -t $DOCKER_LATEST .
+          docker push $DOCKER_IMAGE
+          docker push $DOCKER_LATEST
