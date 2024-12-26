@@ -8,6 +8,7 @@ export default defineConfig({
   build: {
     outDir: '../backend/src/public',
     emptyOutDir: true,
+    sourcemap: process.env.NODE_ENV === 'development',
   },
   resolve: {
     alias: {

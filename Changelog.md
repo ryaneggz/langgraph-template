@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.1.0
 
 ### Fixed
+  - bugfix/72-default-vite-api-url (2024-12-25)
   - bugfix/68-close-stream-client-properly (2024-12-24)
   - bugfix/65-can-refresh-from-sub-route (2024-12-22)
   - bugfix/28-cannot-auth-tools-list (2024-11-30)
