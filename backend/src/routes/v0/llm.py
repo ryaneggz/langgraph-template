@@ -53,7 +53,7 @@ def new_thread(
             kwargs=CONNECTION_POOL_KWARGS,
         )
         agent = Agent(thread_id, pool)
-        agent.builder(tools=body.tools)
+        agent.builder(tools=body.tools, model_name=body.model)
         messages = agent.messages(body.query, body.system, body.images)
         return agent.process(messages, "text/event-stream")
     
@@ -63,7 +63,7 @@ def new_thread(
         kwargs=CONNECTION_POOL_KWARGS,
     ) as pool:
         agent = Agent(thread_id, pool)
-        agent.builder(tools=body.tools)
+        agent.builder(tools=body.tools, model_name=body.model)
         messages = agent.messages(body.query, body.system, body.images)
         return agent.process(messages, "application/json")
     
@@ -108,7 +108,7 @@ def existing_thread(
             kwargs=CONNECTION_POOL_KWARGS,
         )
         agent = Agent(thread_id, pool)
-        agent.builder(tools=body.tools)
+        agent.builder(tools=body.tools, model_name=body.model)
         messages = agent.messages(query=body.query, images=body.images)
         return agent.process(messages, "text/event-stream")
     
@@ -118,6 +118,6 @@ def existing_thread(
         kwargs=CONNECTION_POOL_KWARGS,
     ) as pool:  
         agent = Agent(thread_id, pool)
-        agent.builder(tools=body.tools)
+        agent.builder(tools=body.tools, model_name=body.model)
         messages = agent.messages(query=body.query, images=body.images)
         return agent.process(messages, "application/json")

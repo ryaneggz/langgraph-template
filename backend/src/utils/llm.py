@@ -1,7 +1,8 @@
-import os
 from enum import Enum
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_anthropic import ChatAnthropic
+
+from src.constants import OPENAI_API_KEY, ANTHROPIC_API_KEY
 
 class ModelName(str, Enum):
     OPENAI = "openai-gpt-4o"
@@ -23,9 +24,11 @@ class LLMWrapper:
     def choose_model(self, model_name: str):
         chosen_model = None
         if 'openai' in model_name:
+            self.kwargs['api_key'] = OPENAI_API_KEY
             model_name = model_name.replace('openai-', '')
             chosen_model = ChatOpenAI(model=model_name, **self.kwargs)
         elif 'anthropic' in model_name:
+            self.kwargs['api_key'] = ANTHROPIC_API_KEY
             model_name = model_name.replace('anthropic-', '')
             chosen_model = ChatAnthropic(model=model_name, **self.kwargs)
         else:

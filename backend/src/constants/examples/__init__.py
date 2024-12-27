@@ -1,9 +1,10 @@
 NEW_THREAD_QUERY_EXAMPLE = {
     "system": "You are a helpful assistant.",
     "query": "What is the capital of France?",
+    "model": "openai-gpt-4o",
     "tools": [],
     "images": [],
-    "visualize": False
+    # "visualize": False
 }
 
 NEW_THREAD_ANSWER_EXAMPLE = {
@@ -38,8 +39,9 @@ NEW_THREAD_ANSWER_EXAMPLE = {
 
 EXISTING_THREAD_QUERY_EXAMPLE = {
     "query": "What about Germany?",
+    "model": "openai-gpt-4o",
     "tools": [],
-    "images": []
+    "images": [],
 }
 
 EXISTING_THREAD_ANSWER_EXAMPLE = {

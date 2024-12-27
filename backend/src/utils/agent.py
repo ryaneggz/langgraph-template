@@ -11,14 +11,13 @@ from langchain_core.messages import AnyMessage, SystemMessage, HumanMessage
 from langgraph.checkpoint.postgres import PostgresSaver
 from langgraph.prebuilt import create_react_agent
 from psycopg_pool import ConnectionPool
-
 from src.constants import APP_LOG_LEVEL
 from src.tools import collect_tools
 from src.utils.llm import LLMWrapper, ModelName
 from src.entities import Answer
 from src.utils.logger import logger
 from src.utils.stream import stream_chunks
-
+from src.flows.chatbot import chatbot_builder
 class Agent:
     def __init__(self, thread_id: str, pool: ConnectionPool):
         self.connection_kwargs = {
@@ -29,6 +28,10 @@ class Agent:
         self.config = {"configurable": {"thread_id": self.thread_id}}
         self.graph = None
         self.pool = pool
+        self.model_name = None
+        self.llm: LLMWrapper = None
+        self.tools = []
+        self.checkpointer = None
         
     def _checkpointer(self):
         checkpointer = PostgresSaver(self.pool)
@@ -42,17 +45,19 @@ class Agent:
         
     def builder(
         self,
-        tools: list[str] = [],
+        tools: list[str] = None,
+        model_name: str = ModelName.ANTHROPIC,
         debug: bool = True if APP_LOG_LEVEL == "DEBUG" else False
     ) -> StateGraph:
-        llm = LLMWrapper(
-            model_name=ModelName.ANTHROPIC,
-            api_key=os.getenv("ANTHROPIC_API_KEY"), 
-            tools=[]
-        )
-        checkpointer = self._checkpointer()
-        tools = [] if len(tools) == 0 else collect_tools(tools)
-        graph = create_react_agent(llm, tools=tools, checkpointer=checkpointer)
+        self.llm = LLMWrapper(model_name=model_name, tools=[])
+        self.tools = [] if len(tools) == 0 else collect_tools(tools)
+        self.checkpointer = self._checkpointer()
+        if self.tools:
+            graph = create_react_agent(self.llm, tools=self.tools, checkpointer=self.checkpointer)
+        else:
+            builder = chatbot_builder(config={"model": self.llm.model})
+            graph = builder.compile(checkpointer=self.checkpointer)
+            
         if debug:
             graph.debug = True
         self.graph = graph
@@ -78,7 +83,8 @@ class Agent:
         # Assume text/event-stream for streaming
         def stream_generator():
             try:
-                for chunk in stream_chunks(self.graph, messages, self.thread_id):
+                state = {"messages": messages}
+                for chunk in stream_chunks(self.graph, state, self.thread_id):
                     if chunk:
                         print(chunk)
                         yield chunk
