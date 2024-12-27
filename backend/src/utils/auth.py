@@ -1,29 +1,38 @@
-from fastapi import status
+from fastapi import status, Depends, HTTPException
 from fastapi.security import HTTPBasicCredentials, HTTPBasic
-from fastapi import Depends, HTTPException
 import secrets
-from src.constants import APP_USER_LIST
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from src.constants import DB_URI
+from src.models import User
 
-def verify_credentials(credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
-    for user in APP_USER_LIST:
-        current_username_bytes = credentials.username.encode("utf8")
-        correct_username_bytes = user["username"].encode("utf8")
-        is_correct_username = secrets.compare_digest(
-            current_username_bytes, correct_username_bytes
+engine = create_engine(DB_URI)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+def verify_credentials(
+    credentials: HTTPBasicCredentials = Depends(HTTPBasic()),
+    db: SessionLocal = Depends(get_db)
+):
+    user = db.query(User).filter(User.username == credentials.username).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Basic"},
         )
-        
-        if is_correct_username:
-            current_password_bytes = credentials.password.encode("utf8")
-            correct_password_bytes = user["password"].encode("utf8")
-            is_correct_password = secrets.compare_digest(
-                current_password_bytes, correct_password_bytes
-            )
-            
-            if is_correct_password:
-                return user
-                
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Incorrect username or password",
-        headers={"WWW-Authenticate": "Basic"},
-    ) 
+    
+    if not User.verify_password(credentials.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    
+    return user.username 
