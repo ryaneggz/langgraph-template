@@ -1,7 +1,7 @@
 import uuid
 from typing import Annotated
 
-from fastapi import Body, status, Depends, APIRouter, Request
+from fastapi import Body, HTTPException, status, Depends, APIRouter, Request
 from loguru import logger
 from psycopg_pool import ConnectionPool
 from src.constants import DB_URI, CONNECTION_POOL_KWARGS
@@ -42,30 +42,42 @@ def new_thread(
     body: Annotated[NewThread, Body()],
     username: str = Depends(verify_credentials)
 ):
-    thread_id = str(uuid.uuid4())
-    tools_str = f"and Tools: {', '.join(body.tools)}" if body.tools else ""
-    logger.info(f"Creating new thread with ID: {thread_id} {tools_str} and Query: {body.query}")
-    
-    if "text/event-stream" in request.headers.get("accept", ""):
-        pool = ConnectionPool(
+    try:
+        thread_id = str(uuid.uuid4())
+        tools_str = f"and Tools: {', '.join(body.tools)}" if body.tools else ""
+        logger.info(f"Creating new thread with ID: {thread_id} {tools_str} and Query: {body.query}")
+        
+        if "text/event-stream" in request.headers.get("accept", ""):
+            pool = ConnectionPool(
+                conninfo=DB_URI,
+                max_size=20,
+                kwargs=CONNECTION_POOL_KWARGS,
+            )
+            agent = Agent(thread_id, pool)
+            agent.builder(tools=body.tools, model_name=body.model)
+            messages = agent.messages(body.query, body.system, body.images)
+            return agent.process(messages, "text/event-stream")
+        
+        with ConnectionPool(
             conninfo=DB_URI,
             max_size=20,
             kwargs=CONNECTION_POOL_KWARGS,
-        )
-        agent = Agent(thread_id, pool)
-        agent.builder(tools=body.tools)
-        messages = agent.messages(body.query, body.system, body.images)
-        return agent.process(messages, "text/event-stream")
-    
-    with ConnectionPool(
-        conninfo=DB_URI,
-        max_size=20,
-        kwargs=CONNECTION_POOL_KWARGS,
-    ) as pool:
-        agent = Agent(thread_id, pool)
-        agent.builder(tools=body.tools)
-        messages = agent.messages(body.query, body.system, body.images)
-        return agent.process(messages, "application/json")
+        ) as pool:
+            agent = Agent(thread_id, pool)
+            agent.builder(tools=body.tools, model_name=body.model)
+            messages = agent.messages(body.query, body.system, body.images)
+            return agent.process(messages, "application/json")
+    except ValueError as e:
+        logger.warning(f"Bad Request: {str(e)}")
+        if "Model" in str(e) and "not supported" in str(e):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e)
+            )
+        raise e
+    except Exception as e:
+        logger.error(f"Error creating new thread: {str(e)}")
+        raise e
     
 ################################################################################
 ### Query Existing Thread
@@ -98,26 +110,38 @@ def existing_thread(
     body: Annotated[ExistingThread, Body()],
     username: str = Depends(verify_credentials)
 ):
-    tools_str = f"and Tools: {', '.join(body.tools)}" if body.tools else ""
-    logger.info(f"Querying existing thread with ID: {thread_id} {tools_str} and Query: {body.query}")
-    
-    if "text/event-stream" in request.headers.get("accept", ""):
-        pool = ConnectionPool(
+    try:
+        tools_str = f"and Tools: {', '.join(body.tools)}" if body.tools else ""
+        logger.info(f"Querying existing thread with ID: {thread_id} {tools_str} and Query: {body.query}")
+        
+        if "text/event-stream" in request.headers.get("accept", ""):
+            pool = ConnectionPool(
+                conninfo=DB_URI,
+                max_size=20,
+                kwargs=CONNECTION_POOL_KWARGS,
+            )
+            agent = Agent(thread_id, pool)
+            agent.builder(tools=body.tools, model_name=body.model)
+            messages = agent.messages(query=body.query, images=body.images)
+            return agent.process(messages, "text/event-stream")
+        
+        with ConnectionPool(
             conninfo=DB_URI,
             max_size=20,
             kwargs=CONNECTION_POOL_KWARGS,
-        )
-        agent = Agent(thread_id, pool)
-        agent.builder(tools=body.tools)
-        messages = agent.messages(query=body.query, images=body.images)
-        return agent.process(messages, "text/event-stream")
-    
-    with ConnectionPool(
-        conninfo=DB_URI,
-        max_size=20,
-        kwargs=CONNECTION_POOL_KWARGS,
-    ) as pool:  
-        agent = Agent(thread_id, pool)
-        agent.builder(tools=body.tools)
-        messages = agent.messages(query=body.query, images=body.images)
-        return agent.process(messages, "application/json")
+        ) as pool:  
+            agent = Agent(thread_id, pool)
+            agent.builder(tools=body.tools, model_name=body.model)
+            messages = agent.messages(query=body.query, images=body.images)
+            return agent.process(messages, "application/json")
+    except ValueError as e:
+        logger.warning(f"Bad Request: {str(e)}")
+        if "Model" in str(e) and "not supported" in str(e):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e)
+            )
+        raise e
+    except Exception as e:
+        logger.error(f"Error creating new thread: {str(e)}")
+        raise e

@@ -1,12 +1,16 @@
-import os
 from enum import Enum
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_anthropic import ChatAnthropic
 
+from src.constants import OPENAI_API_KEY, ANTHROPIC_API_KEY
+
 class ModelName(str, Enum):
-    OPENAI = "openai-gpt-4o"
-    OPENAI_EMBEDDING = "openai-text-embedding-3-large"
-    ANTHROPIC = "anthropic-claude-3-5-sonnet-20240620"
+    OPENAI_GPT_4O = "openai-gpt-4o"
+    OPENAI_GPT_4O_MINI = "openai-gpt-4o-mini"
+    OPENAI_REASONING_O1 = "openai-o1-preview"
+    OPENAI_REASONING_O1_MINI = "openai-o1-mini"
+    OPENAI_EMBEDDING_LARGE = "openai-text-embedding-3-large"
+    ANTHROPIC_CLAUDE_3_5_SONNET = "anthropic-claude-3-5-sonnet-20240620"
 
 class LLMWrapper:
     def __init__(self, model_name: str, tools: list = None, **kwargs):
@@ -22,14 +26,20 @@ class LLMWrapper:
         
     def choose_model(self, model_name: str):
         chosen_model = None
+
+        if model_name not in [e.value for e in ModelName]:
+            raise ValueError(f"Model {model_name} not supported")
+        
         if 'openai' in model_name:
+            self.kwargs['api_key'] = OPENAI_API_KEY
             model_name = model_name.replace('openai-', '')
             chosen_model = ChatOpenAI(model=model_name, **self.kwargs)
         elif 'anthropic' in model_name:
+            self.kwargs['api_key'] = ANTHROPIC_API_KEY
             model_name = model_name.replace('anthropic-', '')
             chosen_model = ChatAnthropic(model=model_name, **self.kwargs)
         else:
-            raise ValueError(f"Model {model_name} not supported")
+            raise ValueError(f"Provider {model_name} not supported")
             
         if self.tools and len(self.tools) > 0:
             self.model = chosen_model.bind_tools(tools=self.tools)

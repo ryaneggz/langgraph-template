@@ -4,6 +4,7 @@ from typing import Optional, List, Any
 from pydantic import BaseModel, Field
 from langchain_core.messages import AnyMessage
 
+from src.utils.llm import ModelName
 from src.constants.examples import (
     ADD_DOCUMENTS_EXAMPLE,
     LIST_DOCUMENTS_EXAMPLE,
@@ -27,6 +28,7 @@ class ExistingThread(BaseModel):
     tools: Optional[List[Any]] = Field(default_factory=list)
     stream: Optional[bool] = Field(default=False)
     images: Optional[List[str]] = Field(default_factory=list)
+    model: Optional[str] = Field(default=ModelName.ANTHROPIC_CLAUDE_3_5_SONNET)
     
     model_config = {
         "json_schema_extra": {"example": EXISTING_THREAD_QUERY_EXAMPLE}

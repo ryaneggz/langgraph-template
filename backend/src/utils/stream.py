@@ -61,14 +61,14 @@ async def event_stream(
         
 def stream_chunks(
     graph: StateGraph, 
-    messages: list[AnyMessage],
+    state: dict,
     thread_id: str = None,
     stream_mode: str = "messages"
 ):
     first = True
     try:
         for msg, metadata in graph.stream(
-            {"messages": messages}, 
+            state, 
             {'configurable': {'thread_id': thread_id}},
             stream_mode=stream_mode
         ):

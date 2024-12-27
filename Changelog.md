@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - bugfix/28-cannot-auth-tools-list (2024-11-30)
 
 ### Changed 
+  - feature/52-ability-to-switch-llms (2024-12-27)
   - feature/70-basic-auth-json-defined-users (2024-12-26)
   - feature/70-add-shad-cn (2024-12-25)
   - feature/62-clean-up-message-formatting (2024-12-21)
