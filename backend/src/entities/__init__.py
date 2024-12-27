@@ -28,7 +28,7 @@ class ExistingThread(BaseModel):
     tools: Optional[List[Any]] = Field(default_factory=list)
     stream: Optional[bool] = Field(default=False)
     images: Optional[List[str]] = Field(default_factory=list)
-    model: Optional[str] = Field(default=ModelName.ANTHROPIC)
+    model: Optional[str] = Field(default=ModelName.ANTHROPIC_CLAUDE_3_5_SONNET)
     
     model_config = {
         "json_schema_extra": {"example": EXISTING_THREAD_QUERY_EXAMPLE}

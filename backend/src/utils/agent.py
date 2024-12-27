@@ -46,7 +46,7 @@ class Agent:
     def builder(
         self,
         tools: list[str] = None,
-        model_name: str = ModelName.ANTHROPIC,
+        model_name: str = ModelName.ANTHROPIC_CLAUDE_3_5_SONNET,
         debug: bool = True if APP_LOG_LEVEL == "DEBUG" else False
     ) -> StateGraph:
         self.llm = LLMWrapper(model_name=model_name, tools=[])
@@ -125,8 +125,9 @@ class Agent:
                 logger.error(f"Failed to fetch or encode image {image_url}: {str(e)}")
                 return None
 
-    @staticmethod
+
     def messages(
+        self,
         query: str, 
         system: str = None, 
         images: list[str] = None,
@@ -163,6 +164,6 @@ class Agent:
         messages = [HumanMessage(content=content)]
         
         if not isinstance(messages[0], SystemMessage):
-            if system:
+            if system and "o1" not in self.llm.model_name:
                 messages.insert(0, SystemMessage(content=system))
         return messages
