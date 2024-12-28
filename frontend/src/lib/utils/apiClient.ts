@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { VITE_API_URL } from '../../config';
+import { TOKEN_NAME, VITE_API_URL } from '../../config';
 
 // Create an Axios instance
 const apiClient = axios.create({
@@ -13,9 +13,9 @@ const apiClient = axios.create({
 // Add a request interceptor
 apiClient.interceptors.request.use(
   (config: any) => {
-    const token = localStorage.getItem('token'); // Replace with your token logic
+    const token = localStorage.getItem(TOKEN_NAME); // Replace with your token logic
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = `Basic ${token}`;
     }
     return config;
   },
@@ -31,7 +31,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       // Handle unauthorized access, e.g., logout user
       console.error('Unauthorized! Redirecting to login...');
-      localStorage.removeItem('token'); // Clear token
+      localStorage.removeItem(TOKEN_NAME); // Clear token
       window.location.href = '/login'; // Redirect to login page
     }
     return Promise.reject(error);
