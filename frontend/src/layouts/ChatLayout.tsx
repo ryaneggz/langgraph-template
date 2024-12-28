@@ -9,7 +9,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
   const [searchParams, setSearchParams] = useSearchParams();
   const [models, setModels] = useState<Model[]>([]);
   const currentModel = searchParams.get('model') || '';
-  const { payload, setPayload } = useChatContext();
+  const { setPayload } = useChatContext();
 
   useEffect(() => {
     const fetchModels = async () => {
