@@ -2,7 +2,7 @@ import debug from 'debug';
 import { SSE } from "sse.js";
 import { useRef, useState } from "react";
 import { ThreadPayload } from '../entities';
-import { VITE_API_URL } from '../config';
+import { TOKEN_NAME, VITE_API_URL } from '../config';
 debug.enable('hooks:*');
 const logger = debug('hooks:useChatHook');
 
@@ -16,7 +16,8 @@ const initChatState = {
         query: '',
         system: 'You are a helpful assistant.',
         tools: [] as any[],
-        visualize: false
+        visualize: false,
+        model: ''
     }
 }
 
@@ -36,13 +37,13 @@ export default function useChatHook() {
         setMessages(updatedMessages);
         setResponse("");
         responseRef.current = "";
-        const auth = localStorage.getItem('auth');
+        const token = localStorage.getItem(TOKEN_NAME);
         const source = new SSE(`${VITE_API_URL}/llm${payload.threadId ? `/${payload.threadId}` : ''}`, // TODO: Make this dynamic
             {
                 headers: {
                     'Content-Type': 'application/json', 
                     'Accept': 'text/event-stream', // TODO: Make this dynamic
-                    'Authorization': `Basic ${auth}` // TODO: Make this dynamic
+                    'Authorization': `Basic ${token}` // TODO: Make this dynamic
                 },
                 payload: JSON.stringify(payload),
                 method: 'POST'
@@ -64,7 +65,7 @@ export default function useChatHook() {
 
         source.addEventListener("message", (e: any) => {
             const data = JSON.parse(e.data);
-            const message = data.content[0]?.text;
+            const message = data.content;
             logger("Message received:", message);
             responseRef.current += message;
             

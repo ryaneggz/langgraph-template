@@ -1,12 +1,13 @@
 import { ColorModeButton } from '@/components/buttons/ColorModeButton';
 import { Link, useNavigate } from 'react-router-dom';
 import { MobileNav } from '@/components/navigation/MobileNav';
+import { TOKEN_NAME } from '@/config';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('auth');
+    localStorage.removeItem(TOKEN_NAME);
     navigate('/login');
   };
 
