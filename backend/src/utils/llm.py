@@ -3,15 +3,7 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_anthropic import ChatAnthropic
 
 from src.constants import OPENAI_API_KEY, ANTHROPIC_API_KEY
-
-class ModelName(str, Enum):
-    OPENAI_GPT_4O = "openai-gpt-4o"
-    OPENAI_GPT_4O_MINI = "openai-gpt-4o-mini"
-    OPENAI_REASONING_O1 = "openai-o1-preview"
-    OPENAI_REASONING_O1_MINI = "openai-o1-mini"
-    OPENAI_EMBEDDING_LARGE = "openai-text-embedding-3-large"
-    ANTHROPIC_CLAUDE_3_5_SONNET = "anthropic-claude-3-5-sonnet-20240620"
-
+from src.constants.llm import ModelName
 class LLMWrapper:
     def __init__(self, model_name: str, tools: list = None, **kwargs):
         self.model = None
