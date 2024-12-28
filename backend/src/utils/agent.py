@@ -13,7 +13,8 @@ from langgraph.prebuilt import create_react_agent
 from psycopg_pool import ConnectionPool
 from src.constants import APP_LOG_LEVEL
 from src.tools import collect_tools
-from src.utils.llm import LLMWrapper, ModelName
+from src.utils.llm import LLMWrapper
+from src.constants.llm import ModelName
 from src.entities import Answer
 from src.utils.logger import logger
 from src.utils.stream import stream_chunks

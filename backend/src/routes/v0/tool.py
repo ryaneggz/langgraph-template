@@ -30,3 +30,29 @@ def list_tools(username: str = Depends(verify_credentials)):
         content=tools_response,
         status_code=status.HTTP_200_OK
     )
+    
+################################################################################
+### List Models
+################################################################################
+from src.constants.llm import MODEL_CONFIG
+@router.get(
+    "/models", 
+    tags=[TAG],
+    responses={
+        status.HTTP_200_OK: {
+            "description": "All models.",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "models": MODEL_CONFIG
+                    }
+                }
+            }
+        }
+    }
+)
+def list_models(username: str = Depends(verify_credentials)):
+    return JSONResponse(
+        content={"models": MODEL_CONFIG},
+        status_code=status.HTTP_200_OK
+    )
