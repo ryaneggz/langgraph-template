@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Model, listModels } from '@/services/modelService';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useChatContext } from '@/context/ChatContext';
+import { SiAnthropic } from 'react-icons/si';
+import { SiOpenai } from 'react-icons/si';
 
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -71,11 +73,21 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                 <SelectValue placeholder="Select Model" />
               </SelectTrigger>
               <SelectContent>
-                {models.map((model) => (
-                  <SelectItem key={model.id} value={model.id}>
-                    {model.label}
-                  </SelectItem>
-                ))}
+                {models
+                  .filter(model => !model.metadata.embedding)
+                  .map((model) => (
+                    <SelectItem key={model.id} value={model.id}>
+                      <div className="flex items-center gap-2">
+                        {model.provider === 'openai' && (
+                          <SiOpenai className="h-4 w-4" />
+                        )}
+                        {model.provider === 'anthropic' && (
+                          <SiAnthropic className="h-4 w-4" />
+                        )}
+                        {model.label}
+                      </div>
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>

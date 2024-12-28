@@ -36,7 +36,7 @@ MODEL_CONFIG = [
     },
     {
         "id": ModelName.OPENAI_REASONING_O1,
-        "label": "O1",
+        "label": "o1",
         "provider": "openai",
         "metadata": {
             "system_message": False,
@@ -48,7 +48,7 @@ MODEL_CONFIG = [
     },
     {
         "id": ModelName.OPENAI_REASONING_O1_MINI,
-        "label": "O1 Mini",
+        "label": "o1 Mini",
         "provider": "openai",
         "metadata": {
             "system_message": False,
