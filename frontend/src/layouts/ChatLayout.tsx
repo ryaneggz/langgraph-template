@@ -3,15 +3,16 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Model, listModels } from '@/services/modelService';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useChatContext } from '@/context/ChatContext';
-import { SiAnthropic } from 'react-icons/si';
-import { SiOpenai } from 'react-icons/si';
+import { SiAnthropic, SiOpenai } from 'react-icons/si';
+import { FaPlus } from 'react-icons/fa';
+import { Button } from "@/components/ui/button";
 
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [models, setModels] = useState<Model[]>([]);
   const currentModel = searchParams.get('model') || '';
-  const { setPayload } = useChatContext();
+  const { setPayload, setMessages } = useChatContext();
 
   useEffect(() => {
     const fetchModels = async () => {
@@ -41,6 +42,11 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
     setSearchParams({ model: modelId });
   };
 
+  const handleNewChat = () => {
+    setMessages([]);
+    setPayload((prev: any) => ({ ...prev, threadId: '', query: '' }));
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <header className="bg-card border-b border-border">
@@ -68,28 +74,40 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
               <h1 className="text-2xl font-bold text-foreground">Chat</h1>
             </div>
             
-            <Select value={currentModel} onValueChange={handleModelChange}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Select Model" />
-              </SelectTrigger>
-              <SelectContent>
-                {models
-                  .filter(model => !model.metadata.embedding)
-                  .map((model) => (
-                    <SelectItem key={model.id} value={model.id}>
-                      <div className="flex items-center gap-2">
-                        {model.provider === 'openai' && (
-                          <SiOpenai className="h-4 w-4" />
-                        )}
-                        {model.provider === 'anthropic' && (
-                          <SiAnthropic className="h-4 w-4" />
-                        )}
-                        {model.label}
-                      </div>
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center gap-2">
+              <Select value={currentModel} onValueChange={handleModelChange}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Select Model" />
+                </SelectTrigger>
+                <SelectContent>
+                  {models
+                    .filter(model => !model.metadata.embedding)
+                    .map((model) => (
+                      <SelectItem key={model.id} value={model.id}>
+                        <div className="flex items-center gap-2">
+                          {model.provider === 'openai' && (
+                            <SiOpenai className="h-4 w-4" />
+                          )}
+                          {model.provider === 'anthropic' && (
+                            <SiAnthropic className="h-4 w-4" />
+                          )}
+                          {model.label}
+                        </div>
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleNewChat}
+                className="h-9 w-9"
+                title="New Chat"
+              >
+                <FaPlus className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </header>
