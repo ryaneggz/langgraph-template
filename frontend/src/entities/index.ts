@@ -5,4 +5,5 @@ export interface ThreadPayload {
   system: string;
   tools: any[];
   visualize: boolean;
+  model: string;
 }

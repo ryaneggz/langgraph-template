@@ -65,7 +65,7 @@ export default function useChatHook() {
 
         source.addEventListener("message", (e: any) => {
             const data = JSON.parse(e.data);
-            const message = data.content[0]?.text;
+            const message = data.content;
             logger("Message received:", message);
             responseRef.current += message;
             
@@ -73,7 +73,7 @@ export default function useChatHook() {
                 { role: 'user', content: payload.query },
                 { role: "assistant", content: responseRef.current }
             ];
-            setPayload({ ...payload, query: '', threadId: data.thread_id, model: data.model });
+            setPayload({ ...payload, query: '', threadId: data.thread_id });
             if (data.event === "end") {
                 source.close();
                 logger("Thread ended");

@@ -17,7 +17,7 @@ from src.utils.llm import LLMWrapper
 from src.constants.llm import ModelName
 from src.entities import Answer
 from src.utils.logger import logger
-from src.utils.stream import stream_chunks
+from src.utils.stream import process_stream_output, stream_chunks
 from src.flows.chatbot import chatbot_builder
 class Agent:
     def __init__(self, thread_id: str, pool: ConnectionPool):
@@ -50,7 +50,7 @@ class Agent:
         model_name: str = ModelName.ANTHROPIC_CLAUDE_3_5_SONNET,
         debug: bool = True if APP_LOG_LEVEL == "DEBUG" else False
     ) -> StateGraph:
-        self.llm = LLMWrapper(model_name=model_name, tools=[])
+        self.llm = LLMWrapper(model_name=model_name, tools=tools)
         self.tools = [] if len(tools) == 0 else collect_tools(tools)
         self.checkpointer = self._checkpointer()
         if self.tools:
