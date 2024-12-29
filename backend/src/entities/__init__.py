@@ -47,8 +47,8 @@ class Thread(BaseModel):
     checkpoint_ns: Optional[str] = Field(default='')
     checkpoint_id: Optional[str] = Field(default=None)
     messages: list[AnyMessage] = Field(default_factory=list)
-    v: int = Field(default=1)
-    ts: str = Field(...)
+    v: Optional[int] = Field(default=1)
+    ts: Optional[str] = Field(default=None)
     
     model_config = {
         "json_schema_extra": {
