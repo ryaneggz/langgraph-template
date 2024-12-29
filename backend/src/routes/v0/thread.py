@@ -31,7 +31,7 @@ router = APIRouter(tags=[TAG])
         }
     }
 )
-def threads(
+def list_threads(
     username: str = Depends(verify_credentials),
     page: Optional[int] = Query(1, description="Page number", ge=1),
     per_page: Optional[int] = Query(10, description="Items per page", ge=1, le=100),
@@ -91,7 +91,7 @@ def threads(
 ### Query Thread History
 ################################################################################
 @router.get(
-    "/thread/{thread_id}", 
+    "/threads/{thread_id}", 
     tags=[TAG],
     responses={
         status.HTTP_200_OK: {
@@ -104,7 +104,7 @@ def threads(
         }
     }
 )
-def thread_history(
+def find_thread(
     thread_id: str,
     username: str = Depends(verify_credentials)
 ):
@@ -141,7 +141,7 @@ def thread_history(
         }
     }
 )
-def checkpoints(
+def list_checkpoints(
     username: str = Depends(verify_credentials),
     thread_id: Optional[str] = Query(None, description="Filter by thread ID"),
     checkpoint_id: Optional[str] = Query(None, description="Filter by checkpoint ID"),

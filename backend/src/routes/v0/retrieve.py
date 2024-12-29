@@ -10,7 +10,7 @@ from src.entities import AddDocuments, DocIds, Document
 from src.utils.auth import verify_credentials
 from src.utils.retrieval import VectorStore
 
-TAG = "Documents"
+TAG = "Retrieval"
 router = APIRouter(tags=[TAG])
 
 ################################################################################
