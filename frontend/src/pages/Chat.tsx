@@ -4,7 +4,9 @@ import MarkdownCard from '../components/cards/MarkdownCard';
 import { Button } from '@/components/ui/button';
 
 export default function Chat() {
-    const { messages, payload, handleQuery, setPayload } = useChatContext();
+    const { messages, payload, handleQuery, setPayload, history, useGetHistoryEffect } = useChatContext();
+
+    useGetHistoryEffect();
 
     return (
         <ChatLayout>
