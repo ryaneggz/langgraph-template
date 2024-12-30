@@ -3,9 +3,19 @@ import { useChatContext } from '../context/ChatContext';
 import MarkdownCard from '../components/cards/MarkdownCard';
 import { Button } from '@/components/ui/button';
 import { ThreadHistoryDrawer } from '@/components/drawers/ThreadHistoryDrawer';
+import { useEffect, useRef } from 'react';
 
 export default function Chat() {
     const { messages, payload, handleQuery, setPayload, useGetHistoryEffect } = useChatContext();
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]); // Scroll when messages change
 
     useGetHistoryEffect();
 
@@ -35,6 +45,7 @@ export default function Chat() {
                                     )
                                 }
                             })}
+                            <div ref={messagesEndRef} /> {/* Invisible element to scroll to */}
                         </div>
                     </div>
 
