@@ -6,6 +6,7 @@ import { useChatContext } from '@/context/ChatContext';
 import { SiAnthropic, SiOpenai } from 'react-icons/si';
 import { FaPlus } from 'react-icons/fa';
 import { Button } from "@/components/ui/button";
+import { ColorModeButton } from '@/components/buttons/ColorModeButton';
 
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <button 
-                onClick={() => navigate(-1)}
+                onClick={() => navigate('/dashboard')}
                 className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors mr-4"
               >
                 <svg 
@@ -69,9 +70,8 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                     clipRule="evenodd" 
                   />
                 </svg>
-                Back
               </button>
-              <h1 className="text-2xl font-bold text-foreground">Chat</h1>
+              {/* <h1 className="text-2xl font-bold text-foreground">Chat</h1> */}
             </div>
             
             <div className="flex items-center gap-2">
@@ -107,6 +107,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
               >
                 <FaPlus className="h-4 w-4" />
               </Button>
+              <ColorModeButton />
             </div>
           </div>
         </div>

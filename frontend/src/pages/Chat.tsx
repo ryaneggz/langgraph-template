@@ -21,11 +21,11 @@ export default function Chat() {
 
     return (
         <ChatLayout>
-            <div className="flex h-[calc(100vh-70px)]">
+            <div className="flex min-h-[calc(100vh-70px)] max-h-[calc(100vh-70px)] relative">
                 <ThreadHistoryDrawer />
-                <div className="flex-1 flex flex-col">
-                    <div className="flex-1 overflow-y-auto p-3">
-                        <div className="space-y-4 max-w-4xl mx-auto">
+                <div className="flex-1 flex flex-col overflow-hidden">
+                    <div className="flex-1 overflow-y-auto p-3 min-h-0">
+                        <div className="space-y-4 max-w-4xl mx-auto pb-4">
                             {messages?.map((message: {role: string, content: string, type: string}, index: number) => {
                                 if (message.role === 'user' || message.role === 'human' || message.type === 'human') {
                                     return (
@@ -49,23 +49,25 @@ export default function Chat() {
                         </div>
                     </div>
 
-                    <div className="flex gap-3 border-t border-border pt-4 px-3 pb-3">
-                        <textarea 
-                            className="flex-1 resize-none min-h-[44px] max-h-[200px] p-3 bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
-                            placeholder="Type your message here..."
-                            rows={1}
-                            value={payload.query}
-                            onChange={(e) => setPayload({ ...payload, query: e.target.value })}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handleQuery();
-                                }
-                            }}
-                        />
-                        <Button onClick={handleQuery}>
-                            Send
-                        </Button>
+                    <div className="sticky bottom-0 bg-background border-t border-border">
+                        <div className="flex gap-3 p-3">
+                            <textarea 
+                                className="flex-1 resize-none min-h-[44px] max-h-[200px] p-3 bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                                placeholder="Type your message here..."
+                                rows={1}
+                                value={payload.query}
+                                onChange={(e) => setPayload({ ...payload, query: e.target.value })}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleQuery();
+                                    }
+                                }}
+                            />
+                            <Button onClick={handleQuery}>
+                                Send
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </div>
