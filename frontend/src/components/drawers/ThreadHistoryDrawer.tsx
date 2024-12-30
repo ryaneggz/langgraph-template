@@ -1,0 +1,37 @@
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useChatContext } from "@/context/ChatContext";
+import { formatDistanceToNow } from "date-fns";
+
+export function ThreadHistoryDrawer() {
+  const { history, setMessages, setPayload } = useChatContext();
+
+  const handleThreadClick = (threadId: string, messages: any[]) => {
+    setMessages(messages);
+    setPayload((prev: any) => ({ ...prev, threadId }));
+  };
+
+  return (
+    <div className="w-[300px] border-r border-border hidden md:flex flex-col h-[calc(100vh-70px)]">
+      <ScrollArea className="flex-1">
+        <div className="p-4 space-y-2">
+          {history?.threads?.map((thread: any) => (
+            <button
+              key={thread.id}
+              onClick={() => handleThreadClick(thread.threadId, thread.messages)}
+              className="w-full text-left p-3 rounded-lg hover:bg-accent transition-colors border border-border"
+            >
+              <div className="w-full">
+                <p className="text-sm font-medium line-clamp-2">
+                  {thread.messages[1]?.content || "New Chat"}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1 truncate">
+                  {formatDistanceToNow(new Date(thread.ts), { addSuffix: true })}
+                </p>
+              </div>
+            </button>
+          ))}
+        </div>
+      </ScrollArea>
+    </div>
+  );
+} 

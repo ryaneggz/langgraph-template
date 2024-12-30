@@ -10,6 +10,10 @@ const apiClient = axios.create({
   },
 });
 
+// Add retry configuration
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000;
+
 // Add a request interceptor
 apiClient.interceptors.request.use(
   (config: any) => {
@@ -19,7 +23,15 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error: any) => {
+  async (error: any) => {
+    const config = error.config;
+    config.retryCount = config.retryCount || 0;
+
+    if (config.retryCount < MAX_RETRIES) {
+      config.retryCount += 1;
+      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+      return apiClient(config);
+    }
     return Promise.reject(error);
   }
 );
@@ -27,12 +39,22 @@ apiClient.interceptors.request.use(
 // Add a response interceptor
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => response,
-  (error: any) => {
+  async (error: any) => {
+    const config = error.config;
+    config.retryCount = config.retryCount || 0;
+
     if (error.response?.status === 401) {
       // Handle unauthorized access, e.g., logout user
       console.error('Unauthorized! Redirecting to login...');
       localStorage.removeItem(TOKEN_NAME); // Clear token
       window.location.href = '/login'; // Redirect to login page
+      return Promise.reject(error);
+    }
+
+    if (config.retryCount < MAX_RETRIES) {
+      config.retryCount += 1;
+      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+      return apiClient(config);
     }
     return Promise.reject(error);
   }

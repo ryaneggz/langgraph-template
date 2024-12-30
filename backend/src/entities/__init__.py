@@ -42,14 +42,29 @@ class NewThread(ExistingThread):
         "json_schema_extra": {"example": NEW_THREAD_QUERY_EXAMPLE}
     }
         
-class LLMHTTPResponse(BaseModel):
+class Thread(BaseModel):
     thread_id: str = Field(...)
+    checkpoint_ns: Optional[str] = Field(default='')
+    checkpoint_id: Optional[str] = Field(default=None)
     messages: list[AnyMessage] = Field(default_factory=list)
+    v: Optional[int] = Field(default=1)
+    ts: Optional[str] = Field(default=None)
     
     model_config = {
         "json_schema_extra": {
             "examples": {
                 "thread_history": THREAD_HISTORY_EXAMPLE
+            }
+        }
+    }
+    
+class Threads(BaseModel):
+    threads: list[Thread] = Field(default_factory=list)
+    
+    model_config = {
+        "json_schema_extra": {
+            "examples": {
+                "threads": [THREAD_HISTORY_EXAMPLE, THREAD_HISTORY_EXAMPLE]
             }
         }
     }

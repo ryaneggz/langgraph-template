@@ -9,7 +9,7 @@ from src.entities import AddDocuments
 from src.loaders import Loader
 from src.utils.auth import verify_credentials
 
-TAG = "Sources"
+TAG = "Retrieval"
 router = APIRouter(tags=[TAG])
 
 ################################################################################
