@@ -5,21 +5,24 @@ import { SiAnthropic, SiOpenai } from 'react-icons/si';
 import { FaPlus } from 'react-icons/fa';
 import { Button } from "@/components/ui/button";
 import { ColorModeButton } from '@/components/buttons/ColorModeButton';
+import { useSearchParams } from "react-router-dom";
 import { useChatContext } from "@/context/ChatContext";
 import { Model } from "@/services/modelService";
 
 export default function ChatNav() {
     const navigate = useNavigate();
+    const [searchParams,] = useSearchParams();
+    const currentModel = searchParams.get('model') || '';
+    
     const { 
         models,
-        currentModel,
         handleModelChange,
         handleNewChat
     } = useChatContext();
 
     return (
         <header className="bg-card border-b border-border">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="mx-auto px-4 sm:px-6 lg:px-4 py-4">
             <div className="flex items-center justify-between">
                 <div className="flex items-center">
                 <button 

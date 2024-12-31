@@ -1,6 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
 import { useChatContext } from '@/context/ChatContext';
-import ChatNav from '@/components/nav/ChatNav';
 
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -15,7 +14,6 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-     <ChatNav />
       {children}
     </div>
   );

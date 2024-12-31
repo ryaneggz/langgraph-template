@@ -1,6 +1,8 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatContext } from "@/context/ChatContext";
 import { formatDistanceToNow } from "date-fns";
+import { Button } from "@/components/ui/button";
+import { Settings, Plus } from "lucide-react";
 
 export function ThreadHistoryDrawer() {
   const { history, setMessages, setPayload } = useChatContext();
@@ -11,9 +13,16 @@ export function ThreadHistoryDrawer() {
   };
 
   return (
-    <div className="w-[300px] border-r border-border hidden md:flex flex-col h-[calc(100vh-70px)]">
+    <div className="w-[300px] border-r border-border hidden md:flex flex-col h-[calc(100vh-0px)]">
+      <div className="p-4 border-b border-border">
+        <Button variant="outline" className="w-full" onClick={() => handleThreadClick("", [])}>
+          <Plus className="mr-2 h-4 w-4" />
+          New Chat
+        </Button>
+      </div>
+      
       <ScrollArea className="flex-1">
-        <div className="p-4 space-y-2">
+        <div className="p-2 pr-3 space-y-2">
           {history?.threads?.map((thread: any) => (
             <button
               key={thread.id}
@@ -32,6 +41,13 @@ export function ThreadHistoryDrawer() {
           ))}
         </div>
       </ScrollArea>
+
+      {/* <div className="p-4 border-t border-border">
+        <Button variant="ghost" className="w-full" onClick={() => {}}>
+          <Settings className="mr-2 h-4 w-4" />
+          Settings
+        </Button>
+      </div> */}
     </div>
   );
 } 
