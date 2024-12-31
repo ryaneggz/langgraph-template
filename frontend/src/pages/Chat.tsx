@@ -33,7 +33,7 @@ export default function Chat() {
                                 if (message.role === 'user' || message.role === 'human' || message.type === 'human') {
                                     return (
                                         <div key={index} className="flex justify-end">
-                                            <div className="max-w-[80%] md:max-w-[70%] bg-primary text-primary-foreground p-3 rounded-lg rounded-br-sm">
+                                            <div className="max-w-[80%] md:max-w-[70%] bg-primary/90 text-primary-foreground p-3 rounded-lg rounded-br-sm">
                                                 <MarkdownCard content={message.content} />
                                             </div>
                                         </div>
@@ -41,7 +41,7 @@ export default function Chat() {
                                 } else {
                                     return (
                                         <div key={index} className="flex justify-start">
-                                            <div className="max-w-[90%] md:max-w-[80%] bg-muted text-muted-foreground p-3 rounded-lg rounded-bl-sm">
+                                            <div className="max-w-[90%] md:max-w-[80%] bg-transparent text-foreground-500 p-3 rounded-lg rounded-bl-sm">
                                                 <MarkdownCard content={message.content} />
                                             </div>
                                         </div>
