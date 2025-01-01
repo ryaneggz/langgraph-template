@@ -4,6 +4,7 @@ import MarkdownCard from '../components/cards/MarkdownCard';
 import { Button } from '@/components/ui/button';
 import { ThreadHistoryDrawer } from '@/components/drawers/ThreadHistoryDrawer';
 import { useEffect, useRef } from 'react';
+import ChatNav from '@/components/nav/ChatNav';
 
 export default function Chat() {
     const { messages, payload, handleQuery, setPayload, useGetHistoryEffect } = useChatContext();
@@ -21,16 +22,18 @@ export default function Chat() {
 
     return (
         <ChatLayout>
-            <div className="flex min-h-[calc(100vh-70px)] max-h-[calc(100vh-70px)] relative">
+            <div className="flex min-h-[calc(100vh-0px)] max-h-[calc(100vh-0px)] relative">
                 <ThreadHistoryDrawer />
+                
                 <div className="flex-1 flex flex-col overflow-hidden">
+                    <ChatNav />
                     <div className="flex-1 overflow-y-auto p-3 min-h-0">
                         <div className="space-y-4 max-w-4xl mx-auto pb-4">
                             {messages?.map((message: {role: string, content: string, type: string}, index: number) => {
                                 if (message.role === 'user' || message.role === 'human' || message.type === 'human') {
                                     return (
                                         <div key={index} className="flex justify-end">
-                                            <div className="max-w-[80%] md:max-w-[70%] bg-primary text-primary-foreground p-3 rounded-lg rounded-br-sm">
+                                            <div className="max-w-[80%] md:max-w-[70%] bg-primary/90 text-primary-foreground p-3 rounded-lg rounded-br-sm">
                                                 <MarkdownCard content={message.content} />
                                             </div>
                                         </div>
@@ -38,7 +41,7 @@ export default function Chat() {
                                 } else {
                                     return (
                                         <div key={index} className="flex justify-start">
-                                            <div className="max-w-[90%] md:max-w-[80%] bg-muted text-muted-foreground p-3 rounded-lg rounded-bl-sm">
+                                            <div className="max-w-[90%] md:max-w-[80%] bg-transparent text-foreground-500 p-3 rounded-lg rounded-bl-sm">
                                                 <MarkdownCard content={message.content} />
                                             </div>
                                         </div>

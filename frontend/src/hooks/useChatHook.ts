@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { ThreadPayload } from '../entities';
 import { TOKEN_NAME, VITE_API_URL } from '../config';
 import apiClient from '@/lib/utils/apiClient';
+import { listModels, Model } from '@/services/modelService';
+
 debug.enable('hooks:*');
 const logger = debug('hooks:useChatHook');
 
@@ -26,7 +28,8 @@ const initChatState = {
         per_page: 20,
         total: 0,
         next_page: '',
-    }
+    },
+    models: [],
 }
 
 export default function useChatHook() {
@@ -36,8 +39,7 @@ export default function useChatHook() {
     const [messages, setMessages] = useState<any[]>(initChatState.messages);
     const [payload, setPayload] = useState(initChatState.payload);
     const [history, setHistory] = useState<any>(initChatState.history);
-
-
+    const [models, setModels] = useState<Model[]>(initChatState.models);
     const handleQuery = () => {
         queryThread(payload);
     }
@@ -114,6 +116,25 @@ export default function useChatHook() {
         }
     }
 
+    const fetchModels = async (setSearchParams: (params: any) => void, currentModel: string) => {
+        try {
+            const response = await listModels();
+            setModels(response.models);
+            
+            // Set default model if none selected
+            if (!currentModel && response.models.length > 0) {
+                setSearchParams({ model: response.models[0].id });
+            }
+        } catch (error) {
+            console.error('Failed to fetch models:', error);
+        }
+    };
+
+    const handleNewChat = () => {
+        setMessages([]);
+        setPayload((prev: any) => ({ ...prev, threadId: '', query: '' }));
+    };
+
     const useGetHistoryEffect = () => {
         useEffect(() => {
             getHistory();
@@ -122,6 +143,28 @@ export default function useChatHook() {
                 // Cleanup logic if needed
             };
         }, []);
+    };
+
+    const useFetchModelsEffect = (setSearchParams: (params: any) => void, currentModel: string) => {
+        useEffect(() => {
+            fetchModels(setSearchParams, currentModel);
+
+            return () => {
+                // Cleanup logic if needed
+            };
+        }, []);
+    };
+
+    const useSelectModelEffect = (currentModel: string) => {
+        useEffect(() => {
+            if (currentModel) {
+                setPayload({ ...payload, model: currentModel });
+            }
+        }, [currentModel, setPayload]);
+
+        return () => {
+            // Cleanup logic if needed
+        };
     };
 
     return {
@@ -137,7 +180,12 @@ export default function useChatHook() {
         getHistory,
         history,
         setHistory,
-        useGetHistoryEffect 
+        useGetHistoryEffect,
+        useFetchModelsEffect,
+        models,
+        setModels,
+        useSelectModelEffect,
+        handleNewChat
     }
 }
 
