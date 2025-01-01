@@ -40,7 +40,7 @@ const MarkdownCard = ({ content }: { content: string }) => {
                         </div>
                     ) : (
                         <code
-                            className="rounded px-1 py-0.5 font-bold text-green-300"
+                            className="rounded px-1 py-0.5 font-bold text-primary"
                             {...props}
                         />
                     );
@@ -57,7 +57,7 @@ const MarkdownCard = ({ content }: { content: string }) => {
                     />
                 ),
                 table: ({ node, ...props }) => (
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto my-2">
                         <table
                             className="min-w-full bg-white border border-gray-300"
                             {...props}
@@ -87,6 +87,9 @@ const MarkdownCard = ({ content }: { content: string }) => {
                         className="px-6 py-4 text-sm text-gray-900 border-r border-gray-200"
                         {...props}
                     />
+                ),
+                hr: () => (
+                    <hr className="my-5" />
                 ),
             }}
             remarkPlugins={[remarkGfm]}
