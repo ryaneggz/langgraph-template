@@ -37,16 +37,16 @@ services:
   #   network_mode: host
   #   restart: always
 
-  ## Graphchat
-  # graphchat:
-  #   image: ryaneggz/graphchat:latest
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   container_name: graphchat
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     - postgres
+  # Graphchat
+  graphchat:
+    # image: ryaneggz/graphchat:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: graphchat
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
