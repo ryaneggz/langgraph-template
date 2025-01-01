@@ -2,7 +2,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatContext } from "@/context/ChatContext";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Settings, Plus } from "lucide-react";
+import { 
+  // Settings, 
+  Plus 
+} from "lucide-react";
 
 export function ThreadHistoryDrawer() {
   const { history, setMessages, setPayload } = useChatContext();
