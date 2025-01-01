@@ -38,7 +38,7 @@ export default function Chat() {
                                 } else {
                                     return (
                                         <div key={index} className="flex justify-start">
-                                            <div className="max-w-[90%] md:max-w-[80%] bg-muted text-muted-foreground p-3 rounded-lg rounded-bl-sm">
+                                            <div className="max-w-[90%] md:max-w-[80%] bg-transparent text-primary p-3 rounded-lg rounded-bl-sm">
                                                 <MarkdownCard content={message.content} />
                                             </div>
                                         </div>

@@ -22,8 +22,8 @@ const MarkdownCard = ({ content }: { content: string }) => {
                     const { className} = props;
                     const match = /language-(\w+)/.exec(className || "");
                     return match ? (
-                        <div className="text-white dark bg-gray-950 rounded-md border-[0.5px] border-token-border-medium">
-                            <div className="flex items-center relative text-token-text-secondary bg-token-main-surface-secondary px-4 py-2 text-xs font-sans justify-between rounded-t-md">
+                        <div className="text-white dark bg-gray-950 rounded-md border-[0.5px] border-token-border-medium my-2">
+                            <div className="flex items-center relative text-token-text-secondary bg-token-main-surface-secondary px-2 py-1 text-xs font-sans justify-between rounded-t-md">
                                 <span>{match[0].replace("language-", "")}</span>
                                 <div className="flex items-center">
                                     <span className="" data-state="closed">
@@ -40,7 +40,7 @@ const MarkdownCard = ({ content }: { content: string }) => {
                         </div>
                     ) : (
                         <code
-                            className="rounded px-1 py-0.5 font-bold"
+                            className="rounded px-1 py-0.5 font-bold text-primary"
                             {...props}
                         />
                     );
@@ -57,7 +57,7 @@ const MarkdownCard = ({ content }: { content: string }) => {
                     />
                 ),
                 table: ({ node, ...props }) => (
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto my-2">
                         <table
                             className="min-w-full bg-white border border-gray-300"
                             {...props}
@@ -87,6 +87,9 @@ const MarkdownCard = ({ content }: { content: string }) => {
                         className="px-6 py-4 text-sm text-gray-900 border-r border-gray-200"
                         {...props}
                     />
+                ),
+                hr: () => (
+                    <hr className="my-5" />
                 ),
             }}
             remarkPlugins={[remarkGfm]}
