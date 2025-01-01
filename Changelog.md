@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed 
   - feature/93-open-drawer-on-mobile (2024-12-30)
+  - feature/95-fix-docker-build (2025-01-01)
   - feature/86-model-select-in-react-app (2024-12-28)
   - feature/83-add-endpoint-to-display-models (2024-12-27)
   - feature/52-ability-to-switch-llms (2024-12-27)

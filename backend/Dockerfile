@@ -32,6 +32,11 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+# Install runtime dependencies
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy application from builder stage
 COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
