@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - bugfix/28-cannot-auth-tools-list (2024-11-30)
 
 ### Changed 
+  - feature/99-fix-vite-api-url-append (2025-01-05)
   - feature/93-open-drawer-on-mobile (2024-12-30)
   - feature/95-fix-docker-build (2025-01-01)
   - feature/86-model-select-in-react-app (2024-12-28)

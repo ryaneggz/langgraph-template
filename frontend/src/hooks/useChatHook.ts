@@ -54,8 +54,8 @@ export default function useChatHook() {
             {
                 headers: {
                     'Content-Type': 'application/json', 
-                    'Accept': 'text/event-stream', // TODO: Make this dynamic
-                    'Authorization': `Basic ${token}` // TODO: Make this dynamic
+                    'Accept': 'text/event-stream',
+                    'Authorization': `Basic ${token}`
                 },
                 payload: JSON.stringify(payload),
                 method: 'POST'
@@ -101,7 +101,7 @@ export default function useChatHook() {
 
     const getHistory = async (page: number = 1, perPage: number = 20) => {
         try {
-            const res = await apiClient.get(`${VITE_API_URL}/threads?page=${page}&per_page=${perPage}`, {
+            const res = await apiClient.get(`/threads?page=${page}&per_page=${perPage}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json', 
