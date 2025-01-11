@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.0.1
 
 ### Fixed
+  - bugfix/85-static-users-failing-to-parse-json-env (2025-01-10)
   - bugfix/72-default-vite-api-url (2024-12-25)
   - bugfix/68-close-stream-client-properly (2024-12-24)
   - bugfix/65-can-refresh-from-sub-route (2024-12-22)
