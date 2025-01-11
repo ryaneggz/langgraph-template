@@ -9,9 +9,6 @@ on:
         type: string
 
 jobs:
-  ###############################################################
-  ## Deploy to VM
-  ###############################################################
   deploy:
     runs-on: ubuntu-latest
     # Only run if the input tag contains "rc"
@@ -49,13 +46,11 @@ jobs:
             echo '--- Pulling new image ---'
             docker pull ryaneggz/graphchat:$TAG
 
-            # -------------------------------------------------
-            # Clean up any leftover temporary containers
-            # -------------------------------------------------
+            echo '--- Starting staging container (graphchat_new) on port 8006 ---'
+            # Stop/remove any leftover staging container from a previous run
             docker stop graphchat_new || true
             docker rm graphchat_new || true
 
-            echo '--- Starting new container on port 8006 ---'
             docker run -d \
               --name graphchat_new \
               --network graphchat_default \
@@ -63,35 +58,22 @@ jobs:
               -p 8006:8000 \
               ryaneggz/graphchat:$TAG
 
-            # Give the new container some time to start
+            echo '--- Waiting a few seconds for startup ---'
             sleep 10
 
-            echo '--- Health check on new container ---'
+            echo '--- Health check on staging container (graphchat_new) ---'
             if curl -f http://localhost:8006/health; then
-              echo 'New container is healthy!'
-              # -------------------------------------------------
-              # Rename old container -> graphchat_old
-              # (if it exists/running)
-              # -------------------------------------------------
-              if docker ps -a --format '{{.Names}}' | grep -q '^graphchat$'; then
-                echo '--- Renaming old container to graphchat_old ---'
-                docker rename graphchat graphchat_old || true
-              fi
+              echo 'New container on port 8006 is healthy!'
+              
+              echo '--- Stopping and removing old container (graphchat) if it exists ---'
+              docker stop graphchat || true
+              docker rm graphchat || true
 
-              echo '--- Renaming new container to graphchat ---'
-              docker rename graphchat_new graphchat
+              echo '--- Stopping and removing staging container (graphchat_new) ---'
+              docker stop graphchat_new || true
+              docker rm graphchat_new || true
 
-              # -------------------------------------------------
-              # (Optional) Remove old container
-              # -------------------------------------------------
-              if docker ps -a --format '{{.Names}}' | grep -q '^graphchat_old$'; then
-                echo '--- Stopping and removing old container ---'
-                docker stop graphchat_old || true
-                docker rm graphchat_old || true
-              fi
-
-              echo '--- Restarting new container on production port (8005) ---'
-              docker stop graphchat
+              echo '--- Running new container on production port (8005) as graphchat ---'
               docker run -d \
                 --name graphchat \
                 --network graphchat_default \
@@ -101,8 +83,8 @@ jobs:
 
               echo 'Deployment successful!'
             else
-              echo 'Deployment failed - health check did not pass'
-              # Cleanup new container if health check fails
+              echo 'Deployment failed - health check did not pass.'
+              echo '--- Cleaning up staging container (graphchat_new) ---'
               docker stop graphchat_new || true
               docker rm graphchat_new || true
               exit 1
