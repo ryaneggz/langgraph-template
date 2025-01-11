@@ -37,7 +37,7 @@ jobs:
         TAG=${{ inputs.tag }}
         
         # SSH into the server and execute deployment
-        ssh $SSH_USER@$SSH_HOST "
+        ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "
           # Pull the new image
           docker pull ryaneggz/graphchat:$TAG
 
