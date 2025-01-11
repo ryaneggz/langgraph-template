@@ -1,4 +1,4 @@
-name: Deploy-Agent
+name: Deploy-Docker
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ jobs:
   ###############################################################
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ contains(inputs.tag, 'agent') }}
+    if: ${{ contains(inputs.tag, 'rc') }}
     environment: Dev
     steps:
     - name: Deploy to VM
