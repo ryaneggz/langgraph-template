@@ -23,7 +23,7 @@ jobs:
         SSH_HOST: ${{ secrets.SSH_HOST }}
         SSH_USER: ${{ secrets.SSH_USER }}
       run: |
-        env | sort
+        # env | sort
         # Setup SSH
         mkdir -p ~/.ssh
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
@@ -38,6 +38,15 @@ jobs:
         
         # SSH into the server and execute deployment
         ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "
+          echo 'User: $(whoami)'
+          echo 'Hostname: $(hostname)'
+          echo 'OS: $(uname -a)'
+          echo 'Uptime: $(uptime -p)'
+          docker ps
+          tmux ls || true  # Won't fail if no sessions exist
+          
+          cd ~/agent_api
+
           # Pull the new image
           docker pull ryaneggz/graphchat:$TAG
 
