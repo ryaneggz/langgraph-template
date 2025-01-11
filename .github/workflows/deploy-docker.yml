@@ -38,44 +38,48 @@ jobs:
         
         # SSH into the server and execute deployment
         ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "
-          echo 'User: $(whoami)'
-          echo 'Hostname: $(hostname)'
-          echo 'OS: $(uname -a)'
-          echo 'Uptime: $(uptime -p)'
-          docker ps
-          tmux ls || true  # Won't fail if no sessions exist
-          
-          cd ~/agent_api
+            set -e  # Exit on any error
+            echo 'User: $(whoami)'
+            echo 'Hostname: $(hostname)'
+            echo 'OS: $(uname -a)'
+            echo 'Uptime: $(uptime -p)'
+            docker ps
+            tmux ls || true  # Won't fail if no sessions exist
 
-          # Pull the new image
-          docker pull ryaneggz/graphchat:$TAG
+            cd ~/agent_api
 
-          # Start new container with temporary name and different port
-          docker run -d --name graphchat_new --env-file ./backend/.env -p 8006:8000 ryaneggz/graphchat:$TAG
+            # Pull the new image
+            docker pull ryaneggz/graphchat:$TAG
 
-          # Wait for container to be healthy (adjust sleep time as needed)
-          sleep 10
+            # Stop and remove any existing graphchat_new containers
+            docker stop graphchat_new || true
+            docker rm graphchat_new || true
 
-          # Basic health check (adjust URL and expected response as needed)
-          if curl -f http://localhost:8006/health; then
-            # If health check passes, swap containers
-            docker rename graphchat graphchat_old
-            docker rename graphchat_new graphchat
+            # Start a new container with a temporary name and different port
+            docker run -d --name graphchat_new --env-file ./backend/.env -p 8006:8000 ryaneggz/graphchat:$TAG
 
-            # Stop and remove old container
-            docker stop graphchat_old
-            docker rm graphchat_old
+            # Wait for the container to become healthy (adjust sleep time as needed)
+            sleep 10
 
-            # Update port mapping on new container
-            docker stop graphchat
-            docker run -d --name graphchat --env-file ./backend/.env -p 8005:8000 ryaneggz/graphchat:$TAG
+            # Basic health check (adjust URL and expected response as needed)
+            if curl -f http://localhost:8006/health; then
+                # Stop and remove the old container if it exists
+                docker stop graphchat || true
+                docker rm graphchat || true
 
-            echo 'Deployment successful!'
-          else
-            # If health check fails, cleanup new container
-            docker stop graphchat_new
-            docker rm graphchat_new
-            echo 'Deployment failed - health check did not pass'
-            exit 1
-          fi
+                # Rename new container to graphchat
+                docker rename graphchat_new graphchat
+
+                # Update port mapping on the new container
+                docker stop graphchat
+                docker run -d --name graphchat --env-file ./backend/.env -p 8005:8000 ryaneggz/graphchat:$TAG
+
+                echo 'Deployment successful!'
+            else
+                # If health check fails, clean up the new container
+                docker stop graphchat_new
+                docker rm graphchat_new
+                echo 'Deployment failed - health check did not pass'
+                exit 1
+            fi
         "
