@@ -23,6 +23,7 @@ jobs:
         SSH_HOST: ${{ secrets.SSH_HOST }}
         SSH_USER: ${{ secrets.SSH_USER }}
       run: |
+        env | sort
         # Setup SSH
         mkdir -p ~/.ssh
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
@@ -41,7 +42,7 @@ jobs:
           docker pull ryaneggz/graphchat:$TAG
 
           # Start new container with temporary name and different port
-          docker run -d --name graphchat_blue --env-file ./backend/.env -p 8006:8000 ryaneggz/graphchat:$TAG
+          docker run -d --name graphchat_new --env-file ./backend/.env -p 8006:8000 ryaneggz/graphchat:$TAG
 
           # Wait for container to be healthy (adjust sleep time as needed)
           sleep 10
