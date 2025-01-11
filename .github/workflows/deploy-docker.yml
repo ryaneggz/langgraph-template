@@ -14,72 +14,93 @@ jobs:
   ###############################################################
   deploy:
     runs-on: ubuntu-latest
+    # Only run if the input tag contains "rc"
     if: ${{ contains(inputs.tag, 'rc') }}
     environment: Dev
     steps:
-    - name: Deploy to VM
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        SSH_HOST: ${{ secrets.SSH_HOST }}
-        SSH_USER: ${{ secrets.SSH_USER }}
-      run: |
-        # env | sort
-        # Setup SSH
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan github.com >> ~/.ssh/known_hosts
-        
-        # Add host to known hosts
-        ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
-        
-        # Use input tag instead of ref
-        TAG=${{ inputs.tag }}
-        
-        # SSH into the server and execute deployment
-        ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "
-            set -e  # Exit on any error
-            echo 'User: $(whoami)'
-            echo 'Hostname: $(hostname)'
-            echo 'OS: $(uname -a)'
-            echo 'Uptime: $(uptime -p)'
-            docker ps
-            tmux ls || true  # Won't fail if no sessions exist
+      - name: Deploy to VM
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          # ---------------------------------------------------
+          # Setup SSH
+          # ---------------------------------------------------
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
 
-            cd ~/agent_api
+          # ---------------------------------------------------
+          # Use input tag instead of ref
+          # ---------------------------------------------------
+          TAG=${{ inputs.tag }}
 
-            # Pull the new image
+          # ---------------------------------------------------
+          # SSH into the server and execute deployment
+          # ---------------------------------------------------
+          ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "
+            set -e  # Exit on error
+
+            echo '--- Pulling new image ---'
             docker pull ryaneggz/graphchat:$TAG
 
-            # Stop and remove any existing graphchat_new containers
+            # -------------------------------------------------
+            # Clean up any leftover temporary containers
+            # -------------------------------------------------
             docker stop graphchat_new || true
             docker rm graphchat_new || true
 
-            # Start a new container with a temporary name and different port
-            docker run -d --name graphchat_new --env-file ./backend/.env -p 8006:8000 ryaneggz/graphchat:$TAG
+            echo '--- Starting new container on port 8006 ---'
+            docker run -d \
+              --name graphchat_new \
+              --env-file ./backend/.env \
+              -p 8006:8000 \
+              ryaneggz/graphchat:$TAG
 
-            # Wait for the container to become healthy (adjust sleep time as needed)
+            # Give the new container some time to start
             sleep 10
 
-            # Basic health check (adjust URL and expected response as needed)
+            echo '--- Health check on new container ---'
             if curl -f http://localhost:8006/health; then
-                # Stop and remove the old container if it exists
-                docker stop graphchat || true
-                docker rm graphchat || true
+              echo 'New container is healthy!'
+              # -------------------------------------------------
+              # Rename old container -> graphchat_old
+              # (if it exists/running)
+              # -------------------------------------------------
+              if docker ps -a --format '{{.Names}}' | grep -q '^graphchat$'; then
+                echo '--- Renaming old container to graphchat_old ---'
+                docker rename graphchat graphchat_old || true
+              fi
 
-                # Rename new container to graphchat
-                docker rename graphchat_new graphchat
+              echo '--- Renaming new container to graphchat ---'
+              docker rename graphchat_new graphchat
 
-                # Update port mapping on the new container
-                docker stop graphchat
-                docker run -d --name graphchat --env-file ./backend/.env -p 8005:8000 ryaneggz/graphchat:$TAG
+              # -------------------------------------------------
+              # (Optional) Remove old container
+              # -------------------------------------------------
+              if docker ps -a --format '{{.Names}}' | grep -q '^graphchat_old$'; then
+                echo '--- Stopping and removing old container ---'
+                docker stop graphchat_old || true
+                docker rm graphchat_old || true
+              fi
 
-                echo 'Deployment successful!'
+              echo '--- Restarting new container on production port (8005) ---'
+              docker stop graphchat
+              docker run -d \
+                --name graphchat \
+                --env-file ./backend/.env \
+                -p 8005:8000 \
+                ryaneggz/graphchat:$TAG
+
+              echo 'Deployment successful!'
             else
-                # If health check fails, clean up the new container
-                docker stop graphchat_new
-                docker rm graphchat_new
-                echo 'Deployment failed - health check did not pass'
-                exit 1
+              echo 'Deployment failed - health check did not pass'
+              # Cleanup new container if health check fails
+              docker stop graphchat_new || true
+              docker rm graphchat_new || true
+              exit 1
             fi
-        "
+          "
