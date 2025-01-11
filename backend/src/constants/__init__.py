@@ -4,6 +4,10 @@ import base64
 from dotenv import load_dotenv
 load_dotenv()
 
+def fix_base64_padding(s):
+    """Ensure base64 string has correct padding."""
+    return s + '=' * (-len(s) % 4)
+
 # Server
 HOST = str(os.getenv("HOST", "0.0.0.0"))
 PORT = int(os.getenv("PORT", 8000))
@@ -12,7 +16,9 @@ LOG_LEVEL = os.getenv("LOG_LEVEL", "info")
 # App
 DEFAULT_VECTOR_STORE_PATH = './sandbox/db/vectorstore.json'
 DEFAULT_APP_USER_LIST = '[{"username": "admin", "password": "test1234", "name": "Admin User", "email": "admin@example.com"}]'
-APP_USER_LIST = json.loads(base64.b64decode(os.getenv("APP_USER_LIST", DEFAULT_APP_USER_LIST)).decode('utf-8') + b'==')
+base64_str = os.getenv("APP_USER_LIST", base64.b64encode(DEFAULT_APP_USER_LIST.encode('utf-8')).decode('utf-8'))
+fixed_base64_str = fix_base64_padding(base64_str)
+APP_USER_LIST = json.loads(base64.b64decode(fixed_base64_str).decode('utf-8'))
 APP_VERSION = os.getenv("APP_VERSION", "0.1.0")
 APP_LOG_LEVEL = os.getenv("APP_LOG_LEVEL", "INFO").upper()
 
