@@ -12,7 +12,7 @@ LOG_LEVEL = os.getenv("LOG_LEVEL", "info")
 # App
 DEFAULT_VECTOR_STORE_PATH = './sandbox/db/vectorstore.json'
 DEFAULT_APP_USER_LIST = '[{"username": "admin", "password": "test1234", "name": "Admin User", "email": "admin@example.com"}]'
-APP_USER_LIST = json.loads(base64.b64decode(os.getenv("APP_USER_LIST", DEFAULT_APP_USER_LIST)).decode('utf-8'))
+APP_USER_LIST = json.loads(base64.b64decode(os.getenv("APP_USER_LIST", DEFAULT_APP_USER_LIST)).decode('utf-8') + b'==')
 APP_VERSION = os.getenv("APP_VERSION", "0.1.0")
 APP_LOG_LEVEL = os.getenv("APP_LOG_LEVEL", "INFO").upper()
 
