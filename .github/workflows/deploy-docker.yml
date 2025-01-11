@@ -44,6 +44,8 @@ jobs:
           ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "
             set -e  # Exit on error
 
+            cd ~/agent_api
+
             echo '--- Pulling new image ---'
             docker pull ryaneggz/graphchat:$TAG
 
