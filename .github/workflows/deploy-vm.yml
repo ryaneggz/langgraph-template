@@ -1,9 +1,12 @@
-name: Deploy
+name: Deploy-Agent
 
 on:
-  push:
-    tags:
-      - '*rc*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to deploy (e.g. agent-v1.0.0-rc1)'
+        required: true
+        type: string
 
 jobs:
   ###############################################################
@@ -11,7 +14,7 @@ jobs:
   ###############################################################
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ contains(github.ref, 'rc') }}
+    if: ${{ contains(inputs.tag, 'agent') }}
     environment: Dev
     steps:
     - name: Deploy to VM
@@ -29,8 +32,8 @@ jobs:
         # Add host to known hosts
         ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
         
-        # Extract tag from ref
-        TAG=${GITHUB_REF#refs/tags/}
+        # Use input tag instead of ref
+        TAG=${{ inputs.tag }}
         
         
         # SSH into server and deploy

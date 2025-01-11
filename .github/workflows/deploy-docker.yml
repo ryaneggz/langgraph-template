@@ -1,0 +1,71 @@
+name: Deploy-Agent
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to deploy (e.g. agent-v1.0.0-rc1)'
+        required: true
+        type: string
+
+jobs:
+  ###############################################################
+  ## Deploy to VM
+  ###############################################################
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ contains(inputs.tag, 'agent') }}
+    environment: Dev
+    steps:
+    - name: Deploy to VM
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_USER: ${{ secrets.SSH_USER }}
+      run: |
+        # Setup SSH
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+        
+        # Add host to known hosts
+        ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+        
+        # Use input tag instead of ref
+        TAG=${{ inputs.tag }}
+        
+        # SSH into the server and execute deployment
+        ssh $SSH_USER@$SSH_HOST "
+          # Pull the new image
+          docker pull ryaneggz/graphchat:$TAG
+
+          # Start new container with temporary name and different port
+          docker run -d --name graphchat_blue --env-file ./backend/.env -p 8006:8000 ryaneggz/graphchat:$TAG
+
+          # Wait for container to be healthy (adjust sleep time as needed)
+          sleep 10
+
+          # Basic health check (adjust URL and expected response as needed)
+          if curl -f http://localhost:8006/health; then
+            # If health check passes, swap containers
+            docker rename graphchat graphchat_old
+            docker rename graphchat_new graphchat
+
+            # Stop and remove old container
+            docker stop graphchat_old
+            docker rm graphchat_old
+
+            # Update port mapping on new container
+            docker stop graphchat
+            docker run -d --name graphchat --env-file ./backend/.env -p 8005:8000 ryaneggz/graphchat:$TAG
+
+            echo 'Deployment successful!'
+          else
+            # If health check fails, cleanup new container
+            docker stop graphchat_new
+            docker rm graphchat_new
+            echo 'Deployment failed - health check did not pass'
+            exit 1
+          fi
+        "
