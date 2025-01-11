@@ -58,6 +58,7 @@ jobs:
             echo '--- Starting new container on port 8006 ---'
             docker run -d \
               --name graphchat_new \
+              --network graphchat_default \
               --env-file ./backend/.env \
               -p 8006:8000 \
               ryaneggz/graphchat:$TAG
@@ -93,6 +94,7 @@ jobs:
               docker stop graphchat
               docker run -d \
                 --name graphchat \
+                --network graphchat_default \
                 --env-file ./backend/.env \
                 -p 8005:8000 \
                 ryaneggz/graphchat:$TAG
