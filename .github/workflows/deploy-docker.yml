@@ -80,6 +80,7 @@ jobs:
                 --restart always \
                 --env-file ./backend/.env \
                 -e APP_VERSION=$TAG \
+                -e VITE_APP_VERSION=$TAG \
                 -p 8005:8000 \
                 ryaneggz/graphchat:$TAG
 
