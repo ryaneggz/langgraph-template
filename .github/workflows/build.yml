@@ -70,7 +70,7 @@ jobs:
           cd backend
           
           # Build docs
-          # mkdocs build --site-dir src/public/docs
+          mkdocs build --site-dir src/public/docs
           
           # Cleanup docs folder from backend
           rm -rf docs || true
