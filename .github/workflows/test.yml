@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Install frontend
-      uses: ./.github/workflows/steps/frontend-install.yml
+      uses: ./.github/actions/frontend-install.yml
 
     - name: Run tests
       working-directory: ./frontend
@@ -77,7 +77,7 @@ jobs:
       #     --health-retries 5
     steps:
     - name: Setup Backend
-      uses: ./.github/workflows/steps/backend-install.yml
+      uses: ./.github/actions/backend-install.yml
     
     - name: Run tests
       working-directory: ./backend
