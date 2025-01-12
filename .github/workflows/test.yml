@@ -127,6 +127,7 @@ jobs:
       working-directory: ./backend
       run: |
         env | sort
+        mkdir -p src/public/docs
         pip install --upgrade pip
         pip install uv
         uv pip install -v --system --no-cache-dir \
