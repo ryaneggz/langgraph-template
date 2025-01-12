@@ -41,7 +41,7 @@ export default function Login() {
 
     return (
         <NoAuthLayout>
-            <main className="min-h-screen flex flex-col items-center justify-center bg-background">
+            <main className="mt-[25vh] flex flex-col items-center justify-center bg-background">
                 <div className="absolute top-4 right-4">
                     <ColorModeButton />
                 </div>

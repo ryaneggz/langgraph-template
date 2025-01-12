@@ -36,12 +36,30 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '22'
-        cache: 'npm'
-        cache-dependency-path: './frontend/package-lock.json'
+    
+    - name: Cache Node dependencies
+      id: cache-node
+      uses: actions/cache@v4
+      with:
+        path: |
+          **/node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
 
     - name: Install dependencies
       working-directory: ./frontend
+      if: steps.cache-node.outputs.cache-hit != 'true'
       run: npm ci
+
+    - name: Save Node dependencies cache
+      if: steps.cache-node.outputs.cache-hit != 'true'
+      id: save-cache-node
+      uses: actions/cache@v4
+      with:
+        path: |
+          **/node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }} 
 
     - name: Run tests
       working-directory: ./frontend
@@ -87,10 +105,11 @@ jobs:
       #     --health-timeout 5s
       #     --health-retries 5
     steps:
+
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Python
+    - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
@@ -108,25 +127,13 @@ jobs:
       working-directory: ./backend
       run: |
         env | sort
+        mkdir -p src/public/docs
+        mkdir -p src/public/assets
         pip install --upgrade pip
         pip install uv
         uv pip install -v --system --no-cache-dir \
         -r requirements.txt \
         -r requirements-dev.txt
-
-    - name: Build docs
-      run: |
-        # Copy docs folder to backend directory
-        cp -r docs backend/docs
-        
-        # Change to backend directory
-        cd backend
-        
-        # Build docs
-        # mkdocs build --site-dir src/public/docs
-        
-        # Cleanup docs folder from backend
-        rm -rf docs || true
 
     - name: Save Python dependencies cache
       if: steps.cache-python.outputs.cache-hit != 'true'

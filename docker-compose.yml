@@ -39,7 +39,7 @@ services:
 
   # Graphchat
   graphchat:
-    image: ryaneggz/graphchat:latest
+    image: ryaneggz/graphchat:0.0.1-rc59
     # build:
     #   context: ./backend
     #   dockerfile: Dockerfile

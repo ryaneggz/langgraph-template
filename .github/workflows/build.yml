@@ -15,7 +15,92 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
+      ###############################################################
+      ## Frontend
+      ###############################################################
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Create public directory
+        working-directory: ./backend
+        run: mkdir -p src/public
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Prune frontend dependencies
+        working-directory: ./frontend
+        run: npm prune --production
+
+      - name: Save Node dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      ###############################################################
+      ## Backend
+      ###############################################################
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Cache Python dependencies
+        id: cache-python
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/requirements-dev.txt') }}
+          restore-keys: |
+              ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          env | sort
+          pip install --upgrade pip
+          pip install uv
+          uv pip install -v --system --no-cache-dir \
+          -r requirements.txt \
+          -r requirements-dev.txt
+
+      - name: Build docs
+        run: |
+          # Copy docs folder to backend directory
+          cp -r docs backend/docs
+          
+          # Change to backend directory
+          cd backend
+          
+          # Build docs
+          mkdocs build --site-dir src/public/docs
+          
+          # Cleanup docs folder from backend
+          rm -rf docs || true
+
+      - name: Save Python dependencies cache
+        if: steps.cache-python.outputs.cache-hit != 'true'
+        id: save-cache-python
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/requirements-dev.txt') }}
+
+      ###############################################################
+      ## Docker
+      ###############################################################
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
