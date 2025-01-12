@@ -1,13 +1,17 @@
-import { APP_VERSION } from "@/config";
+import useAppHook from "@/hooks/useAppHook";
 
 export default function NoAuthLayout({ children }: { children: React.ReactNode }) {
+  const { appVersion, useFetchAppVersionEffect } = useAppHook();
+
+  useFetchAppVersionEffect();
+
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-background">
       {children}
-      <footer className="mt-auto bg-white border-t border-gray-200">
+      <footer className="mt-auto bg-card border-t border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <p className="text-center text-gray-500 text-sm">
-            &copy; 2024 Prompt Engineers AI. All rights reserved. v{APP_VERSION}
+          <p className="text-center text-muted-foreground text-sm">
+            &copy; 2024 Prompt Engineers AI. All rights reserved. v{appVersion}
           </p>
         </div>
       </footer>
