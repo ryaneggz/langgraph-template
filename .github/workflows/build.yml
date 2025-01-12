@@ -30,6 +30,10 @@ jobs:
         working-directory: ./frontend
         run: npm ci
 
+      - name: Create public directory
+        working-directory: ./backend
+        run: mkdir -p src/public
+
       - name: Build frontend
         working-directory: ./frontend
         run: npm run build

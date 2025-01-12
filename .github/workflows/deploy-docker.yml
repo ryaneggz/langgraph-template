@@ -77,11 +77,13 @@ jobs:
               docker run -d \
                 --name graphchat \
                 --network graphchat_default \
+                --restart always \
                 --env-file ./backend/.env \
+                -e APP_VERSION=$TAG \
                 -p 8005:8000 \
                 ryaneggz/graphchat:$TAG
 
-              echo 'Deployment successful!'
+              echo '--- Deployment successful! ---'
             else
               echo 'Deployment failed - health check did not pass.'
               echo '--- Cleaning up staging container (graphchat_new) ---'
