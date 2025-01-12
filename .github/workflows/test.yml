@@ -29,9 +29,6 @@ jobs:
   test-frontend:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
     - name: Install frontend
       uses: ./.github/workflows/steps/frontend-install.yml
 
@@ -79,9 +76,6 @@ jobs:
       #     --health-timeout 5s
       #     --health-retries 5
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
     - name: Setup Backend
       uses: ./.github/workflows/steps/backend-install.yml
     
