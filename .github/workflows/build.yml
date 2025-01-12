@@ -28,11 +28,22 @@ jobs:
 
       - name: Install frontend dependencies
         working-directory: ./frontend
-        run: npm ci --omit=dev
+        run: npm ci
 
       - name: Build frontend
         working-directory: ./frontend
         run: npm run build
+
+      - name: Prune frontend dependencies
+        working-directory: ./frontend
+        run: npm prune --production
+
+      - name: Save Node dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
       ###############################################################
       ## Backend
