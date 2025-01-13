@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.0.1
 
 ### Fixed
+  - bugfix/105-fix-chat-selection (2025-01-12)
   - bugfix/104-model-select-stopped-working (2025-01-12)
   - bugfix/85-static-users-failing-to-parse-json-env (2025-01-10)
   - bugfix/72-default-vite-api-url (2024-12-25)
