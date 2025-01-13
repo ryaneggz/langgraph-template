@@ -11,14 +11,17 @@ import { Model } from "@/services/modelService";
 
 export default function ChatNav() {
     const navigate = useNavigate();
-    const [searchParams,] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const currentModel = searchParams.get('model') || '';
     
     const { 
         models,
-        handleModelChange,
         handleNewChat
     } = useChatContext();
+
+    const handleModelChange = (modelId: string) => {
+        setSearchParams({ model: modelId });
+    }
 
     return (
         <header className="bg-card border-b border-border">
@@ -51,20 +54,20 @@ export default function ChatNav() {
                     <SelectValue placeholder="Select Model" />
                     </SelectTrigger>
                     <SelectContent>
-                    {models
-                        .filter((model: Model) => !model.metadata.embedding)
-                        .map((model: Model) => (
-                        <SelectItem key={model.id} value={model.id}>
-                            <div className="flex items-center gap-2">
-                            {model.provider === 'openai' && (
-                                <SiOpenai className="h-4 w-4" />
-                            )}
-                            {model.provider === 'anthropic' && (
-                                <SiAnthropic className="h-4 w-4" />
-                            )}
-                            {model.label}
-                            </div>
-                        </SelectItem>
+                        {models
+                            .filter((model: Model) => !model.metadata.embedding)
+                            .map((model: Model) => (
+                            <SelectItem key={model.id} value={model.id}>
+                                <div className="flex items-center gap-2">
+                                {model.provider === 'openai' && (
+                                    <SiOpenai className="h-4 w-4" />
+                                )}
+                                {model.provider === 'anthropic' && (
+                                    <SiAnthropic className="h-4 w-4" />
+                                )}
+                                {model.label}
+                                </div>
+                            </SelectItem>
                         ))}
                     </SelectContent>
                 </Select>

@@ -186,7 +186,7 @@ export default function useChatHook() {
         setModels,
         useSelectModelEffect,
         handleNewChat
-    }
+    };
 }
 
 
