@@ -2,6 +2,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatContext } from "@/context/ChatContext";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
+import { truncateFrom } from "@/lib/utils/format";
 import { 
   // Settings, 
   Plus 
@@ -29,7 +30,7 @@ export function ThreadHistoryDrawer() {
           </div>
 
           <ScrollArea className="flex-1">
-              <div className="p-2 pr-3 space-y-2">
+              <div className="p-2 space-y-2">
                   {history?.threads?.map((thread: any) => (
                       <button
                           key={thread.thread_id}
@@ -43,7 +44,7 @@ export function ThreadHistoryDrawer() {
                       >
                           <div className="w-full">
                               <p className="text-sm font-medium line-clamp-2">
-                                  {thread.messages[1]?.content || "New Chat"}
+                                  {truncateFrom(thread.messages[1]?.content, 'end', "...", 100) || "New Chat"}
                               </p>
                               <p className="text-xs text-muted-foreground mt-1 truncate">
                                   {formatDistanceToNow(new Date(thread.ts), {
