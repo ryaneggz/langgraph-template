@@ -3,7 +3,7 @@ import { useChatContext } from "@/context/ChatContext";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { truncateFrom } from "@/lib/utils/format";
-import { Plus, Settings } from "lucide-react";
+import { Plus } from "lucide-react";
 import { SettingsPopover } from "../popovers/SettingsPopover";
 
 interface ThreadHistoryDrawerProps {

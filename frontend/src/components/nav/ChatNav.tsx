@@ -14,7 +14,6 @@ interface ChatNavProps {
 }
 
 export default function ChatNav({ onMenuClick }: ChatNavProps) {
-    const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const currentModel = searchParams.get('model') || '';
     
