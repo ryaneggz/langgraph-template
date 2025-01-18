@@ -38,7 +38,7 @@ export default function ChatNav({ onMenuClick }: ChatNavProps) {
                 >
                     <Menu className="h-5 w-5" />
                 </button>
-                <button 
+                {/* <button 
                     onClick={() => navigate('/dashboard')}
                     className="hidden md:inline-flex items-center text-muted-foreground hover:text-foreground transition-colors mr-4"
                 >
@@ -54,44 +54,44 @@ export default function ChatNav({ onMenuClick }: ChatNavProps) {
                         clipRule="evenodd" 
                     />
                     </svg>
-                </button>
+                </button> */}
                 {/* <h1 className="text-2xl font-bold text-foreground">Chat</h1> */}
                 </div>
                 
                 <div className="flex items-center gap-2">
-                <Select value={currentModel} onValueChange={handleModelChange}>
-                    <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="Select Model" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {models
-                            .filter((model: Model) => !model.metadata.embedding)
-                            .map((model: Model) => (
-                            <SelectItem key={model.id} value={model.id}>
-                                <div className="flex items-center gap-2">
-                                {model.provider === 'openai' && (
-                                    <SiOpenai className="h-4 w-4" />
-                                )}
-                                {model.provider === 'anthropic' && (
-                                    <SiAnthropic className="h-4 w-4" />
-                                )}
-                                {model.label}
-                                </div>
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                    <Select value={currentModel} onValueChange={handleModelChange}>
+                        <SelectTrigger className="w-[200px]">
+                        <SelectValue placeholder="Select Model" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {models
+                                .filter((model: Model) => !model.metadata.embedding)
+                                .map((model: Model) => (
+                                <SelectItem key={model.id} value={model.id}>
+                                    <div className="flex items-center gap-2">
+                                    {model.provider === 'openai' && (
+                                        <SiOpenai className="h-4 w-4" />
+                                    )}
+                                    {model.provider === 'anthropic' && (
+                                        <SiAnthropic className="h-4 w-4" />
+                                    )}
+                                    {model.label}
+                                    </div>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
 
-                <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={handleNewChat}
-                    className="h-9 w-9"
-                    title="New Chat"
-                >
-                    <FaPlus className="h-4 w-4" />
-                </Button>
-                <ColorModeButton />
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleNewChat}
+                        className="h-9 w-9"
+                        title="New Chat"
+                    >
+                        <FaPlus className="h-4 w-4" />
+                    </Button>
+                    <ColorModeButton />
                 </div>
             </div>
             </div>

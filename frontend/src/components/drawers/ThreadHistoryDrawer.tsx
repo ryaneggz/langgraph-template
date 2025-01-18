@@ -3,7 +3,7 @@ import { useChatContext } from "@/context/ChatContext";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { truncateFrom } from "@/lib/utils/format";
-import { Plus } from "lucide-react";
+import { Plus, Settings } from "lucide-react";
 
 interface ThreadHistoryDrawerProps {
   isOpen: boolean;
@@ -72,6 +72,13 @@ export function ThreadHistoryDrawer({ isOpen, onClose }: ThreadHistoryDrawerProp
                   ))}
               </div>
           </ScrollArea>
+          
+            <div className="p-4 border-t border-border">
+                <Button variant="ghost" className="w-full" onClick={() => {}}>
+                <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                </Button>
+            </div>
       </div>
     </>
   );
