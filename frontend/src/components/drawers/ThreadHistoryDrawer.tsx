@@ -2,21 +2,39 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatContext } from "@/context/ChatContext";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { 
-  // Settings, 
-  Plus 
-} from "lucide-react";
+import { truncateFrom } from "@/lib/utils/format";
+import { Plus } from "lucide-react";
+import { SettingsPopover } from "../popovers/SettingsPopover";
 
-export function ThreadHistoryDrawer() {
+interface ThreadHistoryDrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function ThreadHistoryDrawer({ isOpen, onClose }: ThreadHistoryDrawerProps) {
   const { history, setMessages, setPayload } = useChatContext();
 
   const handleThreadClick = (threadId: string, messages: any[]) => {
     setMessages(messages);
     setPayload((prev: any) => ({ ...prev, threadId }));
+    onClose(); // Close drawer after selection on mobile
   };
 
   return (
-      <div className="w-[300px] border-r border-border hidden md:flex flex-col h-[calc(100vh-0px)]">
+    <>
+      {/* Overlay for mobile - only shows when drawer is open */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 md:hidden" 
+          onClick={onClose}
+        />
+      )}
+      
+      <div className={`
+        absolute md:relative w-[300px] border-r border-border flex flex-col h-[calc(100vh-0px)]
+        ${isOpen ? 'flex' : 'hidden md:flex'}
+        bg-background z-40
+      `}>
           <div className="p-4 border-b border-border">
               <Button
                   variant="outline"
@@ -29,7 +47,7 @@ export function ThreadHistoryDrawer() {
           </div>
 
           <ScrollArea className="flex-1">
-              <div className="p-2 pr-3 space-y-2">
+              <div className="p-2 space-y-2">
                   {history?.threads?.map((thread: any) => (
                       <button
                           key={thread.thread_id}
@@ -43,7 +61,7 @@ export function ThreadHistoryDrawer() {
                       >
                           <div className="w-full">
                               <p className="text-sm font-medium line-clamp-2">
-                                  {thread.messages[1]?.content || "New Chat"}
+                                  {truncateFrom(thread.messages[1]?.content, 'end', "...", 100) || "New Chat"}
                               </p>
                               <p className="text-xs text-muted-foreground mt-1 truncate">
                                   {formatDistanceToNow(new Date(thread.ts), {
@@ -56,12 +74,10 @@ export function ThreadHistoryDrawer() {
               </div>
           </ScrollArea>
 
-          {/* <div className="p-4 border-t border-border">
-        <Button variant="ghost" className="w-full" onClick={() => {}}>
-          <Settings className="mr-2 h-4 w-4" />
-          Settings
-        </Button>
-      </div> */}
+            <div className="p-4 border-t border-border">
+                <SettingsPopover />
+            </div>
       </div>
+    </>
   );
 } 

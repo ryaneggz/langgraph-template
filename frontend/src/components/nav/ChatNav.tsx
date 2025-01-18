@@ -1,6 +1,4 @@
-
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useNavigate } from 'react-router-dom';
 import { SiAnthropic, SiOpenai } from 'react-icons/si';
 import { FaPlus } from 'react-icons/fa';
 import { Button } from "@/components/ui/button";
@@ -8,9 +6,13 @@ import { ColorModeButton } from '@/components/buttons/ColorModeButton';
 import { useSearchParams } from "react-router-dom";
 import { useChatContext } from "@/context/ChatContext";
 import { Model } from "@/services/modelService";
+import { Menu } from "lucide-react";
 
-export default function ChatNav() {
-    const navigate = useNavigate();
+interface ChatNavProps {
+  onMenuClick: () => void;
+}
+
+export default function ChatNav({ onMenuClick }: ChatNavProps) {
     const [searchParams, setSearchParams] = useSearchParams();
     const currentModel = searchParams.get('model') || '';
     
@@ -29,8 +31,14 @@ export default function ChatNav() {
             <div className="flex items-center justify-between">
                 <div className="flex items-center">
                 <button 
+                    onClick={onMenuClick}
+                    className="inline-flex md:hidden items-center text-muted-foreground hover:text-foreground transition-colors mr-4"
+                >
+                    <Menu className="h-5 w-5" />
+                </button>
+                {/* <button 
                     onClick={() => navigate('/dashboard')}
-                    className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors mr-4"
+                    className="hidden md:inline-flex items-center text-muted-foreground hover:text-foreground transition-colors mr-4"
                 >
                     <svg 
                     xmlns="http://www.w3.org/2000/svg" 
@@ -44,44 +52,44 @@ export default function ChatNav() {
                         clipRule="evenodd" 
                     />
                     </svg>
-                </button>
+                </button> */}
                 {/* <h1 className="text-2xl font-bold text-foreground">Chat</h1> */}
                 </div>
                 
                 <div className="flex items-center gap-2">
-                <Select value={currentModel} onValueChange={handleModelChange}>
-                    <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="Select Model" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {models
-                            .filter((model: Model) => !model.metadata.embedding)
-                            .map((model: Model) => (
-                            <SelectItem key={model.id} value={model.id}>
-                                <div className="flex items-center gap-2">
-                                {model.provider === 'openai' && (
-                                    <SiOpenai className="h-4 w-4" />
-                                )}
-                                {model.provider === 'anthropic' && (
-                                    <SiAnthropic className="h-4 w-4" />
-                                )}
-                                {model.label}
-                                </div>
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                    <Select value={currentModel} onValueChange={handleModelChange}>
+                        <SelectTrigger className="w-[200px]">
+                        <SelectValue placeholder="Select Model" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {models
+                                .filter((model: Model) => !model.metadata.embedding)
+                                .map((model: Model) => (
+                                <SelectItem key={model.id} value={model.id}>
+                                    <div className="flex items-center gap-2">
+                                    {model.provider === 'openai' && (
+                                        <SiOpenai className="h-4 w-4" />
+                                    )}
+                                    {model.provider === 'anthropic' && (
+                                        <SiAnthropic className="h-4 w-4" />
+                                    )}
+                                    {model.label}
+                                    </div>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
 
-                <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={handleNewChat}
-                    className="h-9 w-9"
-                    title="New Chat"
-                >
-                    <FaPlus className="h-4 w-4" />
-                </Button>
-                <ColorModeButton />
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleNewChat}
+                        className="h-9 w-9"
+                        title="New Chat"
+                    >
+                        <FaPlus className="h-4 w-4" />
+                    </Button>
+                    <ColorModeButton />
                 </div>
             </div>
             </div>
