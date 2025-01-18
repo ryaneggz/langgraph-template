@@ -3,12 +3,13 @@ import { useChatContext } from '../context/ChatContext';
 import MarkdownCard from '../components/cards/MarkdownCard';
 import { Button } from '@/components/ui/button';
 import { ThreadHistoryDrawer } from '@/components/drawers/ThreadHistoryDrawer';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ChatNav from '@/components/nav/ChatNav';
 
 export default function Chat() {
     const { messages, payload, handleQuery, setPayload, useGetHistoryEffect } = useChatContext();
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -23,10 +24,10 @@ export default function Chat() {
     return (
         <ChatLayout>
             <div className="flex min-h-[calc(100vh-0px)] max-h-[calc(100vh-0px)] relative">
-                <ThreadHistoryDrawer />
+                <ThreadHistoryDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
                 
                 <div className="flex-1 flex flex-col overflow-hidden">
-                    <ChatNav />
+                    <ChatNav onMenuClick={() => setIsDrawerOpen(!isDrawerOpen)} />
                     <div className="flex-1 overflow-y-auto p-3 min-h-0">
                         <div className="space-y-4 max-w-4xl mx-auto pb-4">
                             {messages?.map((message: {role: string, content: string, type: string}, index: number) => {

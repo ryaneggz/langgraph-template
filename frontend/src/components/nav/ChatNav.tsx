@@ -1,4 +1,3 @@
-
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from 'react-router-dom';
 import { SiAnthropic, SiOpenai } from 'react-icons/si';
@@ -8,8 +7,13 @@ import { ColorModeButton } from '@/components/buttons/ColorModeButton';
 import { useSearchParams } from "react-router-dom";
 import { useChatContext } from "@/context/ChatContext";
 import { Model } from "@/services/modelService";
+import { Menu } from "lucide-react";
 
-export default function ChatNav() {
+interface ChatNavProps {
+  onMenuClick: () => void;
+}
+
+export default function ChatNav({ onMenuClick }: ChatNavProps) {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const currentModel = searchParams.get('model') || '';
@@ -29,8 +33,14 @@ export default function ChatNav() {
             <div className="flex items-center justify-between">
                 <div className="flex items-center">
                 <button 
+                    onClick={onMenuClick}
+                    className="inline-flex md:hidden items-center text-muted-foreground hover:text-foreground transition-colors mr-4"
+                >
+                    <Menu className="h-5 w-5" />
+                </button>
+                <button 
                     onClick={() => navigate('/dashboard')}
-                    className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors mr-4"
+                    className="hidden md:inline-flex items-center text-muted-foreground hover:text-foreground transition-colors mr-4"
                 >
                     <svg 
                     xmlns="http://www.w3.org/2000/svg" 
