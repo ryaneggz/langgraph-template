@@ -1,5 +1,4 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useNavigate } from 'react-router-dom';
 import { SiAnthropic, SiOpenai } from 'react-icons/si';
 import { FaPlus } from 'react-icons/fa';
 import { Button } from "@/components/ui/button";
