@@ -7,6 +7,7 @@ import { useSearchParams } from "react-router-dom";
 import { useChatContext } from "@/context/ChatContext";
 import { Model } from "@/services/modelService";
 import { Menu } from "lucide-react";
+import { ToolSelector } from "../selectors/ToolSelector";
 
 interface ChatNavProps {
   onMenuClick: () => void;
@@ -63,6 +64,7 @@ export default function ChatNav({ onMenuClick }: ChatNavProps) {
                         </SelectTrigger>
                         <SelectContent>
                             {models
+                                .sort((a: Model, b: Model) => a.label.localeCompare(b.label))
                                 .filter((model: Model) => !model.metadata.embedding)
                                 .map((model: Model) => (
                                 <SelectItem key={model.id} value={model.id}>
@@ -79,7 +81,7 @@ export default function ChatNav({ onMenuClick }: ChatNavProps) {
                             ))}
                         </SelectContent>
                     </Select>
-
+                    <ToolSelector />
                     <Button
                         variant="outline"
                         size="icon"
