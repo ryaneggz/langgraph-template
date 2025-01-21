@@ -1,6 +1,6 @@
 # https://langchain-ai.github.io/langgraph/reference/checkpoints/#langgraph.checkpoint.postgres.BasePostgresSaver
 
-from fastapi import status, Depends, APIRouter, Query
+from fastapi import Response, status, Depends, APIRouter, Query
 from fastapi.responses import JSONResponse
 from psycopg_pool import ConnectionPool
 from langgraph.checkpoint.postgres import PostgresSaver
@@ -123,6 +123,31 @@ def find_thread(
             content=response.model_dump(),
             status_code=status.HTTP_200_OK
         )
+        
+################################################################################
+### Query Thread History
+################################################################################
+@router.delete(
+    "/threads/{thread_id}", 
+    tags=[TAG],
+    responses={
+        status.HTTP_204_NO_CONTENT: {
+            "description": "Delete existing thread.",
+        }
+    }
+)
+def delete_thread(
+    thread_id: str,
+    username: str = Depends(verify_credentials)
+):
+    with ConnectionPool(
+        conninfo=DB_URI,
+        max_size=20,
+        kwargs=CONNECTION_POOL_KWARGS,
+    ) as pool:
+        agent = Agent(thread_id, pool)
+        agent.delete()
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
         
 ################################################################################
 ### List Checkpoints

@@ -12,12 +12,24 @@ interface ThreadHistoryDrawerProps {
 }
 
 export function ThreadHistoryDrawer({ isOpen, onClose }: ThreadHistoryDrawerProps) {
-  const { history, setMessages, setPayload } = useChatContext();
+  const { history, setMessages, setPayload, deleteThread, payload } = useChatContext();
 
   const handleThreadClick = (threadId: string, messages: any[]) => {
     setMessages(messages);
     setPayload((prev: any) => ({ ...prev, threadId }));
     onClose(); // Close drawer after selection on mobile
+  };
+
+  const handleDeleteClick = async (e: React.MouseEvent, threadId: string) => {
+    e.stopPropagation(); // Prevent thread selection when clicking delete
+    
+    if (window.confirm('Are you sure you want to delete this thread?')) {
+      try {
+        await deleteThread(threadId);
+      } catch (error) {
+        alert('Failed to delete thread');
+      }
+    }
   };
 
   return (
@@ -49,34 +61,63 @@ export function ThreadHistoryDrawer({ isOpen, onClose }: ThreadHistoryDrawerProp
           <ScrollArea className="flex-1">
               <div className="p-2 space-y-2">
                   {history?.threads?.map((thread: any) => (
-                      <button
+                      <div
                           key={thread.thread_id}
-                          onClick={() =>
-                              handleThreadClick(
-                                  thread.thread_id,
-                                  thread.messages
-                              )
-                          }
-                          className="w-full text-left p-3 rounded-lg hover:bg-accent transition-colors border border-border"
+                          className="group relative"
                       >
-                          <div className="w-full">
-                              <p className="text-sm font-medium line-clamp-2">
-                                  {truncateFrom(thread.messages[1]?.content, 'end', "...", 100) || "New Chat"}
-                              </p>
-                              <p className="text-xs text-muted-foreground mt-1 truncate">
-                                  {formatDistanceToNow(new Date(thread.ts), {
-                                      addSuffix: true,
-                                  })}
-                              </p>
-                          </div>
-                      </button>
+                          <button
+                              onClick={() =>
+                                  handleThreadClick(
+                                      thread.thread_id,
+                                      thread.messages
+                                  )
+                              }
+                              className={`w-full text-left p-3 rounded-lg transition-colors border ${
+                                payload.threadId === thread.thread_id 
+                                  ? 'bg-accent border-accent' 
+                                  : 'hover:bg-accent/50 border-border'
+                              }`}
+                          >
+                              <div className="w-full pr-8">
+                                  <p className="text-sm font-medium line-clamp-2">
+                                      {thread.messages[1]?.content ? truncateFrom(thread.messages[1].content, 'end', "...", 100) : "New Chat"}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground mt-1 truncate">
+                                      {formatDistanceToNow(new Date(thread.ts), {
+                                          addSuffix: true,
+                                      })}
+                                  </p>
+                              </div>
+                          </button>
+                          <Button
+                              variant="ghost"
+                              size="icon"
+                              className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={(e) => handleDeleteClick(e, thread.thread_id)}
+                          >
+                              <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4 text-muted-foreground hover:text-destructive"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                              >
+                                  <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                  />
+                              </svg>
+                          </Button>
+                      </div>
                   ))}
               </div>
           </ScrollArea>
 
-            <div className="p-4 border-t border-border">
-                <SettingsPopover />
-            </div>
+          <div className="p-4 border-t border-border">
+              <SettingsPopover />
+          </div>
       </div>
     </>
   );

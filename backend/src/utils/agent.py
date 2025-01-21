@@ -43,6 +43,23 @@ class Agent:
         checkpointer = self._checkpointer()
         checkpoint = checkpointer.get(self.config)
         return checkpoint
+    
+    def delete(self):
+        try:
+            query_blobs = "DELETE FROM checkpoint_blobs WHERE thread_id = %s"
+            query_checkpoints = "DELETE FROM checkpoints WHERE thread_id = %s"
+            query_checkpoints_writes = "DELETE FROM checkpoint_writes WHERE thread_id = %s"
+            with self.pool.connection() as conn:  # Acquire a connection from the pool
+                with conn.cursor() as cur:
+                    cur.execute(query_blobs, (self.thread_id,))
+                    cur.execute(query_checkpoints, (self.thread_id,))
+                    cur.execute(query_checkpoints_writes, (self.thread_id,))
+                    logger.info(f"Deleted {cur.rowcount} rows with thread_id = {self.thread_id}")
+
+                    return cur.rowcount
+        except Exception as e:
+            logger.error(f"Failed to delete checkpoint: {str(e)}")
+            return 0
         
     def builder(
         self,
@@ -50,8 +67,8 @@ class Agent:
         model_name: str = ModelName.ANTHROPIC_CLAUDE_3_5_SONNET,
         debug: bool = True if APP_LOG_LEVEL == "DEBUG" else False
     ) -> StateGraph:
-        self.llm = LLMWrapper(model_name=model_name, tools=tools)
         self.tools = [] if len(tools) == 0 else collect_tools(tools)
+        self.llm = LLMWrapper(model_name=model_name, tools=self.tools)
         self.checkpointer = self._checkpointer()
         if self.tools:
             graph = create_react_agent(self.llm, tools=self.tools, checkpointer=self.checkpointer)

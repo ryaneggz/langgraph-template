@@ -186,6 +186,23 @@ export default function useChatHook() {
         }, []);
     };
 
+    const deleteThread = async (threadId: string) => {
+        try {
+            await apiClient.delete(`/threads/${threadId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Basic ${token}`
+                }
+            });
+            // Refresh the thread list after deletion
+            getHistory(history.page, history.per_page);
+        } catch (error: any) {
+            console.error('Error deleting thread:', error);
+            throw new Error(error.response?.data?.detail || 'Failed to delete thread');
+        }
+    };
+
     return {
         ...initChatState,
         messages,
@@ -207,7 +224,8 @@ export default function useChatHook() {
         handleNewChat,
         availableTools,
         setAvailableTools,
-        useToolsEffect
+        useToolsEffect,
+        deleteThread
     };
 }
 

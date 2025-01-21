@@ -39,10 +39,12 @@ const MarkdownCard = ({ content }: { content: string }) => {
                             </div>
                         </div>
                     ) : (
-                        <code
-                            className="rounded px-1 py-0.5 font-bold text-primary"
-                            {...props}
-                        />
+                        <div className="overflow-y-auto text-left">
+                            <code
+                                className="rounded px-1 py-0.5 font-bold"
+                                {...props}
+                            />
+                        </div>
                     );
                 },
                 ul: ({ node, ...props }) => (
