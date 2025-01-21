@@ -5,6 +5,7 @@ import { ThreadPayload } from '../entities';
 import { TOKEN_NAME, VITE_API_URL } from '../config';
 import apiClient from '@/lib/utils/apiClient';
 import { listModels, Model } from '@/services/modelService';
+import { listTools } from '../services/toolService';
 
 debug.enable('hooks:*');
 const logger = debug('hooks:useChatHook');
@@ -40,6 +41,9 @@ export default function useChatHook() {
     const [payload, setPayload] = useState(initChatState.payload);
     const [history, setHistory] = useState<any>(initChatState.history);
     const [models, setModels] = useState<Model[]>(initChatState.models);
+    const [availableTools, setAvailableTools] = useState([]);
+
+    
     const handleQuery = () => {
         queryThread(payload);
     }
@@ -50,7 +54,7 @@ export default function useChatHook() {
         setMessages(updatedMessages);
         setResponse("");
         responseRef.current = "";
-        const source = new SSE(`${VITE_API_URL}/llm${payload.threadId ? `/${payload.threadId}` : ''}`, // TODO: Make this dynamic
+        const source = new SSE(`${VITE_API_URL}/llm${payload.threadId ? `/${payload.threadId}` : ''}`,
             {
                 headers: {
                     'Content-Type': 'application/json', 
@@ -167,6 +171,21 @@ export default function useChatHook() {
         };
     };
 
+    const fetchTools = async () => {
+        try {
+            const response = await listTools();
+            setAvailableTools(response.tools);
+        } catch (error) {
+            console.error('Failed to fetch tools:', error);
+        }
+    };
+
+    const useToolsEffect = () => {
+        useEffect(() => {
+            fetchTools();
+        }, []);
+    };
+
     return {
         ...initChatState,
         messages,
@@ -185,7 +204,10 @@ export default function useChatHook() {
         models,
         setModels,
         useSelectModelEffect,
-        handleNewChat
+        handleNewChat,
+        availableTools,
+        setAvailableTools,
+        useToolsEffect
     };
 }
 
