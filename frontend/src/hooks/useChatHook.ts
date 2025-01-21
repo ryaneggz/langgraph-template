@@ -197,6 +197,7 @@ export default function useChatHook() {
             });
             // Refresh the thread list after deletion
             getHistory(history.page, history.per_page);
+            handleNewChat();
         } catch (error: any) {
             console.error('Error deleting thread:', error);
             throw new Error(error.response?.data?.detail || 'Failed to delete thread');
