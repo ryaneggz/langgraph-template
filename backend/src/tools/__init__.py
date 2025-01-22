@@ -6,7 +6,7 @@ from src.tools.agent import agent_builder, available_tools
 from src.tools.sql import sql_query_read, sql_query_write
 tools = [       
     available_tools,
-    shell_local,
+    # shell_local,
     shell_docker,
     retrieval_query,
     retrieval_add,
