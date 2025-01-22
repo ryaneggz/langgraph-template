@@ -62,7 +62,7 @@ jobs:
             sleep 10
 
             echo '--- Health check on staging container (graphchat_new) ---'
-            if curl -f http://localhost:8006/health; then
+            if curl -f http://localhost:8006/api/info; then
               echo 'New container on port 8006 is healthy!'
               
               echo '--- Stopping and removing old container (graphchat) if it exists ---'
