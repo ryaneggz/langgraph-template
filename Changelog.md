@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - bugfix/28-cannot-auth-tools-list (2024-11-30)
 
 ### Changed 
+  - feature/115-remove-shell-local-from-demo (2025-01-21)
   - feature/112-can-select-tools-from-app (2025-01-20)
   - feature/102-frontend-build-cd (2025-01-11)
   - feature/99-fix-vite-api-url-append (2025-01-05)

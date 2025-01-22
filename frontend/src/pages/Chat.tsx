@@ -68,7 +68,7 @@ export default function Chat() {
                                     }
                                 }}
                             />
-                            <Button onClick={handleQuery}>
+                            <Button onClick={handleQuery} disabled={payload.query.trim() === ''}>
                                 Send
                             </Button>
                         </div>
