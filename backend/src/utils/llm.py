@@ -1,8 +1,9 @@
 from enum import Enum
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_anthropic import ChatAnthropic
+from langchain_ollama import ChatOllama
 
-from src.constants import OPENAI_API_KEY, ANTHROPIC_API_KEY
+from src.constants import OLLAMA_BASE_URL, OPENAI_API_KEY, ANTHROPIC_API_KEY
 from src.constants.llm import ModelName
 class LLMWrapper:
     def __init__(self, model_name: str, tools: list = None, **kwargs):
@@ -30,6 +31,10 @@ class LLMWrapper:
             self.kwargs['api_key'] = ANTHROPIC_API_KEY
             model_name = model_name.replace('anthropic-', '')
             chosen_model = ChatAnthropic(model=model_name, **self.kwargs)
+        elif 'ollama' in model_name and OLLAMA_BASE_URL:
+            self.kwargs['base_url'] = OLLAMA_BASE_URL
+            model_name = model_name.replace('ollama-', '')
+            chosen_model = ChatOllama(model=model_name, **self.kwargs)
         else:
             raise ValueError(f"Provider {model_name} not supported")
             

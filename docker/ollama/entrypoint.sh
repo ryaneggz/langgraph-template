@@ -8,10 +8,12 @@ while [ "$(ollama list | grep 'NAME')" == "" ]; do
   sleep 1
 done
 
-## LLaMA3
-ollama pull llama3.1:8b
+# Pull the Llama 3.2 Vision model
+echo "Pulling Llama 3.2 Vision model..."
+ollama pull llama3.2-vision
 
 ## Embeddings
+echo "Pulling Nomic Embeddings model..."
 ollama pull nomic-embed-text
 
 # Keep the container running

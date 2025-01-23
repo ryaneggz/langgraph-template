@@ -38,15 +38,38 @@ services:
   #   restart: always
 
   # Graphchat
-  graphchat:
-    image: ryaneggz/graphchat:0.0.1-rc59
+  # graphchat:
+  #   image: ryaneggz/graphchat:0.0.1-rc65
     # build:
     #   context: ./backend
     #   dockerfile: Dockerfile
-    container_name: graphchat
-    env_file:
-      - ./backend/.env
-    ports:
-      - "8005:8000"
-    depends_on:
-      - postgres
+    # container_name: graphchat
+    # env_file:
+    #   - ./backend/.env
+    # ports:
+    #   - "8005:8000"
+    # depends_on:
+    #   - postgres
+
+  # Ollama (AI Servic
+#   ollama:
+#     image: ollama/ollama
+#     container_name: ollama
+#     runtime: nvidia
+#     deploy:
+#       resources:
+#         reservations:
+#           devices:
+#             - driver: nvidia
+#               capabilities: [gpu]
+#     volumes:
+#       - ollama:/root/.ollama
+#     ports:
+#       - "11434:11434"
+#     command: >
+#       sh -c "
+#         ollama pull llama3.2-vision &&
+#         tail -f /dev/null
+#       "
+# volumes:
+#   ollama:
