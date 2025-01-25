@@ -7,7 +7,10 @@ class ModelName(str, Enum):
     OPENAI_REASONING_O1_MINI = "openai-o1-mini"
     OPENAI_EMBEDDING_LARGE = "openai-text-embedding-3-large"
     ANTHROPIC_CLAUDE_3_5_SONNET = "anthropic-claude-3-5-sonnet-20240620"
-    
+    OLLAMA_LLAMA_3_2_VISION = "ollama-llama3.2-vision"
+    OLLAMA_DEEPSEEK_R1_14B = "ollama-deepseek-r1:14b"
+    GROQ_LLAMA_3_2_90B_VISION = "groq-llama-3.2-90b-vision-preview"
+    GROQ_LLAMA_3_1_70B_TOOL_USE = "llama3-groq-70b-8192-tool-use-preview"
     
 MODEL_CONFIG = [
     {
@@ -74,6 +77,54 @@ MODEL_CONFIG = [
         "id": ModelName.ANTHROPIC_CLAUDE_3_5_SONNET,
         "label": "Claude 3.5 Sonnet",
         "provider": "anthropic",
+        "metadata": {
+            "system_message": True,
+            "reasoning": False,
+            "tool_calling": True,
+            "multimodal": True,
+            "embedding": False,
+        }
+    },
+    {
+        "id": ModelName.OLLAMA_LLAMA_3_2_VISION,
+        "label": "Llama 3.2 Vision",
+        "provider": "ollama",
+        "metadata": {
+            "system_message": True,
+            "reasoning": False,
+            "tool_calling": True,
+            "multimodal": True,
+            "embedding": False,
+        }
+    },
+    {
+        "id": ModelName.OLLAMA_DEEPSEEK_R1_14B,
+        "label": "DeepSeek R1 14B",
+        "provider": "ollama",
+        "metadata": {
+            "system_message": False,
+            "reasoning": True,
+            "tool_calling": False,
+            "multimodal": False,
+            "embedding": False,
+        }
+    },
+    {
+        "id": ModelName.GROQ_LLAMA_3_1_70B_TOOL_USE,
+        "label": "Llama 3.1 70B Tool Use",
+        "provider": "groq",
+        "metadata": {
+            "system_message": True,
+            "reasoning": False,
+            "tool_calling": True,
+            "multimodal": False,
+            "embedding": False,
+        }
+    },
+    {
+        "id": ModelName.GROQ_LLAMA_3_2_90B_VISION,
+        "label": "Llama 3.2 90B Vision",
+        "provider": "groq",
         "metadata": {
             "system_message": True,
             "reasoning": False,

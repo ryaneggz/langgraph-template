@@ -79,7 +79,7 @@ export function ThreadHistoryDrawer({ isOpen, onClose }: ThreadHistoryDrawerProp
                               }`}
                           >
                               <div className="w-full pr-8">
-                                  <p className="text-sm font-medium line-clamp-2">
+                                  <p className="text-sm font-medium line-clamp-2 max-w-60">
                                       {thread.messages[1]?.content ? truncateFrom(thread.messages[1].content, 'end', "...", 100) : "New Chat"}
                                   </p>
                                   <p className="text-xs text-muted-foreground mt-1 truncate">

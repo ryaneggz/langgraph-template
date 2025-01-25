@@ -1,5 +1,5 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SiAnthropic, SiOpenai } from 'react-icons/si';
+import { SiAnthropic, SiOpenai, SiOllama } from 'react-icons/si';
 import { FaPlus } from 'react-icons/fa';
 import { Button } from "@/components/ui/button";
 import { ColorModeButton } from '@/components/buttons/ColorModeButton';
@@ -8,6 +8,7 @@ import { useChatContext } from "@/context/ChatContext";
 import { Model } from "@/services/modelService";
 import { Menu } from "lucide-react";
 import { ToolSelector } from "../selectors/ToolSelector";
+import GroqIcon from "../icons/GroqIcon";
 
 interface ChatNavProps {
   onMenuClick: () => void;
@@ -64,7 +65,7 @@ export default function ChatNav({ onMenuClick }: ChatNavProps) {
                         </SelectTrigger>
                         <SelectContent>
                             {models
-                                .sort((a: Model, b: Model) => a.label.localeCompare(b.label))
+                                .sort((a: Model, b: Model) => a.id.localeCompare(b.id))
                                 .filter((model: Model) => !model.metadata.embedding)
                                 .map((model: Model) => (
                                 <SelectItem key={model.id} value={model.id}>
@@ -74,6 +75,12 @@ export default function ChatNav({ onMenuClick }: ChatNavProps) {
                                     )}
                                     {model.provider === 'anthropic' && (
                                         <SiAnthropic className="h-4 w-4" />
+                                    )}
+                                    {model.provider === 'ollama' && (
+                                        <SiOllama className="h-4 w-4" />
+                                    )}
+                                    {model.provider === 'groq' && (
+                                        <GroqIcon />
                                     )}
                                     {model.label}
                                     </div>
