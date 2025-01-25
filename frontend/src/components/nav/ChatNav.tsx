@@ -8,6 +8,7 @@ import { useChatContext } from "@/context/ChatContext";
 import { Model } from "@/services/modelService";
 import { Menu } from "lucide-react";
 import { ToolSelector } from "../selectors/ToolSelector";
+import GroqIcon from "../icons/GroqIcon";
 
 interface ChatNavProps {
   onMenuClick: () => void;
@@ -77,6 +78,9 @@ export default function ChatNav({ onMenuClick }: ChatNavProps) {
                                     )}
                                     {model.provider === 'ollama' && (
                                         <SiOllama className="h-4 w-4" />
+                                    )}
+                                    {model.provider === 'groq' && (
+                                        <GroqIcon />
                                     )}
                                     {model.label}
                                     </div>

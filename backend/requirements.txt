@@ -7,6 +7,7 @@ langchain_openai==0.2.10
 langchain-community==0.3.8
 langchain-experimental==0.3.3
 langchain-ollama
+langchain-groq
 fastapi
 uvicorn
 python-multipart
