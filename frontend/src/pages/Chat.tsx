@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ThreadHistoryDrawer } from '@/components/drawers/ThreadHistoryDrawer';
 import { useEffect, useRef, useState } from 'react';
 import ChatNav from '@/components/nav/ChatNav';
+import SystemMessageCard from '@/components/cards/SystemMessageCard';
 
 export default function Chat() {
     const { messages, payload, handleQuery, setPayload, useGetHistoryEffect } = useChatContext();
@@ -39,6 +40,8 @@ export default function Chat() {
                                             </div>
                                         </div>
                                     )
+                                } else if (message.role === 'system' || message.type === 'system') {
+                                    return <SystemMessageCard content={message.content} />
                                 } else {
                                     return (
                                         <div key={index} className="flex justify-start">
