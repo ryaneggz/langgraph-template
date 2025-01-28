@@ -34,7 +34,7 @@ def list_tools(username: str = Depends(verify_credentials)):
 ################################################################################
 ### List Models
 ################################################################################
-from src.constants.llm import MODEL_CONFIG
+from src.constants.llm import get_available_models
 @router.get(
     "/models", 
     tags=[TAG],
@@ -44,7 +44,7 @@ from src.constants.llm import MODEL_CONFIG
             "content": {
                 "application/json": {
                     "example": {
-                        "models": MODEL_CONFIG
+                        "models": get_available_models()
                     }
                 }
             }
@@ -53,6 +53,6 @@ from src.constants.llm import MODEL_CONFIG
 )
 def list_models(username: str = Depends(verify_credentials)):
     return JSONResponse(
-        content={"models": MODEL_CONFIG},
+        content={"models": get_available_models()},
         status_code=status.HTTP_200_OK
     )
