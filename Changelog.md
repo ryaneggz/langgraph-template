@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - bugfix/28-cannot-auth-tools-list (2024-11-30)
 
 ### Changed 
+  - feature/120-popout-drawer-action-log (2025-01-29)
   - feature/114-add-chat-ollama (2025-01-22)
   - feature/115-remove-shell-local-from-demo (2025-01-21)
   - feature/112-can-select-tools-from-app (2025-01-20)
