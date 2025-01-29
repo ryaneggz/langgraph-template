@@ -12,9 +12,10 @@ import GroqIcon from "../icons/GroqIcon";
 
 interface ChatNavProps {
   onMenuClick: () => void;
+  onAssistantClick: () => void;
 }
 
-export default function ChatNav({ onMenuClick }: ChatNavProps) {
+export function ChatNav({ onMenuClick, onAssistantClick }: ChatNavProps) {
     const [searchParams, setSearchParams] = useSearchParams();
     const currentModel = searchParams.get('model') || '';
     
@@ -99,6 +100,14 @@ export default function ChatNav({ onMenuClick }: ChatNavProps) {
                         <FaPlus className="h-4 w-4" />
                     </Button>
                     <ColorModeButton />
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={onAssistantClick}
+                        className="ml-2"
+                    >
+                        <SiOpenai className="h-4 w-4" />
+                    </Button>
                 </div>
             </div>
             </div>

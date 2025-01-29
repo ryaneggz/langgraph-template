@@ -4,13 +4,15 @@ import MarkdownCard from '../components/cards/MarkdownCard';
 import { Button } from '@/components/ui/button';
 import { ThreadHistoryDrawer } from '@/components/drawers/ThreadHistoryDrawer';
 import { useEffect, useRef, useState } from 'react';
-import ChatNav from '@/components/nav/ChatNav';
+import {ChatNav} from '@/components/nav/ChatNav';
 import SystemMessageCard from '@/components/cards/SystemMessageCard';
+import { ChatDrawer } from '@/components/drawers/ChatDrawer';
 
 export default function Chat() {
     const { messages, payload, handleQuery, setPayload, useGetHistoryEffect } = useChatContext();
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [isAssistantOpen, setIsAssistantOpen] = useState(true);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -24,11 +26,18 @@ export default function Chat() {
 
     return (
         <ChatLayout>
-            <div className="flex min-h-[calc(100vh-0px)] max-h-[calc(100vh-0px)] relative">
+            <div className={`
+                flex min-h-[calc(100vh-0px)] max-h-[calc(100vh-0px)] relative
+                transition-[padding-right] duration-200 ease-in-out
+                ${isAssistantOpen ? 'pr-[320px]' : ''}
+            `}>
                 <ThreadHistoryDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
                 
                 <div className="flex-1 flex flex-col overflow-hidden">
-                    <ChatNav onMenuClick={() => setIsDrawerOpen(!isDrawerOpen)} />
+                    <ChatNav 
+                        onMenuClick={() => setIsDrawerOpen(!isDrawerOpen)}
+                        onAssistantClick={() => setIsAssistantOpen(!isAssistantOpen)} 
+                    />
                     <div className="flex-1 overflow-y-auto p-3 min-h-0">
                         <div className="space-y-4 max-w-4xl mx-auto pb-4">
                             {messages?.map((message: {role: string, content: string, type: string}, index: number) => {
@@ -77,6 +86,30 @@ export default function Chat() {
                         </div>
                     </div>
                 </div>
+
+                <ChatDrawer isOpen={isAssistantOpen} onClose={() => setIsAssistantOpen(false)}>
+                    <div className="space-y-4">
+                        <div className="flex items-center space-x-2">
+                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                <span className="text-primary">AI</span>
+                            </div>
+                            <div>
+                                <h3 className="font-medium">GPT-4</h3>
+                                <p className="text-sm text-muted-foreground">Our most capable model</p>
+                            </div>
+                        </div>
+                        
+                        <div className="prose prose-sm dark:prose-invert">
+                            <p>The current model can:</p>
+                            <ul className="list-disc pl-4 space-y-1">
+                                <li>Analyze complex problems</li>
+                                <li>Generate creative content</li>
+                                <li>Handle detailed conversations</li>
+                                <li>Process and explain code</li>
+                            </ul>
+                        </div>
+                    </div>
+                </ChatDrawer>
             </div>
         </ChatLayout>
     );
