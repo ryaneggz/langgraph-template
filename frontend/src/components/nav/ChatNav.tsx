@@ -100,14 +100,14 @@ export function ChatNav({ onMenuClick, onAssistantClick }: ChatNavProps) {
                         <FaPlus className="h-4 w-4" />
                     </Button>
                     <ColorModeButton />
-                    <Button
+                    {/* <Button
                         variant="ghost"
                         size="icon"
                         onClick={onAssistantClick}
                         className="ml-2"
                     >
                         <SiOpenai className="h-4 w-4" />
-                    </Button>
+                    </Button> */}
                 </div>
             </div>
             </div>

@@ -14,6 +14,7 @@ const initChatState = {
     response: null,
     responseRef: "",
     messages: [],
+    toolCallMessage: null,
     payload: {
         threadId: '',
         images: [] as string[],
@@ -31,6 +32,8 @@ const initChatState = {
         next_page: '',
     },
     models: [],
+    isToolCallInProgress: false,
+    currentToolCall: null,
 }
 
 export default function useChatHook() {
@@ -42,6 +45,9 @@ export default function useChatHook() {
     const [history, setHistory] = useState<any>(initChatState.history);
     const [models, setModels] = useState<Model[]>(initChatState.models);
     const [availableTools, setAvailableTools] = useState([]);
+    const [toolCallMessage, setToolCallMessage] = useState<any>(initChatState.toolCallMessage);
+    const [isToolCallInProgress, setIsToolCallInProgress] = useState(false);
+    const [currentToolCall, setCurrentToolCall] = useState<any>(null);
 
     
     const handleQuery = () => {
@@ -83,21 +89,42 @@ export default function useChatHook() {
             const data = JSON.parse(e.data);
             const message = data.content;
             logger("Message received:", message);
-            responseRef.current += message;
-            
-            const finalMessages = [...messages, 
-                { role: 'user', content: payload.query },
-                { role: "assistant", content: responseRef.current }
-            ];
-            setPayload({ ...payload, query: '', threadId: data.thread_id });
-            if (data.event === "end") {
+
+            if (data.event === 'ai_chunk') {
+                responseRef.current += message;
+                const finalMessages = [...messages, 
+                    { role: 'user', content: payload.query },
+                    { role: "assistant", content: responseRef.current }
+                ];
+                setMessages(finalMessages);
+            } else if (data.event === 'tool_call') {
+                const toolCallData = {
+                    content: message.content || message,
+                    type: 'tool',
+                    name: message.name,
+                    status: 'pending',
+                    tool_call_id: message.id,
+                    id: crypto.randomUUID()
+                };
+                
+                setCurrentToolCall(toolCallData);
+                setIsToolCallInProgress(true);
+                
+                const updatedMessages = [...messages, toolCallData];
+                setMessages(updatedMessages);
+            } else if (data.event === 'end') {
+                if (toolCallMessage) {
+                    const updatedMessages = [...messages, toolCallMessage];
+                    setMessages(updatedMessages);
+                    setToolCallMessage(null);
+                }
                 getHistory(1, history.per_page);
                 source.close();
                 logger("Thread ended");
                 return;
             }
-            setResponse(responseRef.current);
-            setMessages(finalMessages);
+
+            setPayload({ ...payload, query: '', threadId: data.thread_id });
         });
         source.stream();
         return true;
@@ -214,6 +241,8 @@ export default function useChatHook() {
         handleQuery,
         payload,
         setPayload,
+        toolCallMessage,
+        setToolCallMessage,
         getHistory,
         history,
         setHistory,
@@ -226,7 +255,11 @@ export default function useChatHook() {
         availableTools,
         setAvailableTools,
         useToolsEffect,
-        deleteThread
+        deleteThread,
+        isToolCallInProgress,
+        setIsToolCallInProgress,
+        currentToolCall,
+        setCurrentToolCall,
     };
 }
 
