@@ -72,7 +72,7 @@ export default function Chat() {
                 <div className="flex-1 flex flex-col overflow-hidden">
                     <ChatNav 
                         onMenuClick={() => setIsDrawerOpen(!isDrawerOpen)}
-                        onAssistantClick={() => setIsAssistantOpen(!isAssistantOpen)} 
+                        // onAssistantClick={() => setIsAssistantOpen(!isAssistantOpen)} 
                     />
                     <div className="flex-1 overflow-y-auto p-3 min-h-0">
                         <div className="space-y-4 max-w-4xl mx-auto pb-4">

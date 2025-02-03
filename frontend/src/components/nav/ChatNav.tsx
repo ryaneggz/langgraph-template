@@ -12,9 +12,13 @@ import GroqIcon from "../icons/GroqIcon";
 
 interface ChatNavProps {
   onMenuClick: () => void;
+//   onAssistantClick: () => void;
 }
 
-export function ChatNav({ onMenuClick }: ChatNavProps) {
+export function ChatNav({ 
+    onMenuClick, 
+    // onAssistantClick 
+}: ChatNavProps) {
     const [searchParams, setSearchParams] = useSearchParams();
     const currentModel = searchParams.get('model') || '';
     
