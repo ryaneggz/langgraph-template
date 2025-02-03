@@ -7,7 +7,7 @@ from src.utils.llm import LLMWrapper
 from src.utils.logger import logger
 
 @tool
-async def browser_use(task: str, model: str = "openai-gpt-4o"):
+def browser_use(task: str, model: str = "openai-gpt-4o"):
     """Use the browser to perform a task.
     
     Example:
@@ -24,12 +24,15 @@ async def browser_use(task: str, model: str = "openai-gpt-4o"):
         Response: The result of the task
     """
     try:
+        llm = LLMWrapper(model_name=model)
         agent = Agent(
             task=task,
-            llm=LLMWrapper(model=model),
+            llm=llm,
         )
-        result = await agent.run()
-        return result
+        import asyncio
+        result = asyncio.run(agent.run())
+        formatted_results = [dict(result) for result in result.action_results()]
+        return formatted_results
     except Exception as e:
         logger.error(f"Error in browser_use: {str(e)}")
         raise ToolException(f"Error running browser_use: {str(e)}")
