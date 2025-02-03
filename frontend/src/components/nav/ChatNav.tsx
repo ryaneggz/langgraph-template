@@ -103,14 +103,6 @@ export function ChatNav({
                         <FaPlus className="h-4 w-4" />
                     </Button>
                     <ColorModeButton />
-                    {/* <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={onAssistantClick}
-                        className="ml-2"
-                    >
-                        <SiOpenai className="h-4 w-4" />
-                    </Button> */}
                 </div>
             </div>
             </div>
