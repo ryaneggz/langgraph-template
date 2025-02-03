@@ -4,6 +4,7 @@ from src.tools.shell import shell_local, shell_docker
 from src.tools.retrieval import retrieval_query, retrieval_add, retrieval_load
 from src.tools.agent import agent_builder, available_tools
 from src.tools.sql import sql_query_read, sql_query_write
+from src.tools.browser import browser_use
 tools = [       
     available_tools,
     # shell_local,
@@ -14,6 +15,7 @@ tools = [
     agent_builder,
     sql_query_read,
     sql_query_write,
+    browser_use,
 ]
 tool_node = ToolNode(tools)
 
