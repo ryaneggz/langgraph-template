@@ -5,6 +5,7 @@ class ModelName(str, Enum):
     OPENAI_GPT_4O_MINI = "openai-gpt-4o-mini"
     OPENAI_REASONING_O1 = "openai-o1-preview"
     OPENAI_REASONING_O1_MINI = "openai-o1-mini"
+    OPENAI_REASONING_O3_MINI = "openai-o3-mini"
     OPENAI_EMBEDDING_LARGE = "openai-text-embedding-3-large"
     ANTHROPIC_CLAUDE_3_5_SONNET = "anthropic-claude-3-5-sonnet-20240620"
     OLLAMA_LLAMA_3_2_VISION = "ollama-llama3.2-vision"
@@ -53,6 +54,18 @@ MODEL_CONFIG = [
     {
         "id": ModelName.OPENAI_REASONING_O1_MINI,
         "label": "o1 Mini",
+        "provider": "openai",
+        "metadata": {
+            "system_message": False,
+            "reasoning": True,
+            "tool_calling": False,
+            "multimodal": False,
+            "embedding": False,
+        }
+    },
+    {
+        "id": ModelName.OPENAI_REASONING_O3_MINI,
+        "label": "o3 Mini",
         "provider": "openai",
         "metadata": {
             "system_message": False,
