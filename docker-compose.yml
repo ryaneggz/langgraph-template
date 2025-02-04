@@ -1,7 +1,7 @@
-version: "3"
 services:
-
+  ##############################################
   ## Database (Postgres)
+  ##############################################
   postgres:
     image: pgvector/pgvector:pg16
     container_name: postgres
@@ -15,7 +15,6 @@ services:
       - ./docker/postgres/data:/var/lib/postgresql/data
       - ./docker/postgres/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
       
-  ## PGAdmin
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin
@@ -29,7 +28,9 @@ services:
     depends_on:
       - postgres
 
+  ##############################################
   ## Slack Agent
+  ##############################################
   # slack_agent:
   #   container_name: slack_agent
   #   image: ryaneggz/slack-agent:latest
@@ -37,42 +38,48 @@ services:
   #   network_mode: host
   #   restart: always
 
-  # Graphchat
-  # graphchat:
-  #   image: ryaneggz/graphchat:0.0.1-rc65
-    # build:
-    #   context: ./backend
-    #   dockerfile: Dockerfile
-    # container_name: graphchat
-    # env_file:
-    #   - ./backend/.env
-    # ports:
-    #   - "8005:8000"
-    # depends_on:
-    #   - postgres
+  ##############################################
+  ## Graphchat
+  ##############################################
+  graphchat:
+    # image: ryaneggz/graphchat:0.0.1-rc65
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: graphchat
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
 
-  # Ollama (AI Servic
-#   ollama:
-#     image: ollama/ollama
-#     container_name: ollama
-#     runtime: nvidia
-#     deploy:
-#       resources:
-#         reservations:
-#           devices:
-#             - driver: nvidia
-#               capabilities: [gpu]
-#     volumes:
-#       - ollama:/root/.ollama
-#     ports:
-#       - "11434:11434"
-#     command: >
-#       sh -c "
-#         ollama pull llama3.2-vision &&
-#         tail -f /dev/null
-#       "
+  ##############################################
+  ## Ollama (AI Service)
+  ##############################################
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      - "11434:11434"
+    command: >
+      sh -c "
+        ollama pull llama3.2-vision &&
+        tail -f /dev/null
+      "
 
+  ##############################################
   ## Exec Server
+  ##############################################
   exec_server:
     build:
       context: ./docker/ubuntu
@@ -81,5 +88,5 @@ services:
     ports:
       - "3005:3005"
 
-# volumes:
-#   ollama:
+volumes:
+  ollama:
