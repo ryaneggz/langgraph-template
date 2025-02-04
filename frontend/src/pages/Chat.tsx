@@ -76,6 +76,7 @@ export default function Chat() {
                     />
                     <div className="flex-1 overflow-y-auto p-3 min-h-0">
                         <div className="space-y-4 max-w-4xl mx-auto pb-4">
+                            {!payload.threadId && <SystemMessageCard content={payload.system} />}
                             {messages?.map((message: ChatMessage, index: number) => {
                                 if (message.type === 'tool') {
                                     return (
