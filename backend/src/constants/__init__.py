@@ -35,3 +35,6 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+# Tools
+SHELL_REMOTE_SERVER_URL = os.getenv("SHELL_REMOTE_SERVER_URL", "http://exec_server:3005/exec")

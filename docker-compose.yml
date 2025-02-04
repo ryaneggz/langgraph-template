@@ -71,5 +71,15 @@ services:
 #         ollama pull llama3.2-vision &&
 #         tail -f /dev/null
 #       "
+
+  ## Exec Server
+  exec_server:
+    build:
+      context: ./docker/ubuntu
+      dockerfile: Dockerfile
+    container_name: exec_server
+    ports:
+      - "3005:3005"
+
 # volumes:
 #   ollama:
