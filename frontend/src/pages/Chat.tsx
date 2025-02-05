@@ -36,6 +36,8 @@ export default function Chat() {
     const [isAssistantOpen, setIsAssistantOpen] = useState(false);
     const [selectedToolMessage, setSelectedToolMessage] = useState<any>(null);
 
+    const [currentThreadId, setCurrentThreadId] = useState<string | null>(null);
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
@@ -59,6 +61,14 @@ export default function Chat() {
         setIsToolCallInProgress(false);
         setCurrentToolCall(null);
     };
+
+    useEffect(() => {
+        console.log(payload.threadId);
+        setCurrentThreadId(payload.threadId);
+        if (payload.threadId !== currentThreadId) {
+            handleDrawerClose();
+        }
+    }, [payload.threadId]);
 
     return (
         <ChatLayout>
@@ -186,7 +196,7 @@ export default function Chat() {
                                     </div>
                                     <div>
                                         <span className="font-semibold">Output:</span>
-                                        <div className="mt-2 p-2 bg-muted rounded-lg overflow-x-auto">
+                                        <div className="max-w-[290px] max-h-[600px] mt-2 p-2 bg-muted rounded-lg overflow-x-auto">
                                             <MarkdownCard content={selectedToolMessage.content} />
                                         </div>
                                     </div>
