@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     tmux \
     nano \
     git \
+    jq \
     build-essential
 
 # Set NVM_DIR environment variable
