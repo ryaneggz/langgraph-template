@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.0.1
 
 ### Fixed
+  - bugfix/131-action-log-overflow (2025-02-04)
   - bugfix/128-fix-remote-container-exec (2025-02-03)
   - bugfix/109-open-sidebar-mobile (2025-01-17)
   - bugfix/105-fix-chat-selection (2025-01-12)
