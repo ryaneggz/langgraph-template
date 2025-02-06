@@ -203,9 +203,15 @@ export default function Chat() {
                                         </span>
                                     </div>
                                     <div>
-                                        <span className="font-semibold">Output:</span>
+                                        <span className="font-semibold">Input:</span>
                                         <div className="max-w-[290px] max-h-[600px] mt-2 p-2 bg-muted rounded-lg overflow-x-auto">
                                             <MarkdownCard content={selectedToolMessage.content} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span className="font-semibold">Output:</span>
+                                        <div className="max-w-[290px] max-h-[600px] mt-2 p-2 bg-muted rounded-lg overflow-x-auto">
+                                            <MarkdownCard content={selectedToolMessage.output} />
                                         </div>
                                     </div>
                                 </div>
