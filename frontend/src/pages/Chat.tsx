@@ -62,6 +62,8 @@ export default function Chat() {
         setCurrentToolCall(null);
     };
 
+    
+
     const prevThreadIdRef = useRef();
 
     useEffect(() => {
