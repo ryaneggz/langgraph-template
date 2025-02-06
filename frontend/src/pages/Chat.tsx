@@ -36,7 +36,7 @@ export default function Chat() {
     const [isAssistantOpen, setIsAssistantOpen] = useState(false);
     const [selectedToolMessage, setSelectedToolMessage] = useState<any>(null);
 
-    const [currentThreadId, setCurrentThreadId] = useState<string | null>(null);
+    const [, setCurrentThreadId] = useState<string | null>(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
