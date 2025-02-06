@@ -2,7 +2,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatContext } from "@/context/ChatContext";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { truncateFrom } from "@/lib/utils/format";
+import { combineToolMessages, truncateFrom } from "@/lib/utils/format";
 import { Plus } from "lucide-react";
 import { SettingsPopover } from "../popovers/SettingsPopover";
 
@@ -15,7 +15,7 @@ export function ThreadHistoryDrawer({ isOpen, onClose }: ThreadHistoryDrawerProp
   const { history, setMessages, setPayload, deleteThread, payload } = useChatContext();
 
   const handleThreadClick = (threadId: string, messages: any[]) => {
-    setMessages(messages);
+    setMessages(combineToolMessages(messages));
     setPayload((prev: any) => ({ ...prev, threadId }));
     onClose(); // Close drawer after selection on mobile
   };

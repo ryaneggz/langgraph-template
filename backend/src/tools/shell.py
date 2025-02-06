@@ -1,7 +1,7 @@
 from langchain_core.tools import tool
 from langchain_community.tools import ShellTool
 
-from src.constants import SHELL_REMOTE_SERVER_URL
+from src.constants import SHELL_EXEC_SERVER_URL
 from src.utils.logger import logger
 
 
@@ -44,7 +44,7 @@ def shell_exec(commands: list[str]):
     outputs = []
     
     for command in commands:
-        response = requests.post(SHELL_REMOTE_SERVER_URL, json={"cmd": command})
+        response = requests.post(SHELL_EXEC_SERVER_URL, json={"cmd": command})
         output = response.text
         outputs.append(output)
         logger.debug(output)  # Optional: Log each command's output

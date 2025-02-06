@@ -112,6 +112,24 @@ export default function useChatHook() {
                 
                 const updatedMessages = [...messages, toolCallData];
                 setMessages(updatedMessages);
+            } else if (data.event === 'tool_chunk') {
+                const toolChunkData = {
+                    content: message.content || message,
+                    type: 'tool',
+                    name: message.name,
+                    status: 'success',
+                    tool_call_id: message.id,
+                    isOutput: true
+                };
+                
+                setCurrentToolCall((prev: any) => ({
+                    ...prev,
+                    output: toolChunkData.content,
+                    status: 'success'
+                }));
+                
+                const updatedMessages = [...messages, toolChunkData];
+                setMessages(updatedMessages);
             } else if (data.event === 'end') {
                 if (toolCallMessage) {
                     const updatedMessages = [...messages, toolCallMessage];

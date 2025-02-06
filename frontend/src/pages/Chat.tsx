@@ -36,6 +36,8 @@ export default function Chat() {
     const [isAssistantOpen, setIsAssistantOpen] = useState(false);
     const [selectedToolMessage, setSelectedToolMessage] = useState<any>(null);
 
+    const [, setCurrentThreadId] = useState<string | null>(null);
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
@@ -60,6 +62,23 @@ export default function Chat() {
         setCurrentToolCall(null);
     };
 
+    
+
+    const prevThreadIdRef = useRef();
+
+    useEffect(() => {
+        // Only perform the check if we have a previous value
+        if (prevThreadIdRef.current !== undefined) {
+            if (payload.threadId && payload.threadId !== prevThreadIdRef.current) {
+                handleDrawerClose();
+            }
+        }
+    
+        // Update the ref and state
+        prevThreadIdRef.current = payload.threadId;
+        setCurrentThreadId(payload.threadId || null);
+    }, [payload.threadId]);
+
     return (
         <ChatLayout>
             <div className={`
@@ -76,7 +95,7 @@ export default function Chat() {
                     />
                     <div className="flex-1 overflow-y-auto p-3 min-h-0">
                         <div className="space-y-4 max-w-4xl mx-auto pb-4">
-                            {!payload.threadId && <SystemMessageCard content={payload.system} />}
+                            {!messages.find((message: ChatMessage) => message.type === 'system') && <SystemMessageCard content={payload.system} />}
                             {messages?.map((message: ChatMessage, index: number) => {
                                 if (message.type === 'tool') {
                                     return (
@@ -186,9 +205,15 @@ export default function Chat() {
                                         </span>
                                     </div>
                                     <div>
-                                        <span className="font-semibold">Output:</span>
-                                        <div className="mt-2 p-2 bg-muted rounded-lg overflow-x-auto">
+                                        <span className="font-semibold">Input:</span>
+                                        <div className="max-w-[290px] max-h-[600px] mt-2 p-2 bg-muted rounded-lg overflow-x-auto">
                                             <MarkdownCard content={selectedToolMessage.content} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span className="font-semibold">Output:</span>
+                                        <div className="max-w-[290px] max-h-[600px] mt-2 p-2 bg-muted rounded-lg overflow-x-auto">
+                                            <MarkdownCard content={selectedToolMessage.output} />
                                         </div>
                                     </div>
                                 </div>
