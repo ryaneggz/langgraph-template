@@ -84,6 +84,7 @@ jobs:
                 -p 8005:8000 \
                 ryaneggz/graphchat:$TAG
 
+              echo '--- Cleaning up old images ---'
               docker system prune -a --filter "until=24h" -f
               
               echo '--- Deployment successful! ---'
