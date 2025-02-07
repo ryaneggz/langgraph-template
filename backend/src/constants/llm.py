@@ -13,8 +13,8 @@ class ModelName(str, Enum):
     OLLAMA_DEEPSEEK_R1_14B = "ollama-deepseek-r1:14b"
     GROQ_LLAMA_3_2_90B_VISION = "groq-llama-3.2-90b-vision-preview"
     GROQ_LLAMA_3_1_70B_TOOL_USE = "groq-llama3-groq-70b-8192-tool-use-preview"
-    GEMINI_PRO_1_5_FLASH = "google-gemini-1.5-pro"
-    GEMINI_PRO_2_FLASH = "google-gemini-2-pro"
+    GEMINI_PRO_1_5 = "google-gemini-1.5-pro"
+    GEMINI_PRO_2 = "google-gemini-2-pro"
     
 MODEL_CONFIG = [
     {
@@ -162,7 +162,7 @@ MODEL_CONFIG = [
         }
     },
     {
-        "id": ModelName.GEMINI_PRO_1_5_FLASH,
+        "id": ModelName.GEMINI_PRO_1_5,
         "label": "Gemini 1.5 Pro",
         "provider": "google",
         "metadata": {
@@ -173,18 +173,18 @@ MODEL_CONFIG = [
             "embedding": False,
         },
     },
-    {
-        "id": ModelName.GEMINI_PRO_2_FLASH,
-        "label": "Gemini 2 Pro",
-        "provider": "google",
-        "metadata": {
-            "system_message": True,
-            "reasoning": False,
-            "tool_calling": False,
-            "multimodal": True,
-            "embedding": False,
-        }
-    }
+    # {
+    #     "id": ModelName.GEMINI_PRO_2,
+    #     "label": "Gemini 2 Pro",
+    #     "provider": "google",
+    #     "metadata": {
+    #         "system_message": True,
+    #         "reasoning": False,
+    #         "tool_calling": False,
+    #         "multimodal": True,
+    #         "embedding": False,
+    #     }
+    # }
 ]
 
 def get_available_models():
