@@ -11,8 +11,10 @@ class ModelName(str, Enum):
     OLLAMA_LLAMA_3_2_VISION = "ollama-llama3.2-vision"
     OLLAMA_DEEPSEEK_R1_8B = "ollama-deepseek-r1:8b"
     OLLAMA_DEEPSEEK_R1_14B = "ollama-deepseek-r1:14b"
+    GROQ_DEEPSEEK_R1_DISTILL_LLAMA_70B = "deepseek-r1-distill-llama-70b"
+    GROQ_LLAMA_3_3_70B_VERSATILE = "groq-llama-3.3-70b-versatile"
+    GROQ_LLAMA_3_3_70B_SPECDEC = "groq-llama-3.3-70b-specdec"
     GROQ_LLAMA_3_2_90B_VISION = "groq-llama-3.2-90b-vision-preview"
-    GROQ_LLAMA_3_1_70B_TOOL_USE = "groq-llama3-groq-70b-8192-tool-use-preview"
     GEMINI_PRO_1_5 = "google-gemini-1.5-pro"
     GEMINI_PRO_2 = "google-gemini-2-pro"
     
@@ -137,15 +139,27 @@ MODEL_CONFIG = [
             "embedding": False,
         }
     },
+    # {
+    #     "id": ModelName.GROQ_DEEPSEEK_R1_DISTILL_LLAMA_70B,
+    #     "label": "DeepSeek R1 Distill Llama 70B",
+    #     "provider": "groq",
+    #     "metadata": {
+    #         "system_message": True,
+    #         "reasoning": False,
+    #         "tool_calling": True,
+    #         "multimodal": True,
+    #         "embedding": False,
+    #     }
+    # },
     {
-        "id": ModelName.GROQ_LLAMA_3_1_70B_TOOL_USE,
-        "label": "Llama 3.1 70B Tool Use",
+        "id": ModelName.GROQ_LLAMA_3_3_70B_VERSATILE,
+        "label": "Llama 3.3 70B Versatile",
         "provider": "groq",
         "metadata": {
             "system_message": True,
             "reasoning": False,
             "tool_calling": True,
-            "multimodal": False,
+            "multimodal": True,
             "embedding": False,
         }
     },

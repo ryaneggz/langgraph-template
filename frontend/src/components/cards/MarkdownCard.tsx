@@ -45,6 +45,9 @@ const MarkdownCard = ({ content }: { content: string }) => {
                         />
                     );
                 },
+                pre: ({ node, ...props }) => (
+                    <pre className="bg-gray-950 text-white p-2 rounded-md" {...props} />
+                ),
                 ul: ({ node, ...props }) => (
                     <ul className="list-disc pl-5 my-2" {...props} />
                 ),
