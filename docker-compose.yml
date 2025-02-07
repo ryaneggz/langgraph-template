@@ -42,10 +42,10 @@ services:
   ## Graphchat
   ##############################################
   graphchat:
-    # image: ryaneggz/graphchat:0.0.1-rc65
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: ryaneggz/graphchat:0.0.1-rc71
+    # build:
+    #   context: ./backend
+    #   dockerfile: Dockerfile
     container_name: graphchat
     env_file:
       - ./backend/.env
