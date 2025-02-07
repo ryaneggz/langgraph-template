@@ -47,9 +47,9 @@ jobs:
             docker pull ryaneggz/graphchat:$TAG
 
             echo '--- Starting staging container (graphchat_new) on port 8006 ---'
-            # Stop/remove any leftover staging container from a previous run
-            docker stop graphchat_new || true
-            docker rm graphchat_new || true
+            # Stop/remove any leftover staging container from a previous run (ignore errors if not found)
+            docker stop graphchat_new 2>/dev/null || true
+            docker rm graphchat_new 2>/dev/null || true
 
             docker run -d \
               --name graphchat_new \
@@ -70,8 +70,8 @@ jobs:
               docker rm graphchat || true
 
               echo '--- Stopping and removing staging container (graphchat_new) ---'
-              docker stop graphchat_new || true
-              docker rm graphchat_new || true
+              docker stop graphchat_new 2>/dev/null || true
+              docker rm graphchat_new 2>/dev/null || true
 
               echo '--- Running new container on production port (8005) as graphchat ---'
               docker run -d \
@@ -91,8 +91,8 @@ jobs:
             else
               echo 'Deployment failed - health check did not pass.'
               echo '--- Cleaning up staging container (graphchat_new) ---'
-              docker stop graphchat_new || true
-              docker rm graphchat_new || true
+              docker stop graphchat_new 2>/dev/null || true
+              docker rm graphchat_new 2>/dev/null || true
               exit 1
             fi
           "
