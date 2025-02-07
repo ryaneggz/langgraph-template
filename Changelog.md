@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - bugfix/28-cannot-auth-tools-list (2024-11-30)
 
 ### Changed 
+  - feature/135-google-llm-provider (2025-02-07)
   - feature/130-edit-system-message (2025-02-04)
   - feature/125-add-03-mini (2025-02-02)
   - feature/120-popout-drawer-action-log (2025-01-29)

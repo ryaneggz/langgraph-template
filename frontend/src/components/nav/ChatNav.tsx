@@ -1,5 +1,5 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SiAnthropic, SiOpenai, SiOllama } from 'react-icons/si';
+import { SiAnthropic, SiOpenai, SiOllama, SiGoogle } from 'react-icons/si';
 import { FaPlus } from 'react-icons/fa';
 import { Button } from "@/components/ui/button";
 import { ColorModeButton } from '@/components/buttons/ColorModeButton';
@@ -85,6 +85,9 @@ export function ChatNav({
                                     )}
                                     {model.provider === 'groq' && (
                                         <GroqIcon />
+                                    )}
+                                    {model.provider === 'google' && (
+                                        <SiGoogle className="h-4 w-4" />
                                     )}
                                     {model.label}
                                     </div>
