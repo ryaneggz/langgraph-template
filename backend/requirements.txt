@@ -4,6 +4,7 @@ langgraph==0.2.53
 langgraph-checkpoint-postgres==2.0.5
 langchain_anthropic
 langchain_openai
+langchain-google-genai
 langchain-community
 langchain-experimental
 langchain-ollama

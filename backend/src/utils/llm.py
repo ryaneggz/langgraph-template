@@ -3,8 +3,9 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_anthropic import ChatAnthropic
 from langchain_ollama import ChatOllama
 from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 
-from src.constants import OLLAMA_BASE_URL, OPENAI_API_KEY, ANTHROPIC_API_KEY, GROQ_API_KEY
+from src.constants import OLLAMA_BASE_URL, OPENAI_API_KEY, ANTHROPIC_API_KEY, GROQ_API_KEY, GEMINI_API_KEY
 from src.constants.llm import ModelName
 class LLMWrapper:
     def __init__(self, model_name: str, tools: list = None, **kwargs):
@@ -40,6 +41,10 @@ class LLMWrapper:
             self.kwargs['api_key'] = GROQ_API_KEY
             model_name = model_name.replace('groq-', '')
             chosen_model = ChatGroq(model=model_name, **self.kwargs)
+        elif 'google' in model_name and GEMINI_API_KEY:
+            self.kwargs['api_key'] = GEMINI_API_KEY
+            model_name = model_name.replace('google-', '')
+            chosen_model = ChatGoogleGenerativeAI(model=model_name, **self.kwargs)
         else:
             raise ValueError(f"Provider {model_name} not supported")
             
