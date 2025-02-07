@@ -84,6 +84,8 @@ jobs:
                 -p 8005:8000 \
                 ryaneggz/graphchat:$TAG
 
+              docker system prune -a --filter "until=24h" -f
+              
               echo '--- Deployment successful! ---'
             else
               echo 'Deployment failed - health check did not pass.'
