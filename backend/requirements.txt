@@ -22,3 +22,6 @@ mkdocs
 mkdocs-material
 mkdocstrings[python]
 aiofiles
+alembic
+sqlalchemy
+passlib[bcrypt]
