@@ -92,7 +92,7 @@ jobs:
               echo 'Deployment failed - health check did not pass.'
               echo '--- Cleaning up staging container (graphchat_new) ---'
               docker stop graphchat_new 2>/dev/null || true
-              docker rm graphchat_new 2>/dev/null || true
+              # docker rm graphchat_new 2>/dev/null || true
               exit 1
             fi
           "
