@@ -1,30 +1,106 @@
 name: Build
 
 on:
-  workflow_run:
-    workflows: ["Test"]
-    types: [completed]
+  push:
+    tags:
+      - '*'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Use the head_branch from `workflow_run` instead of github.ref
-    if: >
-      github.event.workflow_run.conclusion == 'success' &&
-      (
-        github.event.workflow_run.head_branch == 'development' ||
-        github.event.workflow_run.head_branch == 'main' ||
-        github.event.workflow_run.head_branch == 'master'
-      )
+    environment: Dev
     env:
       DOCKER_USERNAME: ryaneggz
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
+      ###############################################################
+      ## Frontend
+      ###############################################################
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Create public directory
+        working-directory: ./backend
+        run: mkdir -p src/public
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Prune frontend dependencies
+        working-directory: ./frontend
+        run: npm prune --production
+
+      - name: Save Node dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      ###############################################################
+      ## Backend
+      ###############################################################
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Cache Python dependencies
+        id: cache-python
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/requirements-dev.txt') }}
+          restore-keys: |
+              ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          env | sort
+          pip install --upgrade pip
+          pip install uv
+          uv pip install -v --system --no-cache-dir \
+          -r requirements.txt \
+          -r requirements-dev.txt
+
+      - name: Build docs
+        run: |
+          # Copy docs folder to backend directory
+          cp -r docs backend/docs
+          
+          # Change to backend directory
+          cd backend
+          
+          # Build docs
+          mkdocs build --site-dir src/public/docs
+          
+          # Cleanup docs folder from backend
+          rm -rf docs || true
+
+      - name: Save Python dependencies cache
+        if: steps.cache-python.outputs.cache-hit != 'true'
+        id: save-cache-python
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/requirements-dev.txt') }}
+
+      ###############################################################
+      ## Docker
+      ###############################################################
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -37,8 +113,8 @@ jobs:
       - name: Build and push Docker image
         working-directory: ./backend
         run: |
-          COMMIT_SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          DOCKER_IMAGE=ryaneggz/graphchat:${COMMIT_SHORT_SHA}
+          # Use the tag name for the Docker image version
+          DOCKER_IMAGE=ryaneggz/graphchat:${GITHUB_REF#refs/tags/}
           DOCKER_LATEST=ryaneggz/graphchat:latest
           
           echo "Building images: $DOCKER_IMAGE and $DOCKER_LATEST"

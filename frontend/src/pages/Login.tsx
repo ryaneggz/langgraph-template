@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NoAuthLayout from '../layouts/NoAuthLayout';
-import { VITE_API_URL } from '../config';
+import { TOKEN_NAME, VITE_API_URL } from '../config';
 import { ColorModeButton } from '@/components/buttons/ColorModeButton';
 
 export default function Login() {
@@ -27,7 +27,7 @@ export default function Login() {
 
             if (response.ok) {
                 // Store credentials in localStorage
-                localStorage.setItem('auth', btoa(`${username}:${password}`));
+                localStorage.setItem(TOKEN_NAME, btoa(`${username}:${password}`));
                 navigate('/dashboard');
             } else {
                 setError('Invalid credentials');
@@ -41,7 +41,7 @@ export default function Login() {
 
     return (
         <NoAuthLayout>
-            <main className="min-h-screen flex flex-col items-center justify-center bg-background">
+            <main className="mt-[25vh] flex flex-col items-center justify-center bg-background">
                 <div className="absolute top-4 right-4">
                     <ColorModeButton />
                 </div>

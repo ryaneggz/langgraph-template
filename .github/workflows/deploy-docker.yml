@@ -1,0 +1,98 @@
+name: Deploy-Docker
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to deploy (e.g. agent-v1.0.0-rc1)'
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Only run if the input tag contains "rc"
+    if: ${{ contains(inputs.tag, 'rc') }}
+    environment: Dev
+    steps:
+      - name: Deploy to VM
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          # ---------------------------------------------------
+          # Setup SSH
+          # ---------------------------------------------------
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+
+          # ---------------------------------------------------
+          # Use input tag instead of ref
+          # ---------------------------------------------------
+          TAG=${{ inputs.tag }}
+
+          # ---------------------------------------------------
+          # SSH into the server and execute deployment
+          # ---------------------------------------------------
+          ssh -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "
+            set -e  # Exit on error
+
+            cd ~/agent_api
+
+            echo '--- Pulling new image ---'
+            docker pull ryaneggz/graphchat:$TAG
+
+            echo '--- Starting staging container (graphchat_new) on port 8006 ---'
+            # Stop/remove any leftover staging container from a previous run (ignore errors if not found)
+            docker stop graphchat_new 2>/dev/null || true
+            docker rm graphchat_new 2>/dev/null || true
+
+            docker run -d \
+              --name graphchat_new \
+              --network graphchat_default \
+              --env-file ./backend/.env \
+              -p 8006:8000 \
+              ryaneggz/graphchat:$TAG
+
+            echo '--- Waiting a few seconds for startup ---'
+            sleep 10
+
+            echo '--- Health check on staging container (graphchat_new) ---'
+            if curl -f http://localhost:8006/api/info; then
+              echo 'New container on port 8006 is healthy!'
+              
+              echo '--- Stopping and removing old container (graphchat) if it exists ---'
+              docker stop graphchat || true
+              docker rm graphchat || true
+
+              echo '--- Stopping and removing staging container (graphchat_new) ---'
+              docker stop graphchat_new 2>/dev/null || true
+              docker rm graphchat_new 2>/dev/null || true
+
+              echo '--- Running new container on production port (8005) as graphchat ---'
+              docker run -d \
+                --name graphchat \
+                --network graphchat_default \
+                --restart always \
+                --env-file ./backend/.env \
+                -e APP_VERSION=$TAG \
+                -e VITE_APP_VERSION=$TAG \
+                -p 8005:8000 \
+                ryaneggz/graphchat:$TAG
+
+              echo '--- Cleaning up old images ---'
+              docker system prune -a --filter "until=24h" -f
+              
+              echo '--- Deployment successful! ---'
+            else
+              echo 'Deployment failed - health check did not pass.'
+              echo '--- Cleaning up staging container (graphchat_new) ---'
+              docker stop graphchat_new 2>/dev/null || true
+              docker rm graphchat_new 2>/dev/null || true
+              exit 1
+            fi
+          "

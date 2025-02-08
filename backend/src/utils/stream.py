@@ -58,26 +58,55 @@ async def event_stream(
 #     ):
 #         print(msg, metadata)
 #         yield msg
+
+# Custom function to process the output
+def process_stream_output(
+    graph: StateGraph, 
+    state: dict,
+    thread_id: str = None,
+    stream_mode: str = "messages"
+):
+    for msg, metadata in graph.stream(
+        state, 
+        {'configurable': {'thread_id': thread_id}} if thread_id else {},
+        stream_mode=stream_mode
+    ):
+        if msg.content and not isinstance(msg, HumanMessage):
+            # Convert message content to SSE format
+            content = msg.content
+            if not isinstance(content, str):
+                content = content[0].text
+            data = {
+                "thread_id": thread_id,
+                "event": "ai_chunk" if isinstance(msg, AIMessageChunk) else "tool_chunk",
+                "content": content
+            }
+            yield f"data: {json.dumps(data)}\n\n"
+        else:
+            print(msg)
         
 def stream_chunks(
     graph: StateGraph, 
-    messages: list[AnyMessage],
+    state: dict,
     thread_id: str = None,
     stream_mode: str = "messages"
 ):
     first = True
     try:
         for msg, metadata in graph.stream(
-            {"messages": messages}, 
+            state, 
             {'configurable': {'thread_id': thread_id}},
             stream_mode=stream_mode
         ):
             if msg.content and not isinstance(msg, HumanMessage):
                 # Convert message content to SSE format
+                content = msg.content
+                if not isinstance(content, str):
+                    content = content[0].get('text')
                 data = {
                     "thread_id": thread_id,
                     "event": "ai_chunk" if isinstance(msg, AIMessageChunk) else "tool_chunk",
-                    "content": msg.content
+                    "content": content
                 }
                 yield f"data: {json.dumps(data)}\n\n"
 

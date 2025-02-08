@@ -1,0 +1,32 @@
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v4
+
+  - name: Setup Node.js
+    uses: actions/setup-node@v4
+    with:
+      node-version: '22'
+
+  - name: Cache Node dependencies
+    id: cache-node
+    uses: actions/cache@v4
+    with:
+      path: |
+        **/node_modules
+      key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+      restore-keys: |
+        ${{ runner.os }}-node-
+
+  - name: Install dependencies
+    working-directory: ./frontend
+    if: steps.cache-node.outputs.cache-hit != 'true'
+    run: npm ci
+
+  - name: Save Node dependencies cache
+    if: steps.cache-node.outputs.cache-hit != 'true'
+    id: save-cache-node
+    uses: actions/cache@v4
+    with:
+      path: |
+        **/node_modules
+      key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }} 

@@ -8,8 +8,8 @@ from langchain_experimental.sql import SQLDatabaseChain
 
 from src.constants import *
 from src.utils.logger import logger
-from src.utils.llm import LLMWrapper, ModelName
-
+from src.utils.llm import LLMWrapper
+from src.constants.llm import ModelName
 @tool
 def sql_query_read(question: str):
     """Execute a read-only query against a PostgreSQL database based on a natural language question.
@@ -28,7 +28,7 @@ def sql_query_read(question: str):
         logger.info(f"Running READ SQL query: {question}")
         db = SQLDatabase.from_uri(DB_URI_SANDBOX, engine_args={"pool_size": 20})
         llm = LLMWrapper(
-            model_name=ModelName.ANTHROPIC,
+            model_name=ModelName.ANTHROPIC_CLAUDE_3_5_SONNET,
             api_key=ANTHROPIC_API_KEY, 
             tools=[]
         )
@@ -64,7 +64,7 @@ def sql_query_write(question: str):
         logger.info(f"Running WRITE SQL query: {question}")
         db = SQLDatabase.from_uri(DB_URI_SANDBOX, engine_args={"pool_size": 20})
         llm = LLMWrapper(
-            model_name=ModelName.ANTHROPIC,
+            model_name=ModelName.ANTHROPIC_CLAUDE_3_5_SONNET,
             api_key=ANTHROPIC_API_KEY, 
             tools=[]
         )

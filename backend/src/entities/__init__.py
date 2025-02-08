@@ -4,9 +4,10 @@ from typing import Optional, List, Any
 from pydantic import BaseModel, Field
 from langchain_core.messages import AnyMessage
 
+from src.constants.llm import ModelName
 from src.constants.examples import (
     ADD_DOCUMENTS_EXAMPLE,
-    LIST_DOCUMENTS_EXAMPLE,
+    # LIST_DOCUMENTS_EXAMPLE,
     THREAD_HISTORY_EXAMPLE,
     NEW_THREAD_ANSWER_EXAMPLE,
     EXISTING_THREAD_ANSWER_EXAMPLE,
@@ -27,6 +28,7 @@ class ExistingThread(BaseModel):
     tools: Optional[List[Any]] = Field(default_factory=list)
     stream: Optional[bool] = Field(default=False)
     images: Optional[List[str]] = Field(default_factory=list)
+    model: Optional[str] = Field(default=ModelName.ANTHROPIC_CLAUDE_3_5_SONNET)
     
     model_config = {
         "json_schema_extra": {"example": EXISTING_THREAD_QUERY_EXAMPLE}
@@ -40,14 +42,29 @@ class NewThread(ExistingThread):
         "json_schema_extra": {"example": NEW_THREAD_QUERY_EXAMPLE}
     }
         
-class LLMHTTPResponse(BaseModel):
+class Thread(BaseModel):
     thread_id: str = Field(...)
+    checkpoint_ns: Optional[str] = Field(default='')
+    checkpoint_id: Optional[str] = Field(default=None)
     messages: list[AnyMessage] = Field(default_factory=list)
+    v: Optional[int] = Field(default=1)
+    ts: Optional[str] = Field(default=None)
     
     model_config = {
         "json_schema_extra": {
             "examples": {
                 "thread_history": THREAD_HISTORY_EXAMPLE
+            }
+        }
+    }
+    
+class Threads(BaseModel):
+    threads: list[Thread] = Field(default_factory=list)
+    
+    model_config = {
+        "json_schema_extra": {
+            "examples": {
+                "threads": [THREAD_HISTORY_EXAMPLE, THREAD_HISTORY_EXAMPLE]
             }
         }
     }

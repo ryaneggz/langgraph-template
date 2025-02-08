@@ -18,7 +18,7 @@ def get_db():
 
 def verify_credentials(
     credentials: HTTPBasicCredentials = Depends(HTTPBasic()),
-    db: SessionLocal = Depends(get_db)
+    db: SessionLocal = Depends(get_db) # type: ignore
 ):
     user = db.query(User).filter(User.username == credentials.username).first()
     if not user:

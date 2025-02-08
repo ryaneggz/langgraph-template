@@ -13,16 +13,16 @@ const MarkdownCard = ({ content }: { content: string }) => {
                     <h1 className="text-2xl font-bold my-4" {...props} />
                 ),
                 h3: ({ node, ...props }) => (
-                    <h3 className="text-base font-bold my-2" {...props} />
+                    <h3 className="text-base font-bold mt-3 mb-2" {...props} />
                 ),
                 p: ({ node, ...props }) => (
-                    <p className={`py-1`} {...props} />
+                    <p className={`py-2`} {...props} />
                 ),
                 code: (props) => {
                     const { className} = props;
                     const match = /language-(\w+)/.exec(className || "");
                     return match ? (
-                        <div className="text-white dark bg-gray-950 rounded-md border-[0.5px] border-token-border-medium">
+                        <div className="text-white dark bg-gray-950 rounded-md border-[0.5px] border-token-border-medium my-2">
                             <div className="flex items-center relative text-token-text-secondary bg-token-main-surface-secondary px-4 py-2 text-xs font-sans justify-between rounded-t-md">
                                 <span>{match[0].replace("language-", "")}</span>
                                 <div className="flex items-center">
@@ -40,11 +40,14 @@ const MarkdownCard = ({ content }: { content: string }) => {
                         </div>
                     ) : (
                         <code
-                            className="rounded px-1 py-0.5 font-bold"
+                            className="rounded text-green-400 bg-green-400/10 py-0.5 px-1 font-bold"
                             {...props}
                         />
                     );
                 },
+                pre: ({ node, ...props }) => (
+                    <pre className="bg-gray-950 text-white p-2 rounded-md" {...props} />
+                ),
                 ul: ({ node, ...props }) => (
                     <ul className="list-disc pl-5 my-2" {...props} />
                 ),
@@ -57,7 +60,7 @@ const MarkdownCard = ({ content }: { content: string }) => {
                     />
                 ),
                 table: ({ node, ...props }) => (
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto my-2">
                         <table
                             className="min-w-full bg-white border border-gray-300"
                             {...props}
@@ -87,6 +90,9 @@ const MarkdownCard = ({ content }: { content: string }) => {
                         className="px-6 py-4 text-sm text-gray-900 border-r border-gray-200"
                         {...props}
                     />
+                ),
+                hr: () => (
+                    <hr className="my-5" />
                 ),
             }}
             remarkPlugins={[remarkGfm]}

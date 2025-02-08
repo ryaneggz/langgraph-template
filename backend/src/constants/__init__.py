@@ -1,7 +1,12 @@
 import os
 import json
+import base64
 from dotenv import load_dotenv
 load_dotenv()
+
+def fix_base64_padding(s):
+    """Ensure base64 string has correct padding."""
+    return s + '=' * (-len(s) % 4)
 
 # Server
 HOST = str(os.getenv("HOST", "0.0.0.0"))
@@ -10,7 +15,10 @@ LOG_LEVEL = os.getenv("LOG_LEVEL", "info")
 
 # App
 DEFAULT_VECTOR_STORE_PATH = './sandbox/db/vectorstore.json'
-APP_USER_LIST = json.loads(os.getenv("APP_USER_LIST", '[{"username": "admin", "password": "test1234", "name": "Admin User", "email": "admin@example.com"}]'))
+DEFAULT_APP_USER_LIST = '[{"username": "admin", "password": "test1234", "name": "Admin User", "email": "admin@example.com"}]'
+base64_str = os.getenv("APP_USER_LIST", base64.b64encode(DEFAULT_APP_USER_LIST.encode('utf-8')).decode('utf-8'))
+fixed_base64_str = fix_base64_padding(base64_str)
+APP_USER_LIST = json.loads(base64.b64decode(fixed_base64_str).decode('utf-8'))
 APP_VERSION = os.getenv("APP_VERSION", "0.1.0")
 APP_LOG_LEVEL = os.getenv("APP_LOG_LEVEL", "INFO").upper()
 
@@ -25,3 +33,9 @@ CONNECTION_POOL_KWARGS = {
 # LLM API Keys
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+# Tools
+SHELL_EXEC_SERVER_URL = os.getenv("SHELL_EXEC_SERVER_URL", "http://exec_server:3005/exec")
