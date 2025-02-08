@@ -10,6 +10,7 @@ from src.constants import (
     LOG_LEVEL,
     APP_VERSION
 )
+from src.utils.migrations import run_migrations
 
 app = FastAPI(
     title="Thread Agent by Prompt Engineers AI 🤖",
@@ -27,6 +28,17 @@ app = FastAPI(
     debug=True,
     docs_url="/api"
 )
+
+@app.on_event("startup")
+async def startup_event():
+    print("Starting up...")
+    print(f"Environment Settings:")
+    print(f"APP_VERSION: {APP_VERSION}")
+    print(f"LOG_LEVEL: {LOG_LEVEL}")
+    print(f"HOST: {HOST}")
+    print(f"PORT: {PORT}")
+    run_migrations()
+
 
 # Add CORS middleware
 app.add_middleware(
