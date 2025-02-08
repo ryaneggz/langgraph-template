@@ -77,7 +77,7 @@ alembic upgrade head
 ```
 
 ```bash
-python scripts/seed_admin.py
+python -m seeds.user_seeder
 ```
 
 2. Create new
