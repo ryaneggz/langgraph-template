@@ -34,5 +34,6 @@ def verify_credentials(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Basic"},
         )
-    
-    return user.username 
+    del user.hashed_password
+    user.id = str(user.id)
+    return user 

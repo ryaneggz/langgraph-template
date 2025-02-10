@@ -4,6 +4,7 @@ from typing import Annotated
 from fastapi import Body, HTTPException, status, Depends, APIRouter, Request
 from loguru import logger
 from psycopg_pool import ConnectionPool
+from src.models import User
 from src.constants import DB_URI, CONNECTION_POOL_KWARGS
 
 from src.entities import Answer, NewThread, ExistingThread
@@ -40,7 +41,7 @@ router = APIRouter(tags=[TAG])
 def new_thread(
     request: Request,
     body: Annotated[NewThread, Body()],
-    username: str = Depends(verify_credentials)
+    user: User = Depends(verify_credentials)
 ):
     try:
         thread_id = str(uuid.uuid4())
@@ -53,7 +54,7 @@ def new_thread(
                 max_size=20,
                 kwargs=CONNECTION_POOL_KWARGS,
             )
-            agent = Agent(thread_id, pool)
+            agent = Agent(config={"thread_id": thread_id, "user_id": user.id}, pool=pool)
             agent.builder(tools=body.tools, model_name=body.model)
             messages = agent.messages(body.query, body.system, body.images)
             return agent.process(messages, "text/event-stream")
@@ -63,7 +64,7 @@ def new_thread(
             max_size=20,
             kwargs=CONNECTION_POOL_KWARGS,
         ) as pool:
-            agent = Agent(thread_id, pool)
+            agent = Agent(config={"thread_id": thread_id, "user_id": user.id}, pool=pool)
             agent.builder(tools=body.tools, model_name=body.model)
             messages = agent.messages(body.query, body.system, body.images)
             return agent.process(messages, "application/json")
@@ -108,7 +109,7 @@ def existing_thread(
     request: Request,
     thread_id: str, 
     body: Annotated[ExistingThread, Body()],
-    username: str = Depends(verify_credentials)
+    user: User = Depends(verify_credentials)
 ):
     try:
         tools_str = f"and Tools: {', '.join(body.tools)}" if body.tools else ""
@@ -120,7 +121,7 @@ def existing_thread(
                 max_size=20,
                 kwargs=CONNECTION_POOL_KWARGS,
             )
-            agent = Agent(thread_id, pool)
+            agent = Agent(config={"thread_id": thread_id, "user_id": user.id}, pool=pool)
             agent.builder(tools=body.tools, model_name=body.model)
             messages = agent.messages(query=body.query, images=body.images)
             return agent.process(messages, "text/event-stream")
@@ -130,7 +131,7 @@ def existing_thread(
             max_size=20,
             kwargs=CONNECTION_POOL_KWARGS,
         ) as pool:  
-            agent = Agent(thread_id, pool)
+            agent = Agent(config={"thread_id": thread_id, "user_id": user.id}, pool=pool)
             agent.builder(tools=body.tools, model_name=body.model)
             messages = agent.messages(query=body.query, images=body.images)
             return agent.process(messages, "application/json")
