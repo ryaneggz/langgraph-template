@@ -65,7 +65,7 @@ export default function useChatHook() {
                 headers: {
                     'Content-Type': 'application/json', 
                     'Accept': 'text/event-stream',
-                    'Authorization': `Basic ${token}`
+                    'Authorization': `Bearer ${token}`
                 },
                 payload: JSON.stringify(payload),
                 method: 'POST'
@@ -154,7 +154,7 @@ export default function useChatHook() {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json', 
-                    'Authorization': `Basic ${token}`
+                    'Authorization': `Bearer ${token}`
                 },
                 method: 'GET'
             });
@@ -237,7 +237,7 @@ export default function useChatHook() {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': `Basic ${token}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
             // Refresh the thread list after deletion

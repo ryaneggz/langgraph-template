@@ -5,7 +5,7 @@ import { TOKEN_NAME, VITE_API_URL } from '../config';
 import { ColorModeButton } from '@/components/buttons/ColorModeButton';
 
 export default function Login() {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -17,20 +17,25 @@ export default function Login() {
         setError('');
 
         try {
-            const response = await fetch(`${VITE_API_URL}/tools`, {
-                method: 'GET',
+            const response = await fetch(`${VITE_API_URL}/auth/login`, {
+                method: 'POST',
                 headers: {
-                    'Authorization': `Basic ${btoa(`${username}:${password}`)}`,
                     'Content-Type': 'application/json'
-                }
+                },
+                body: JSON.stringify({
+                    email,
+                    password
+                })
             });
 
             if (response.ok) {
-                // Store credentials in localStorage
-                localStorage.setItem(TOKEN_NAME, btoa(`${username}:${password}`));
+                const data = await response.json();
+                // Store JWT token in localStorage
+                localStorage.setItem(TOKEN_NAME, data.access_token);
                 navigate('/dashboard');
             } else {
-                setError('Invalid credentials');
+                const errorData = await response.json();
+                setError(errorData.detail || 'Invalid credentials');
             }
         } catch (err) {
             setError('Failed to connect to server');
@@ -61,16 +66,16 @@ export default function Login() {
                         
                         <div className="space-y-4">
                             <div>
-                                <label htmlFor="username" className="block text-sm font-medium text-foreground">
-                                    Username
+                                <label htmlFor="email" className="block text-sm font-medium text-foreground">
+                                    Email
                                 </label>
                                 <input
-                                    id="username"
-                                    type="text"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
+                                    id="email"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     className="mt-1 block w-full px-3 py-2 bg-background border border-input rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                                    placeholder="Enter your username"
+                                    placeholder="Enter your email"
                                     required
                                 />
                             </div>

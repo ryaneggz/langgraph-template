@@ -22,7 +22,7 @@ export default function Register() {
     setError("")
 
     try {
-      const response = await fetch(`${VITE_API_URL}/register`, {
+      const response = await fetch(`${VITE_API_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -36,12 +36,13 @@ export default function Register() {
       })
 
       if (response.ok) {
-        // Automatically log in the user after successful registration
-        localStorage.setItem(TOKEN_NAME, btoa(`${username}:${password}`))
+        const data = await response.json()
+        // Store JWT token in localStorage
+        localStorage.setItem(TOKEN_NAME, data.access_token)
         navigate("/dashboard")
       } else {
-        const data = await response.json()
-        setError(data.message || "Registration failed")
+        const errorData = await response.json()
+        setError(errorData.detail || "Registration failed")
       }
     } catch (err) {
       setError("Failed to connect to server")

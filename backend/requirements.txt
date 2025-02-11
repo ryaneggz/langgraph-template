@@ -14,6 +14,7 @@ uvicorn
 python-multipart
 psycopg2
 psycopg2-binary
+pydantic[email]
 pypdf
 rapidocr-onnxruntime
 loguru
@@ -25,3 +26,4 @@ aiofiles
 alembic
 sqlalchemy
 passlib[bcrypt]
+python-jose[cryptography]
