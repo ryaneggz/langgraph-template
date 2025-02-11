@@ -43,6 +43,10 @@ def upgrade() -> None:
         # Composite primary key ensures no duplicate (user, thread) pair can exist.
         sa.PrimaryKeyConstraint('user', 'thread', name='user_threads_pkey')
     )
+    
+    # Add index on user column for faster lookups
+    op.create_index('idx_user_threads_user', 'user_threads', ['user'])
 
 def downgrade() -> None:
+    op.drop_index('idx_user_threads_user')
     op.drop_table('user_threads')
