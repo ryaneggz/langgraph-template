@@ -9,6 +9,7 @@ from psycopg_pool import ConnectionPool
 from langgraph.graph import StateGraph
 from langchain_core.messages import AnyMessage, SystemMessage, HumanMessage
 from langgraph.checkpoint.postgres import PostgresSaver
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langgraph.prebuilt import create_react_agent
 from psycopg_pool import ConnectionPool
 from src.constants import APP_LOG_LEVEL
@@ -20,18 +21,18 @@ from src.utils.logger import logger
 from src.utils.stream import process_stream_output, stream_chunks
 from src.flows.chatbot import chatbot_builder
 class Agent:
-    def __init__(self, thread_id: str, pool: ConnectionPool):
+    def __init__(self, config: dict, pool: ConnectionPool):
         self.connection_kwargs = {
             "autocommit": True,
             "prepare_threshold": 0,
         }
-        self.thread_id = thread_id
-        self.config = {"configurable": {"thread_id": self.thread_id}}
+        self.thread_id = config.get("thread_id", None)
+        self.config = {"configurable": config}
         self.graph = None
         self.pool = pool
-        self.model_name = None
+        self.model_name = config.get("model_name", None)
         self.llm: LLMWrapper = None
-        self.tools = []
+        self.tools = config.get("tools", [])
         self.checkpointer = None
         
     def _checkpointer(self):
@@ -44,6 +45,69 @@ class Agent:
         checkpoint = checkpointer.get(self.config)
         return checkpoint
     
+    async def acheckpoint(self, checkpointer):
+        checkpoint = await checkpointer.aget(self.config)
+        return checkpoint
+    
+    async def user_threads(self, page=1, per_page=20, sort_order='desc'):
+        """
+        Retrieve a paginated list of user_threads records for the configured user, ordered by created_at.
+        
+        :param page: The page number (1-indexed).
+        :param page_size: Number of records per page.
+        :param sort_order: 'asc' for ascending or 'desc' for descending order based on created_at.
+        :return: A list of user_threads records.
+        """
+        try:
+            user_id = self.config["configurable"]["user_id"]
+            # Calculate the offset for pagination.
+            offset = (page - 1) * per_page
+
+            # Validate sort_order.
+            order = sort_order.upper()
+            if order not in ('ASC', 'DESC'):
+                order = 'DESC'
+
+            # Build the query. "user" is quoted because it's a reserved keyword.
+            query = f"""
+                SELECT thread
+                FROM user_threads
+                WHERE "user" = %s
+                ORDER BY created_at {order}
+                LIMIT %s OFFSET %s
+            """
+
+            # Acquire an asynchronous connection from the pool.
+            async with self.pool.connection() as conn:
+                async with conn.cursor() as cur:
+                    await cur.execute(query, (user_id, per_page, offset))
+                    rows = await cur.fetchall()
+                    logger.info(f"Retrieved {len(rows)} user_threads for user {user_id} (page {page})")
+                    # Convert the list of rows (tuples) into a set of thread UUIDs.
+                    thread_ids = {str(row[0]) for row in rows}
+                    return thread_ids
+
+        except Exception as e:
+            logger.error(f"Failed to retrieve paginated user_threads for user {user_id}: {str(e)}")
+            return []
+    
+    def create_user_thread(self):
+        try:
+            # Quote "user" since it is a reserved keyword in PostgreSQL.
+            query_user_threads = (
+                'INSERT INTO user_threads ("user", thread) '
+                'VALUES (%s, %s) '
+                'ON CONFLICT ("user", thread) DO NOTHING'
+            )
+            with self.pool.connection() as conn:  # Acquire a connection from the pool
+                with conn.cursor() as cur:
+                    cur.execute(query_user_threads, (self.config["configurable"]["user_id"], self.thread_id))
+                    logger.info(f"Created {cur.rowcount} rows with thread_id = {self.thread_id}")
+                    return cur.rowcount
+        except Exception as e:
+            logger.error(f"Failed to create user thread: {str(e)}")
+            return 0
+        
     def delete(self):
         try:
             query_blobs = "DELETE FROM checkpoint_blobs WHERE thread_id = %s"
@@ -86,8 +150,9 @@ class Agent:
         messages: list[AnyMessage], 
         content_type: str = "application/json",
     ) -> Response:
+        self.create_user_thread()
         if content_type == "application/json":
-            invoke = self.graph.invoke({"messages": messages}, {'configurable': {'thread_id': self.thread_id}})
+            invoke = self.graph.invoke({"messages": messages}, {'configurable': self.config})
             content = Answer(
                 thread_id=self.thread_id,
                 answer=invoke.get('messages')[-1]
@@ -102,7 +167,7 @@ class Agent:
         def stream_generator():
             try:
                 state = {"messages": messages}
-                for chunk in stream_chunks(self.graph, state, self.thread_id):
+                for chunk in stream_chunks(self.graph, state, self.config):
                     if chunk:
                         print(chunk)
                         yield chunk

@@ -39,3 +39,8 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Tools
 SHELL_EXEC_SERVER_URL = os.getenv("SHELL_EXEC_SERVER_URL", "http://exec_server:3005/exec")
+
+# JWT Settings
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "this-is-a-secret-key")  # Change this in production!
+JWT_ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24

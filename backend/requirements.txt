@@ -1,7 +1,7 @@
 python-dotenv
 anthropic
-langgraph==0.2.53
-langgraph-checkpoint-postgres==2.0.5
+langgraph
+langgraph-checkpoint-postgres
 langchain_anthropic
 langchain_openai
 langchain-google-genai
@@ -14,6 +14,7 @@ uvicorn
 python-multipart
 psycopg2
 psycopg2-binary
+pydantic[email]
 pypdf
 rapidocr-onnxruntime
 loguru
@@ -25,3 +26,4 @@ aiofiles
 alembic
 sqlalchemy
 passlib[bcrypt]
+python-jose[cryptography]

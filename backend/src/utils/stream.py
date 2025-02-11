@@ -88,14 +88,15 @@ def process_stream_output(
 def stream_chunks(
     graph: StateGraph, 
     state: dict,
-    thread_id: str = None,
+    config: str = None,
     stream_mode: str = "messages"
 ):
     first = True
     try:
+        thread_id = config.get("configurable", {}).get("thread_id")
         for msg, metadata in graph.stream(
             state, 
-            {'configurable': {'thread_id': thread_id}},
+            config,
             stream_mode=stream_mode
         ):
             if msg.content and not isinstance(msg, HumanMessage):
@@ -123,6 +124,9 @@ def stream_chunks(
                         "content": str(gathered.tool_calls)
                     }
                     yield f"data: {json.dumps(tool_data)}\n\n"
+    
+    except Exception as e:
+        print("Error in stream_chunks", e)
     finally:
         print("Closing stream")
         # Send end event
