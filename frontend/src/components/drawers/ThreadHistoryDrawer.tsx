@@ -60,7 +60,7 @@ export function ThreadHistoryDrawer({ isOpen, onClose }: ThreadHistoryDrawerProp
 
           <ScrollArea className="flex-1">
               <div className="p-2 space-y-2">
-                  {history?.threads?.map((thread: any) => (
+                  {history?.threads?.sort((a: any, b: any) => new Date(b.ts).getTime() - new Date(a.ts).getTime()).map((thread: any) => (
                       <div
                           key={thread.thread_id}
                           className="group relative"

@@ -59,31 +59,32 @@ async def list_threads(
                     seen_thread_ids.add(thread_id)
                     agent = Agent(config={"thread_id": thread_id, "user_id": user.id}, pool=pool)
                     checkpoint = await agent.acheckpoint(checkpointer)
-                    messages = checkpoint.get('channel_values', {}).get('messages')
-                    if isinstance(messages, list):
-                            thread = Thread(
-                                thread_id=thread_id,
-                                checkpoint_ns='',
-                                checkpoint_id=checkpoint.get('id'),
-                                messages=messages,
-                                ts=checkpoint.get('ts'),
-                                v=checkpoint.get('v')
-                            )
-                            threads.append(thread.model_dump())
+                    if checkpoint:
+                        messages = checkpoint.get('channel_values', {}).get('messages')
+                        if isinstance(messages, list):
+                                thread = Thread(
+                                    thread_id=thread_id,
+                                    checkpoint_ns='',
+                                    checkpoint_id=checkpoint.get('id'),
+                                    messages=messages,
+                                    ts=checkpoint.get('ts'),
+                                    v=checkpoint.get('v')
+                                )
+                                threads.append(thread.model_dump())
                         
-            # Calculate pagination after collecting all threads
-            start_idx = (page - 1) * per_page
-            end_idx = start_idx + per_page
-            paginated_threads = threads[start_idx:end_idx]
+            # # Calculate pagination after collecting all threads
+            # start_idx = (page - 1) * per_page
+            # end_idx = start_idx + per_page
+            # paginated_threads = threads[start_idx:end_idx]
             
-            # Get the timestamp of the last thread for pagination
-            last_ts = paginated_threads[-1]['ts'] if paginated_threads else None
+            # # Get the timestamp of the last thread for pagination
+            # last_ts = paginated_threads[-1]['ts'] if paginated_threads else None
             
             return JSONResponse(
                 content={
-                    'threads': paginated_threads,
-                    'next_page': last_ts,
-                    'total': len(paginated_threads),
+                    'threads': threads,
+                    'next_page': page + 1,
+                    'total': len(threads),
                     'page': page,
                     'per_page': per_page
                     },

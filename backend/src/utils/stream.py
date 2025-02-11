@@ -93,7 +93,7 @@ def stream_chunks(
 ):
     first = True
     try:
-        thread_id = config.get("thread_id")
+        thread_id = config.get("configurable", {}).get("thread_id")
         for msg, metadata in graph.stream(
             state, 
             config,
